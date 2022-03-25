@@ -3,7 +3,6 @@ pip install mysql-connector-python
 pip install concurrent-log-handler
 """
 from multiprocessing import Queue, Process
-from ntpath import join
 import os
 import signal
 import uuid
@@ -13,6 +12,7 @@ from utils import MAX_QUEUE_PUT_TIMEOUT_SEC, MAX_QUEUE_SIZE, PROC_JOIN_TIMEOUT
 from utils import log_msg, read_arabic_words_in_txt_files
 from classes import AbstractWordSaver, WordSaverFactory
 from utils import remove_diac_from_word, tokenize_arabic_words_as_array_bis
+from logging import INFO, WARN, ERROR
 
 def split_list(items: list, chunk_size: int):
   for i in range(0, len(items), chunk_size):
@@ -24,7 +24,7 @@ def save_words(queue: Queue, job_uuid: str, words_saver: AbstractWordSaver):
             words = queue.get(block=True, timeout=MAX_QUEUE_GET_TIMEOUT_SEC)
             words_saver.save_words(job_uuid, words)
     except Exception as e:
-        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)))
+        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)), level=INFO)
 
 def read_arabic_words_many_corpus_dir(bdall_dir: str, 
                                         tokenizer_fn, 
@@ -122,9 +122,9 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                     log_msg("{} chunks found/ {} files in {}".format(chnks_cnt, len(files), per_dir))
                 pipelines.append(pipeline)
             
-                log_msg("{} periodes found in {}".format(nbr_pers, dom_dir), console=True)
+                log_msg("{} periodes found in {}".format(nbr_pers, dom_dir))
             nbr_total_dom+=nbr_dom
-            log_msg("{} domaines found in {}".format(nbr_dom, corpus_dir), console=True)
+            log_msg("{} domaines found in {}".format(nbr_dom, corpus_dir))
     
     # Generate processes for the orphan txt files
     orphan_chunks = split_list(orphan_txt_files_paths, DATA_BY_PROCESS_CHUNK_SIZE * 10)
@@ -154,18 +154,19 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
     # Logs    
     orphan_txt_files_count = len(orphan_txt_files_paths)
     bdall_files_count += orphan_txt_files_count
-    log_msg("{} domaines au total sur tous les corpus found in {}".format(nbr_total_dom, bdall_dir), console=True)
+    log_msg("{} domaines au total sur tous les corpus found in {}".format(nbr_total_dom, bdall_dir),  level=INFO)
                 
-    log_msg(console=True, msg="{} processes will be started over {} total number of files ({} files found out of the standard folders)...".format(processes_count, bdall_files_count, orphan_txt_files_count))
+    log_msg("{} processes will be started over {} total number of files ({} files found out of the standard folders)...".format(processes_count, bdall_files_count, orphan_txt_files_count), level=INFO)
     if show_only_summary:
-        raise RuntimeError("Files & processes summary")
-    if len(pipelines)>0:
-        run_pipelines_blocking(pipelines) # this a blocking operation
+        log_msg("Files & processes summary", level=INFO)
     else:
-        log_msg("No pipeline to run", console=True)
-    
-    end_time = time.perf_counter()
-    log_msg(console=True, msg="Process end in {} sec".format(round(end_time-start_time, 2)))
+        if len(pipelines)>0:
+            run_pipelines_blocking(pipelines) # this a blocking operation
+        else:
+            log_msg("No pipeline to run",  level=WARN)
+        
+        end_time = time.perf_counter()
+        log_msg( "Process end in {} sec".format(round(end_time-start_time, 2)), level=INFO)
 
 
 # --------------------- Program :
@@ -185,12 +186,12 @@ if __name__=="__main__":
     chunk_size=1000
     show_summary=False
 
-    log_msg("Script started : {}".format(in_dir), console=True)
-    log_msg("- MAX_QUEUE_SIZE : {}".format(MAX_QUEUE_SIZE), console=True)
-    log_msg("- MAX_QUEUE_PUT_TIMEOUT_SEC : {}sec".format(MAX_QUEUE_PUT_TIMEOUT_SEC), console=True)
-    log_msg("- MAX_QUEUE_GET_TIMEOUT_SEC : {}sec".format(MAX_QUEUE_GET_TIMEOUT_SEC), console=True)
-    log_msg("- DATA_BY_PROCESS_CHUNK_SIZE : {}".format(DATA_BY_PROCESS_CHUNK_SIZE), console=True)
-    log_msg("- PROC_JOIN_TIMEOUT : {}sec".format(PROC_JOIN_TIMEOUT), console=True)
+    log_msg("Script started : {}".format(in_dir),  level=INFO)
+    log_msg("- MAX_QUEUE_SIZE : {}".format(MAX_QUEUE_SIZE),  level=INFO)
+    log_msg("- MAX_QUEUE_PUT_TIMEOUT_SEC : {}sec".format(MAX_QUEUE_PUT_TIMEOUT_SEC),  level=INFO)
+    log_msg("- MAX_QUEUE_GET_TIMEOUT_SEC : {}sec".format(MAX_QUEUE_GET_TIMEOUT_SEC),  level=INFO)
+    log_msg("- DATA_BY_PROCESS_CHUNK_SIZE : {}".format(DATA_BY_PROCESS_CHUNK_SIZE),  level=INFO)
+    log_msg("- PROC_JOIN_TIMEOUT : {}sec".format(PROC_JOIN_TIMEOUT),  level=INFO)
     start_exec_time = time.perf_counter()
     words_saver = None
     config = {
@@ -211,9 +212,9 @@ if __name__=="__main__":
                                         show_only_summary=show_summary,
                                         has_base_dirs=in_dir_has_base_dirs)
     except Exception as ex:
-        log_msg("Error : {}".format(str(ex.args)), console=True, error=True)
+        log_msg("Error : {}".format(str(ex.args)),  level=ERROR)
     end_exec_time=time.perf_counter()
-    log_msg('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))), console=True)
+    log_msg('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))),  level=INFO)
 
 # 174 domaines au total sur tous les corpus found in E:\bdall
 # 784 processes will be started over 216839 (71%) total number of files (86594 fichiers ignored) : 

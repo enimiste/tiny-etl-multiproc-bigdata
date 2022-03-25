@@ -1,6 +1,6 @@
 from multiprocessing import Queue
 import logging
-from operator import le
+from logging import INFO
 import sys
 import threading
 from concurrent_log_handler import ConcurrentRotatingFileHandler
@@ -15,32 +15,28 @@ if not 'DEFINED' in globals():
     MAX_QUEUE_SIZE = 100_000
 
     LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
+    console_handler = logging.StreamHandler(stream=sys.stdout)
+    console_handler.setFormatter(logging.Formatter(LOGGING_FORMAT))
+    console_handler.setLevel(logging.INFO)
     logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
                                                                         filename=os.path.abspath(f'logs/log-{date.today()}.log'),
-                                                                        maxBytes=50*1024*1024, backupCount=100)], 
+                                                                        maxBytes=50*1024*1024, backupCount=100), console_handler], 
                                                     level=logging.DEBUG,
                                                     encoding='utf-8',
                                                     format=LOGGING_FORMAT)
     LOGGER = logging.getLogger("my-logger")
-    CONSOLE_HANDLER = logging.StreamHandler(stream=sys.stdout)
-    CONSOLE_HANDLER.setFormatter(logging.Formatter(LOGGING_FORMAT))
-    CONSOLE_HANDLER.setLevel(logging.DEBUG)
+    
     DEFINED=True
 
-def log_msg_sync(msg, console=False, error=False, level=logging.DEBUG):
+def log_msg_sync(msg, level=logging.DEBUG):
     global LOGGER
     if not LOGGER is None:
-        if error:
-            level=logging.ERROR
-        if console:
-            LOGGER.addHandler(CONSOLE_HANDLER)
         LOGGER.log(level, msg)
-        LOGGER.removeHandler(CONSOLE_HANDLER)
-    elif console:
+    else:
         print(msg)
     
-def log_msg(msg, console=False, error=False, level=logging.DEBUG):
-    threading.Thread(target=log_msg_sync, args=(msg, console, error, level)).start()
+def log_msg(msg, level=logging.DEBUG):
+    threading.Thread(target=log_msg_sync, args=(msg, level)).start()
     
 def tokenize_arabic_words_as_array(txt_content) -> list:
     import re
@@ -110,7 +106,7 @@ def read_arabic_words_dom_dir(dom_in_dir: str,
                 if len(words) > 0:
                     queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
             except Exception as e:
-                log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), error=True)
+                log_msg("Error processing File {} : {}".format(txt_file, str(e.args)))
 
     return True
 
@@ -125,7 +121,7 @@ def read_arabic_words_in_txt_files(files_paths: list,
             if len(words) > 0:
                 queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
         except Exception as e:
-            log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), error=True)
+            log_msg("Error processing File {} : {}".format(txt_file, str(e.args)))
 
     return True
 
@@ -162,14 +158,14 @@ def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn
                 res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount] + prepend_per_item))
         return res_words
     except Exception as e:
-        log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)), error=True)
+        log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)))
         return []
         #raise e
         
 def run_pipelines_blocking(pipelines: list):
     try:
         # Start processes
-        log_msg("Start processes", console=True)
+        log_msg("Start processes",  level=INFO)
         nbr_proc=0
         for p in pipelines:
             try:
@@ -182,15 +178,15 @@ def run_pipelines_blocking(pipelines: list):
                         one_started=True
                         nbr_proc+=1
                     except Exception as ex:
-                        log_msg("Error while starting task process : {}".format(str(ex.args)), error=True)
+                        log_msg("Error while starting task process : {}".format(str(ex.args)))
                 if not one_started:
                     p['save_proc'].terminate()
                     p['queue'].close()
             except Exception as ex2:
-                log_msg("Error while starting pipeline process : {}".format(str(ex2.args)), error=True)
-        log_msg("{} processes started".format(nbr_proc), console=True)
+                log_msg("Error while starting pipeline process : {}".format(str(ex2.args)))
+        log_msg("{} processes started".format(nbr_proc),  level=INFO)
         # Joining processes
-        log_msg("Joining processes", console=True)
+        log_msg("Joining processes",  level=INFO)
         working = True
         joined = set()
         while working:
@@ -203,11 +199,11 @@ def run_pipelines_blocking(pipelines: list):
                         sp.join(timeout=PROC_JOIN_TIMEOUT)
                         if not sp.exitcode is None:
                             joined.add(sp.pid)
-                            log_msg("{} processes were joined".format(len(joined)), console=True)
+                            log_msg("{} processes were joined".format(len(joined)),  level=INFO)
                             try:
                                 sp.terminate()
                             except Exception as tex:
-                                log_msg("Error while terminate tasks process : {}".format(str(tex.args)), error=True)
+                                log_msg("Error while terminate tasks process : {}".format(str(tex.args)))
                         else:
                             working=True
 
@@ -218,18 +214,18 @@ def run_pipelines_blocking(pipelines: list):
                                 t.join(timeout=PROC_JOIN_TIMEOUT)
                                 if not t.exitcode is None:
                                     joined.add(t.pid)
-                                    log_msg("{} processes were joined".format(len(joined)), console=True)
+                                    log_msg("{} processes were joined".format(len(joined)),  level=INFO)
                                     try:
                                         sp.terminate()
                                     except Exception as tex:
-                                        log_msg("Error while terminate tasks process : {}".format(str(tex.args)), error=True)
+                                        log_msg("Error while terminate tasks process : {}".format(str(tex.args)))
                                 else:
                                     working=True
                         except Exception as ex:
-                            log_msg("Error while joining task process : {}".format(str(ex.args)), error=True)
+                            log_msg("Error while joining task process : {}".format(str(ex.args)))
                 except Exception as ex2:
-                    log_msg("Error while joining pipeline process : {}".format(str(ex2.args)), error=True)
-        log_msg("Closing saver objects", console=True)
+                    log_msg("Error while joining pipeline process : {}".format(str(ex2.args)))
+        log_msg("Closing saver objects",  level=INFO)
         # Closing saver object
         for p in pipelines:
             try:
@@ -237,7 +233,7 @@ def run_pipelines_blocking(pipelines: list):
             except Exception:
                 pass
     except KeyboardInterrupt:
-        log_msg(error=True, console=True, msg="Caught KeyboardInterrupt, terminating workers ...")
+        log_msg("Caught KeyboardInterrupt, terminating workers ...", level=INFO)
         for p in pipelines:
             try:
                 p['save_proc'].terminate()
@@ -246,9 +242,9 @@ def run_pipelines_blocking(pipelines: list):
                     try:
                        t.terminate()
                     except Exception as ex:
-                        log_msg("Error while terminate tasks process : {}".format(str(ex.args)), error=True)
+                        log_msg("Error while terminate tasks process : {}".format(str(ex.args)))
                 p['queue'].close()
             except Exception as ex2:
-                log_msg("Error while terminate save process or/and queue : {}".format(str(ex2.args)), error=True)
+                log_msg("Error while terminate save process or/and queue : {}".format(str(ex2.args)))
     finally:
-        log_msg("run_pipelines_blocking End executing", console=True)
+        log_msg("run_pipelines_blocking End executing",  level=INFO)

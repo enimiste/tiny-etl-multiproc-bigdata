@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+from logging import INFO, WARN
 from utils import log_msg
  
 class AbstractWordSaver(ABC):
@@ -28,21 +28,21 @@ class WordsSaverToDB(AbstractWordSaver):
         try:
             if self.connection is None:
                 self.connection = mysql.connector.connect(host=self.host, database=self.database, user=self.user, password=self.password)
-                log_msg("MySQL connection is opened successfully", console=True)   
+                log_msg("MySQL connection is opened successfully",  level=INFO)   
             
             if not self.connection.is_connected():
                 self.connection.reconnect()
             return self.connection
 
         except mysql.connector.Error as error:
-            log_msg("Failed to insert record {}".format(error))
+            log_msg("Failed to connect to database {}".format(str(error.args)))
             raise error
 
     def save_words(self, job_uuid: str, words: list):
         import mysql.connector
 
         if self.job_uuid != job_uuid:
-            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid), console=True, error=True)
+            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid),  level=WARN)
             return
         connection = self._connect()
         try:
@@ -63,16 +63,16 @@ class WordsSaverToDB(AbstractWordSaver):
             cursor.close()
 
         except mysql.connector.Error as error:
-            log_msg("Failed to insert records {}".format(error), error=True)
+            log_msg("Failed to insert records {}".format(error))
             if not connection is None and connection.in_transaction():
                 try:
                     connection.rollback()
                 except Exception as ex:
-                    log_msg("Failed to rollback inserted records {}".format(ex), error=True)
+                    log_msg("Failed to rollback inserted records {}".format(str(ex.args)))
 
     def close(self, job_uuid: str):
         if self.job_uuid != job_uuid:
-            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid), console=True, error=True)
+            log_msg("Trying to close save words saver from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid),  level=WARN)
             return
 
         if not self.connection is None and self.connection.is_connected():
@@ -80,7 +80,7 @@ class WordsSaverToDB(AbstractWordSaver):
                 self.connection.close()
             except Exception:
                 pass
-            log_msg("MySQL connection is closed successfully", console=True)
+            log_msg("MySQL connection is closed successfully",  level=INFO)
 
 class WordsSaverToFile(AbstractWordSaver):
     def __init__(self, job_uuid: str, out_dir: str):
@@ -93,7 +93,7 @@ class WordsSaverToFile(AbstractWordSaver):
         import os
 
         if self.job_uuid != job_uuid:
-            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid), console=True, error=True)
+            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid),  level=WARN)
             return
 
         if self.file_hd is None:
@@ -105,7 +105,7 @@ class WordsSaverToFile(AbstractWordSaver):
 
     def close(self, job_uuid: str):
         if self.job_uuid != job_uuid:
-            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid), console=True, error=True)
+            log_msg("Trying to close words saver from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid),  level=WARN)
             return
 
         if not self.file_hd is None:
