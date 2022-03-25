@@ -1,7 +1,6 @@
 from multiprocessing import Queue
 import logging
 import sys
-from turtle import st
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 import os
 from datetime import date
