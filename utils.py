@@ -1,31 +1,41 @@
 from multiprocessing import Queue
 import logging
+import sys
+from turtle import st
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 import os
 from datetime import date
 
-MAX_QUEUE_SIZE = 1000_000
-MAX_QUEUE_PUT_TIMEOUT_SEC = 30
-MAX_QUEUE_GET_TIMEOUT_SEC = 30
-DATA_BY_PROCESS_CHUNK_SIZE = 4_000
-PROC_JOIN_TIMEOUT = 10
+if not 'DEFINED' in globals():
+    MAX_QUEUE_SIZE = 1000_000
+    MAX_QUEUE_PUT_TIMEOUT_SEC = 30
+    MAX_QUEUE_GET_TIMEOUT_SEC = 30
+    DATA_BY_PROCESS_CHUNK_SIZE = 4_000
+    PROC_JOIN_TIMEOUT = 10
 
-logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
-                                                                    filename=os.path.abspath(f'logs/log-{date.today()}.log'),
-                                                                    maxBytes=50*1024*1024, backupCount=100)], 
-                                                level=logging.DEBUG,
-                                                encoding='utf-8',
-                                                format='%(levelname)s : %(asctime)s - %(processName)s %(threadName)s : %(message)s')
-LOGGER = logging.getLogger("my-logger")
+    LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
+    logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
+                                                                        filename=os.path.abspath(f'logs/log-{date.today()}.log'),
+                                                                        maxBytes=50*1024*1024, backupCount=100)], 
+                                                    level=logging.DEBUG,
+                                                    encoding='utf-8',
+                                                    format=LOGGING_FORMAT)
+    LOGGER = logging.getLogger("my-logger")
+    CONSOLE_HANDLER = logging.StreamHandler(stream=sys.stdout)
+    CONSOLE_HANDLER.setFormatter(logging.Formatter(LOGGING_FORMAT))
+    CONSOLE_HANDLER.setLevel(logging.DEBUG)
+    DEFINED=True
 
 def log_msg(msg, console=False, error=False, level=logging.DEBUG):
     global LOGGER
     if not LOGGER is None:
         if error:
-            LOGGER.error(msg)
-        else:
-            LOGGER.log(level, msg)
-    if console:
+            level=logging.ERROR
+        if console:
+            LOGGER.addHandler(CONSOLE_HANDLER)
+        LOGGER.log(level, msg)
+        LOGGER.removeHandler(CONSOLE_HANDLER)
+    elif console:
         print(msg)
     
 def tokenize_arabic_words_as_array(txt_content) -> list:
