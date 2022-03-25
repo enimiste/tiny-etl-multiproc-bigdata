@@ -3,25 +3,14 @@ import os
 import signal
 import uuid
 import time
-from utils import DATA_BY_PROCESS_CHUNK_SIZE, MAX_QUEUE_GET_TIMEOUT_SEC, run_pipelines_blocking
+from utils import DATA_BY_PROCESS_CHUNK_SIZE, MAX_QUEUE_GET_TIMEOUT_SEC, pipeline_builder, run_pipelines_blocking, save_words, split_list
 from utils import MAX_QUEUE_PUT_TIMEOUT_SEC, MAX_QUEUE_SIZE, PROC_JOIN_TIMEOUT
 from utils import log_msg, read_arabic_words_in_txt_files
-from classes import AbstractWordSaver, WordSaverFactory
+from classes import WordSaverFactory
 from utils import remove_diac_from_word, tokenize_arabic_words_as_array_bis
 from logging import INFO, WARN, ERROR
 import glob
 
-def split_list(items: list, chunk_size: int):
-  for i in range(0, len(items), chunk_size):
-      yield items[i:i + chunk_size]
-
-def save_words(queue: Queue, job_uuid: str, words_saver: AbstractWordSaver):
-    try:
-        while True:
-            words = queue.get(block=True, timeout=MAX_QUEUE_GET_TIMEOUT_SEC)
-            words_saver.save_words(job_uuid, words)
-    except Exception as e:
-        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)), exception=e, level=ERROR)
 
 def build_read_arabic_words_pipelines(bdall_dir: str, 
                                         tokenizer_fn, 
@@ -75,10 +64,8 @@ def build_read_arabic_words_pipelines(bdall_dir: str,
                 queue = Queue(maxsize=queue_max_size)
                 job_uuid = str(uuid.uuid1())
                 words_saver = words_saver_factory.create(job_uuid)
-                pipeline = {'queue': queue, 
-                            'tasks': [], 
-                            'saver': words_saver,  
-                            'save_proc': Process(target=save_words, args=(queue, job_uuid, words_saver))}
+                pipeline = pipeline_builder(queue, words_saver,  
+                            Process(target=save_words, args=(queue, job_uuid, words_saver)))
                 processes_count+=1
 
                 # Period folders
@@ -124,10 +111,9 @@ def build_read_arabic_words_pipelines(bdall_dir: str,
             queue = Queue(maxsize=queue_max_size)
             job_uuid = str(uuid.uuid1())
             words_saver = words_saver_factory.create(job_uuid)
-            pipeline = {'queue': queue, 
-                        'tasks': [], 
-                        'saver': words_saver,  
-                        'save_proc': Process(target=save_words, args=(queue, job_uuid, words_saver))}
+            pipeline = pipeline_builder(queue, words_saver,  
+                            Process(target=save_words, args=(queue, job_uuid, words_saver)))
+
             processes_count+=1
             chunks = split_list(orph_chnks, DATA_BY_PROCESS_CHUNK_SIZE)
             for chunk in chunks:

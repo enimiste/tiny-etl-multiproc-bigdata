@@ -1,4 +1,4 @@
-from multiprocessing import Queue
+from multiprocessing import Queue, Process
 import logging
 from logging import INFO, ERROR
 import sys
@@ -43,39 +43,32 @@ def log_msg_sync(msg: str, exception: Exception = None, level: int = logging.DEB
 def log_msg(msg: str, exception: Exception = None, level: int = logging.DEBUG):
     threading.Thread(target=log_msg_sync, args=(msg, exception, level)).start()
     
-def tokenize_arabic_words_as_array(txt_content) -> list:
-    import re
-                
-    arabic_words = re.findall("[^a-zA-Z\^0-9\\^١-٩\^[()•\+-@،?!|É°¢$£\éè¡àêâ\{\}%€–_`\",ä/'''<®>*:\$\[\~\-Ò©#¬¹±²\\ª·´¶º»µ¼&¨¤¾¦¿\À´ËÂ\\¥]+", txt_content)
-    all_words=[]
-    # [[words.append(word) for word in txt.replace(' ', '\n').replace('\t', '\n').split('\n') if word and word.strip() ] for txt in arabic_words]
-    for txt in arabic_words:
-        wrds = txt.replace('×', '').replace(' ', '\n').replace('\r', '\n').replace('\t', '\n').replace('َ', '').replace('ّ', '').replace('ِ', '').replace('ُ', '').replace('ْ', '').replace('ً', '').replace('ٌ', '').replace('ٍ', '').split('\n')
-        for w in wrds:
-            if w and w.strip():
-                all_words.append(w)
-            
-    return all_words
 
-def tokenize_arabic_words_as_array_bis(txt_content) -> list:
-    import re
-                
-    arabic_words = re.findall(r'[َُِْـًٌٍّؤائءآىإأبتثجحخدذرزسشصضطظعغفقكلمنهـوي]+', txt_content)
-    all_words=[]
-    # [[words.append(word) for word in txt.replace(' ', '\n').replace('\t', '\n').split('\n') if word and word.strip() ] for txt in arabic_words]
-    for txt in arabic_words:
-        wrds = txt.replace('×', '').replace(' ', '\n').replace('\r', '\n').replace('\t', '\n').split('\n')
-        for w in wrds:
-            if w and w.strip():
-                all_words.append(w)
-            
-    return all_words
+def split_list(items: list, chunk_size: int):
+  for i in range(0, len(items), chunk_size):
+      yield items[i:i + chunk_size]
 
-def remove_diac_from_word(word) -> str:
-   # import re
-    word = word.replace('َ', '').replace('ّ', '').replace('ِ', '').replace('ُ', '').replace('ْ', '').replace('ً', '').replace('ٌ', '').replace('ٍ', '')
-    return word
+def save_words(queue: Queue, job_uuid: str, words_saver):
+    """
+    words_saver : AbstractWordSaver
+    """
+    try:
+        while True:
+            words = queue.get(block=True, timeout=MAX_QUEUE_GET_TIMEOUT_SEC)
+            words_saver.save_words(job_uuid, words)
+    except Exception as e:
+        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)), exception=e, level=ERROR)
 
+def pipeline_builder(queue: Queue, words_saver, saver_process: Process) -> dict:
+    """
+    words_saver : AbstractWordSaver
+    """
+    return {'queue': queue, 
+                            'tasks': [], 
+                            'saver': words_saver,  
+                            'save_proc': saver_process}
+
+         
 def read_file_with_encoding(filepath, expected_encoding) -> tuple:
     import cchardet as chardet
     from pathlib import Path
@@ -95,58 +88,6 @@ def read_file_with_encoding(filepath, expected_encoding) -> tuple:
 
     return (text, encoding, confidence)
 
-def read_arabic_words_in_txt_files(files_paths: list, 
-                                    tokenizer_fn, 
-                                    remove_diac_from_word_fn, 
-                                    infos: dict, 
-                                    queue: Queue) -> bool:
-    for txt_file in files_paths:
-        try:
-            words = read_arabic_words(txt_file, tokenizer_fn, remove_diac_from_word_fn, infos)
-            if len(words) > 0:
-                queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
-        except Exception as e:
-            log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), exception=e, level=ERROR)
-
-    return True
-
-def read_arabic_words_per_dir(per_in_dir: str, 
-                                tokenizer_fn, 
-                                remove_diac_from_word_fn, 
-                                infos: dict, 
-                                queue: Queue) -> bool:
-    import glob
-    return read_arabic_words_in_txt_files(glob.glob(per_in_dir + '/*.txt'),
-                                            tokenizer_fn, 
-                                            remove_diac_from_word_fn, 
-                                            infos, 
-                                            queue)
-                    
-            
-def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn, infos: dict)->list:
-    import os
-    res_words = []
-    try:
-        if not txt_file_path is None and not txt_file_path.endswith('.txt'):
-            raise RuntimeError("Only *.txt files are allowed. File {0} given".format(txt_file_path))
-            
-        (txt_file_content, encod, confid) = read_file_with_encoding(txt_file_path, "utf-8")
-    
-        words = tokenizer_fn(txt_file_content)
-        wordsCount = len(words)
-        log_msg("{} words found on {}".format(wordsCount, txt_file_path))
-        uniqueWords = set([remove_diac_from_word_fn(word) for word in words])
-        res_words = []
-        for word in uniqueWords:
-            len_word = len(word)
-            if(len_word < 16 and len_word > 1):  
-                res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount], infos))
-        return res_words
-    except Exception as e:
-        log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)), exception=e, level=ERROR)
-        return []
-        #raise e
-        
 def run_pipelines_blocking(pipelines: list):
     try:
         # Start processes
@@ -233,3 +174,91 @@ def run_pipelines_blocking(pipelines: list):
                 log_msg("Error while terminate save process or/and queue : {}".format(str(ex2.args)), exception=ex2, level=ERROR)
     finally:
         log_msg("run_pipelines_blocking End executing",  level=INFO)
+
+# ======================================= Metier ========================= :                   
+def tokenize_arabic_words_as_array(txt_content) -> list:
+    import re
+                
+    arabic_words = re.findall("[^a-zA-Z\^0-9\\^١-٩\^[()•\+-@،?!|É°¢$£\éè¡àêâ\{\}%€–_`\",ä/'''<®>*:\$\[\~\-Ò©#¬¹±²\\ª·´¶º»µ¼&¨¤¾¦¿\À´ËÂ\\¥]+", txt_content)
+    all_words=[]
+    # [[words.append(word) for word in txt.replace(' ', '\n').replace('\t', '\n').split('\n') if word and word.strip() ] for txt in arabic_words]
+    for txt in arabic_words:
+        wrds = txt.replace('×', '').replace(' ', '\n').replace('\r', '\n').replace('\t', '\n').replace('َ', '').replace('ّ', '').replace('ِ', '').replace('ُ', '').replace('ْ', '').replace('ً', '').replace('ٌ', '').replace('ٍ', '').split('\n')
+        for w in wrds:
+            if w and w.strip():
+                all_words.append(w)
+            
+    return all_words
+
+def tokenize_arabic_words_as_array_bis(txt_content) -> list:
+    import re
+                
+    arabic_words = re.findall(r'[َُِْـًٌٍّؤائءآىإأبتثجحخدذرزسشصضطظعغفقكلمنهـوي]+', txt_content)
+    all_words=[]
+    # [[words.append(word) for word in txt.replace(' ', '\n').replace('\t', '\n').split('\n') if word and word.strip() ] for txt in arabic_words]
+    for txt in arabic_words:
+        wrds = txt.replace('×', '').replace(' ', '\n').replace('\r', '\n').replace('\t', '\n').split('\n')
+        for w in wrds:
+            if w and w.strip():
+                all_words.append(w)
+            
+    return all_words
+
+def remove_diac_from_word(word) -> str:
+   # import re
+    word = word.replace('َ', '').replace('ّ', '').replace('ِ', '').replace('ُ', '').replace('ْ', '').replace('ً', '').replace('ٌ', '').replace('ٍ', '')
+    return word
+
+
+def read_arabic_words_in_txt_files(files_paths: list, 
+                                    tokenizer_fn, 
+                                    remove_diac_from_word_fn, 
+                                    infos: dict, 
+                                    queue: Queue) -> bool:
+    for txt_file in files_paths:
+        try:
+            words = read_arabic_words(txt_file, tokenizer_fn, remove_diac_from_word_fn, infos)
+            if len(words) > 0:
+                queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
+        except Exception as e:
+            log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), exception=e, level=ERROR)
+
+    return True
+
+def read_arabic_words_per_dir(per_in_dir: str, 
+                                tokenizer_fn, 
+                                remove_diac_from_word_fn, 
+                                infos: dict, 
+                                queue: Queue) -> bool:
+    import glob
+    return read_arabic_words_in_txt_files(glob.glob(per_in_dir + '/*.txt'),
+                                            tokenizer_fn, 
+                                            remove_diac_from_word_fn, 
+                                            infos, 
+                                            queue)
+                    
+            
+def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn, infos: dict)->list:
+    import os
+    res_words = []
+    try:
+        if not txt_file_path is None and not txt_file_path.endswith('.txt'):
+            raise RuntimeError("Only *.txt files are allowed. File {0} given".format(txt_file_path))
+            
+        (txt_file_content, encod, confid) = read_file_with_encoding(txt_file_path, "utf-8")
+    
+        words = tokenizer_fn(txt_file_content)
+        wordsCount = len(words)
+        log_msg("{} words found on {}".format(wordsCount, txt_file_path))
+        uniqueWords = set([remove_diac_from_word_fn(word) for word in words])
+        res_words = []
+        for word in uniqueWords:
+            len_word = len(word)
+            if(len_word < 16 and len_word > 1):  
+                res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount], infos))
+        return res_words
+    except Exception as e:
+        log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)), exception=e, level=ERROR)
+        return []
+        #raise e
+        
