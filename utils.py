@@ -7,23 +7,24 @@ from datetime import date
 MAX_QUEUE_SIZE = 1000_000
 MAX_QUEUE_PUT_TIMEOUT_SEC = 30
 MAX_QUEUE_GET_TIMEOUT_SEC = 30
-DATA_BY_PROCESS_CHUNK_SIZE = 1_000
+DATA_BY_PROCESS_CHUNK_SIZE = 4_000
 PROC_JOIN_TIMEOUT = 10
 
 logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
                                                                     filename=os.path.abspath(f'logs/log-{date.today()}.log'),
                                                                     maxBytes=50*1024*1024, backupCount=100)], 
                                                 level=logging.DEBUG,
+                                                encoding='utf-8',
                                                 format='%(levelname)s : %(asctime)s - %(processName)s %(threadName)s : %(message)s')
 LOGGER = logging.getLogger("my-logger")
 
-def log_msg(msg, console=False, error=False):
+def log_msg(msg, console=False, error=False, level=logging.DEBUG):
     global LOGGER
     if not LOGGER is None:
         if error:
             LOGGER.error(msg)
         else:
-            LOGGER.info(msg)
+            LOGGER.log(level, msg)
     if console:
         print(msg)
     
@@ -84,7 +85,6 @@ def read_arabic_words_dom_dir(dom_in_dir: str,
                             remove_diac_from_word_fn, 
                             prepend_per_item: list, 
                             queue: Queue) -> bool:
-    from os import path 
     import os
     import glob
 
@@ -93,11 +93,10 @@ def read_arabic_words_dom_dir(dom_in_dir: str,
         for txt_file in glob.glob(per_dir + '/*.txt'):
             try:
                 words = read_arabic_words(txt_file, tokenizer_fn, remove_diac_from_word_fn, prepend_per_item + [per])
-                queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
-            
+                if len(words) > 0:
+                    queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
             except Exception as e:
-                log_msg("Error post processing {} : {}".format(txt_file, str(e)), error=True)
-                raise e
+                log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), error=True)
 
     return True
 
@@ -109,10 +108,10 @@ def read_arabic_words_in_txt_files(files_paths: list,
     for txt_file in files_paths:
         try:
             words = read_arabic_words(txt_file, tokenizer_fn, remove_diac_from_word_fn, prepend_per_item)
-            queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
+            if len(words) > 0:
+                queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
         except Exception as e:
-            log_msg("Error post processing {} : {}".format(txt_file, str(e)), error=True)
-            raise e
+            log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), error=True)
 
     return True
 
@@ -131,18 +130,16 @@ def read_arabic_words_per_dir(per_in_dir: str,
             
 def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn, prepend_per_item: list)->list:
     import os
-
+    res_words = []
     try:
-        if not txt_file_path.endswith('.txt'):
+        if not txt_file_path is None and not txt_file_path.endswith('.txt'):
             raise RuntimeError("Only *.txt files are allowed. File {0} given".format(txt_file_path))
             
         (txt_file_content, encod, confid) = read_file_with_encoding(txt_file_path, "utf-8")
-        if "utf-8".upper() != encod.upper():
-            log_msg("File {} has a diff. encoding {} with confid {}%. Expected UTF-8".format(txt_file_path, encod, round(100*confid, 2)))
     
         words = tokenizer_fn(txt_file_content)
-        log_msg("{} words found on {}".format(len(words), txt_file_path))
         wordsCount = len(words)
+        log_msg("{} words found on {}".format(wordsCount, txt_file_path))
         uniqueWords = set([remove_diac_from_word_fn(word) for word in words])
         res_words = []
         for word in uniqueWords:
@@ -150,7 +147,9 @@ def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn
             if(len_word < 16 and len_word > 1):  
                 res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount] + prepend_per_item))
         return res_words
-
     except Exception as e:
-        log_msg("File ignored {} : {}".format(txt_file_path, str(e)), error=True)
+        log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)), error=True)
+        return []
         #raise e
+        
+

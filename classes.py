@@ -24,7 +24,6 @@ class WordsSaverToDB(AbstractWordSaver):
                                 VALUES(%s,%s,%s)"""
     def _connect(self):
         import mysql.connector
-        from mysql.connector import Error
 
         try:
             if self.connection is None:

@@ -8,7 +8,6 @@ import os
 import signal
 import uuid
 import time
-import logging
 from utils import DATA_BY_PROCESS_CHUNK_SIZE, MAX_QUEUE_GET_TIMEOUT_SEC
 from utils import MAX_QUEUE_PUT_TIMEOUT_SEC, MAX_QUEUE_SIZE, PROC_JOIN_TIMEOUT
 from utils import log_msg, read_arabic_words_in_txt_files
@@ -25,7 +24,7 @@ def save_words(queue: Queue, job_uuid: str, words_saver: AbstractWordSaver):
             words = queue.get(block=True, timeout=MAX_QUEUE_GET_TIMEOUT_SEC)
             words_saver.save_words(job_uuid, words)
     except Exception as e:
-        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e)))
+        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)))
 
 def read_arabic_words_many_corpus_dir(bdall_dir: str, 
                                         tokenizer_fn, 
@@ -40,55 +39,65 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
     original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGINT, original_sigint_handler)
 
-    pipelines = [] # [{'save_proc': Process, 'tasks': [Process, ...]}]
+    pipelines = [] # [{'queue': Queue, 'save_proc': Process, 'tasks': [Process, ...]}]
     processes_count = 0
     bdall_files_count=0
     nbr_total_dom=0
-    ignored_txt_files_count=0
+    orphan_txt_files_paths=set()
     if not os.path.isdir(bdall_dir):
         raise RuntimeError("{} should be a valid directory".format(bdall_dir))
 
+    # Corpus folders
     for corpus in os.listdir(bdall_dir):
         corpus_dir=os.path.join(bdall_dir, corpus)
         if not os.path.isdir(corpus_dir):
             if os.path.isfile(corpus_dir) and corpus_dir.endswith(".txt"):
-                ignored_txt_files_count+=1
-            log_msg("Corpus {} path ignored".format(corpus_dir))
+                orphan_txt_files_paths.add(corpus_dir)
+                log_msg("Txt file {} found on Corpus folder : {}".format(corpus_dir, os.path.basename(bdall_dir)))
             continue
+
         if not has_base_dirs:
             bases = [corpus_dir]
         else:
             bases = os.listdir(corpus_dir)
 
+        # Base folders if there is one, otherwise it takes the value of corpus
         for base in bases:
             base_dir=os.path.join(corpus_dir, base)
             if not os.path.isdir(base_dir):
                 if os.path.isfile(base_dir) and base_dir.endswith(".txt"):
-                    ignored_txt_files_count+=1
-                log_msg("Base {} path ignored".format(base_dir))
+                    orphan_txt_files_paths.add(base_dir)
+                    log_msg("Txt file {} found on Corpus/Base folder : {}".format(base_dir, corpus))
                 continue
+
+            # Domain folders
             nbr_dom=0
             for dom in os.listdir(base_dir):
                 dom_dir=os.path.join(base_dir, dom)
                 if not os.path.isdir(dom_dir):
                     if os.path.isfile(dom_dir) and dom_dir.endswith(".txt"):
-                        ignored_txt_files_count+=1
-                    log_msg("Dom {} path ignored".format(dom_dir))
+                        orphan_txt_files_paths.add(dom_dir)
+                        log_msg("Txt file found {} on Base/Corpus folder : {}".format(dom_dir, base))
                     continue
                 nbr_dom+=1
                 #Pipeline
                 queue = Queue(maxsize=queue_max_size)
                 job_uuid = str(uuid.uuid1())
                 words_saver = words_saver_factory.create(job_uuid)
-                pipeline = {'queue': queue, 'tasks': [], 'saver': words_saver,  'save_proc': Process(target=save_words, args=(queue, job_uuid, words_saver))}
+                pipeline = {'queue': queue, 
+                            'tasks': [], 
+                            'saver': words_saver,  
+                            'save_proc': Process(target=save_words, args=(queue, job_uuid, words_saver))}
                 processes_count+=1
+
+                # Period folders
                 nbr_pers =0
                 for per in os.listdir(dom_dir):
                     per_dir=os.path.join(dom_dir, per)
                     if not os.path.isdir(per_dir): 
                         if os.path.isfile(per_dir) and per_dir.endswith(".txt"):
-                            ignored_txt_files_count+=1
-                        log_msg("Per {} path ignored".format(per_dir))
+                            orphan_txt_files_paths.add(per_dir)
+                            log_msg("Txt file {} found on Dom folder : {}".format(per_dir, dom))
                         continue
                     nbr_pers+=1
                     files = glob.glob(per_dir + '/*.txt')
@@ -101,27 +110,59 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                     elif files_cnt > 0:
                         files_chunks=[files]
                     for chunk in files_chunks:
-                        chnks_cnt+=1
-                        p1 = Process(target=read_arabic_words_in_txt_files, args=(chunk, 
-                                                                                tokenizer_fn, 
-                                                                                remove_diac_from_word_fn, 
-                                                                                [corpus, dom, per], 
-                                                                                queue))
-                        pipeline['tasks'].append(p1)
-                        processes_count+=1
+                        if len(chunk)>0:
+                            chnks_cnt+=1
+                            p1 = Process(target=read_arabic_words_in_txt_files, args=(chunk, 
+                                                                                    tokenizer_fn, 
+                                                                                    remove_diac_from_word_fn, 
+                                                                                    [corpus, dom, per], 
+                                                                                    queue))
+                            pipeline['tasks'].append(p1)
+                            processes_count+=1
                     log_msg("{} chunks found/ {} files in {}".format(chnks_cnt, len(files), per_dir))
                 pipelines.append(pipeline)
             
                 log_msg("{} periodes found in {}".format(nbr_pers, dom_dir), console=True)
             nbr_total_dom+=nbr_dom
             log_msg("{} domaines found in {}".format(nbr_dom, corpus_dir), console=True)
+    
+    # Generate processes for the orphan txt files
+    orphan_chunks = split_list(orphan_txt_files_paths, DATA_BY_PROCESS_CHUNK_SIZE * 10)
+    for orph_chnks in orphan_chunks:
+        if len(orphan_chunks)>0:
+            queue = Queue(maxsize=queue_max_size)
+            job_uuid = str(uuid.uuid1())
+            words_saver = words_saver_factory.create(job_uuid)
+            pipeline = {'queue': queue, 
+                        'tasks': [], 
+                        'saver': words_saver,  
+                        'save_proc': Process(target=save_words, args=(queue, job_uuid, words_saver))}
+            processes_count+=1
+            chunks = split_list(orph_chnks, DATA_BY_PROCESS_CHUNK_SIZE)
+            for chunk in chunks:
+                if len(chunk)>0:
+                    p1 = Process(target=read_arabic_words_in_txt_files, args=(chunk, 
+                                                                                    tokenizer_fn, 
+                                                                                    remove_diac_from_word_fn, 
+                                                                                    [corpus, dom, per], 
+                                                                                    queue))
+                    pipeline['tasks'].append(p1)
+                    processes_count+=1
+            pipelines.append(pipeline)
+
+
+    # Logs    
+    orphan_txt_files_count = len(orphan_txt_files_paths)
+    bdall_files_count += orphan_txt_files_count
     log_msg("{} domaines au total sur tous les corpus found in {}".format(nbr_total_dom, bdall_dir), console=True)
                 
-    log_msg(console=True, msg="{} processes will be started over {} total number of files ({} fichiers ignored)...".format(processes_count, bdall_files_count, ignored_txt_files_count))
+    log_msg(console=True, msg="{} processes will be started over {} total number of files ({} files found out of the standard folders)...".format(processes_count, bdall_files_count, orphan_txt_files_count))
     if show_only_summary:
         raise RuntimeError("Files & processes summary")
-    
-    run_pipelines_blocking(pipelines) # this a blocking operation
+    if len(pipelines)>0:
+        run_pipelines_blocking(pipelines) # this a blocking operation
+    else:
+        log_msg("No pipeline to run", console=True)
     
     end_time = time.perf_counter()
     log_msg(console=True, msg="Process end in {} sec".format(round(end_time-start_time, 2)))
@@ -142,12 +183,12 @@ def run_pipelines_blocking(pipelines: list):
                         one_started=True
                         nbr_proc+=1
                     except Exception as ex:
-                        log_msg("Error while starting task process : {}".format(str(ex)), error=True)
+                        log_msg("Error while starting task process : {}".format(str(ex.args)), error=True)
                 if not one_started:
                     p['save_proc'].terminate()
                     p['queue'].close()
             except Exception as ex2:
-                log_msg("Error while starting pipeline process : {}".format(str(ex2)), error=True)
+                log_msg("Error while starting pipeline process : {}".format(str(ex2.args)), error=True)
         log_msg("{} processes started".format(nbr_proc), console=True)
         # Joining processes
         log_msg("Joining processes", console=True)
@@ -164,6 +205,10 @@ def run_pipelines_blocking(pipelines: list):
                         if not sp.exitcode is None:
                             joined.add(sp.pid)
                             log_msg("{} processes were joined".format(len(joined)), console=True)
+                            try:
+                                sp.terminate()
+                            except Exception as tex:
+                                log_msg("Error while terminate tasks process : {}".format(str(tex.args)), error=True)
                         else:
                             working=True
 
@@ -175,12 +220,16 @@ def run_pipelines_blocking(pipelines: list):
                                 if not t.exitcode is None:
                                     joined.add(t.pid)
                                     log_msg("{} processes were joined".format(len(joined)), console=True)
+                                    try:
+                                        sp.terminate()
+                                    except Exception as tex:
+                                        log_msg("Error while terminate tasks process : {}".format(str(tex.args)), error=True)
                                 else:
                                     working=True
                         except Exception as ex:
-                            log_msg("Error while joining task process : {}".format(str(ex)), error=True)
+                            log_msg("Error while joining task process : {}".format(str(ex.args)), error=True)
                 except Exception as ex2:
-                    log_msg("Error while joining pipeline process : {}".format(str(ex2)), error=True)
+                    log_msg("Error while joining pipeline process : {}".format(str(ex2.args)), error=True)
         log_msg("Closing saver objects", console=True)
         # Closing saver object
         for p in pipelines:
@@ -198,10 +247,10 @@ def run_pipelines_blocking(pipelines: list):
                     try:
                        t.terminate()
                     except Exception as ex:
-                        log_msg("Error while terminate tasks process : {}".format(str(ex)), error=True)
+                        log_msg("Error while terminate tasks process : {}".format(str(ex.args)), error=True)
                 p['queue'].close()
             except Exception as ex2:
-                log_msg("Error while terminate save process or/and queue : {}".format(str(ex2)), error=True)
+                log_msg("Error while terminate save process or/and queue : {}".format(str(ex2.args)), error=True)
     finally:
         log_msg("run_pipelines_blocking End executing", console=True)
 
@@ -209,10 +258,10 @@ def run_pipelines_blocking(pipelines: list):
 if __name__=="__main__":
     import time
 
-    #in_dir='bdall_test_data'
+    in_dir='bdall_test_data'
     #in_dir='bdall_real_data'
-    in_dir='bdall'
-    in_dir_has_base_dirs = True # bdakk > corpus > base > D > D > *.txt
+    #in_dir='bdall'
+    in_dir_has_base_dirs = True # bdall > corpus > base > D > D > *.txt
     out_dir = 'out_dir'
     save_to_db=True
     db_host='localhost'
@@ -248,7 +297,7 @@ if __name__=="__main__":
                                         show_only_summary=show_summary,
                                         has_base_dirs=in_dir_has_base_dirs)
     except Exception as ex:
-        log_msg("Error : {}".format(str(ex)), console=True, error=True)
+        log_msg("Error : {}".format(str(ex.args)), console=True, error=True)
     end_exec_time=time.perf_counter()
     log_msg('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))), console=True)
 
