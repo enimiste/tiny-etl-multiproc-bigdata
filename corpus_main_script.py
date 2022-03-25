@@ -10,8 +10,7 @@ from classes import WordSaverFactory
 from utils import remove_diac_from_word, tokenize_arabic_words_as_array_bis
 from logging import INFO, WARN, ERROR
 import glob
-
-
+ 
 def build_read_arabic_words_pipelines(bdall_dir: str, 
                                         tokenizer_fn, 
                                         remove_diac_from_word_fn, 
@@ -147,7 +146,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                                                                                                 queue_max_size, 
                                                                                                 {'corpus': '', 'domaine':'', 'periode': ''},
                                                                                                 has_base_dirs)
-
+    
     log_msg("{} processes will be started over {} total number of files ({} files found out of the standard folders)...".format(processes_count, 
                                                                                                                                 bdall_files_count, 
                                                                                                                                 orphan_txt_files_count), 
