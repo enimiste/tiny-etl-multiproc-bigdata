@@ -1,11 +1,12 @@
 from multiprocessing import Queue
 import logging
-from logging import INFO
+from logging import INFO, ERROR
 import sys
 import threading
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 import os
 from datetime import date
+import traceback
 
 if not 'DEFINED' in globals():
     PROC_JOIN_TIMEOUT = 1
@@ -28,15 +29,18 @@ if not 'DEFINED' in globals():
     
     DEFINED=True
 
-def log_msg_sync(msg, level=logging.DEBUG):
+def log_msg_sync(msg: str, exception: Exception = None, level: int = logging.DEBUG):
     global LOGGER
     if not LOGGER is None:
         LOGGER.log(level, msg)
+        if not exception is None and level==ERROR:
+            LOGGER.log(level, "{}, Trace : {}".format(msg, str(traceback.format_exception(exception))))
+        
     else:
         print(msg)
     
-def log_msg(msg, level=logging.DEBUG):
-    threading.Thread(target=log_msg_sync, args=(msg, level)).start()
+def log_msg(msg: str, exception: Exception = None, level: int = logging.DEBUG):
+    threading.Thread(target=log_msg_sync, args=(msg, exception, level)).start()
     
 def tokenize_arabic_words_as_array(txt_content) -> list:
     import re
@@ -106,7 +110,7 @@ def read_arabic_words_dom_dir(dom_in_dir: str,
                 if len(words) > 0:
                     queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
             except Exception as e:
-                log_msg("Error processing File {} : {}".format(txt_file, str(e.args)))
+                log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), exception=e, level=ERROR)
 
     return True
 
@@ -121,7 +125,7 @@ def read_arabic_words_in_txt_files(files_paths: list,
             if len(words) > 0:
                 queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
         except Exception as e:
-            log_msg("Error processing File {} : {}".format(txt_file, str(e.args)))
+            log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), exception=e, level=ERROR)
 
     return True
 
@@ -158,7 +162,7 @@ def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn
                 res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount] + prepend_per_item))
         return res_words
     except Exception as e:
-        log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)))
+        log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)), exception=e, level=ERROR)
         return []
         #raise e
         
@@ -178,12 +182,12 @@ def run_pipelines_blocking(pipelines: list):
                         one_started=True
                         nbr_proc+=1
                     except Exception as ex:
-                        log_msg("Error while starting task process : {}".format(str(ex.args)))
+                        log_msg("Error while starting task process : {}".format(str(ex.args)), exception=ex, level=ERROR)
                 if not one_started:
                     p['save_proc'].terminate()
                     p['queue'].close()
             except Exception as ex2:
-                log_msg("Error while starting pipeline process : {}".format(str(ex2.args)))
+                log_msg("Error while starting pipeline process : {}".format(str(ex2.args)), exception=ex2, level=ERROR)
         log_msg("{} processes started".format(nbr_proc),  level=INFO)
         # Joining processes
         log_msg("Joining processes",  level=INFO)
@@ -203,7 +207,7 @@ def run_pipelines_blocking(pipelines: list):
                             try:
                                 sp.terminate()
                             except Exception as tex:
-                                log_msg("Error while terminate tasks process : {}".format(str(tex.args)))
+                                log_msg("Error while terminate tasks process : {}".format(str(tex.args)), level=ERROR, exception=tex)
                         else:
                             working=True
 
@@ -218,13 +222,13 @@ def run_pipelines_blocking(pipelines: list):
                                     try:
                                         sp.terminate()
                                     except Exception as tex:
-                                        log_msg("Error while terminate tasks process : {}".format(str(tex.args)))
+                                        log_msg("Error while terminate tasks process : {}".format(str(tex.args)), exception=tex, level=ERROR)
                                 else:
                                     working=True
                         except Exception as ex:
-                            log_msg("Error while joining task process : {}".format(str(ex.args)))
+                            log_msg("Error while joining task process : {}".format(str(ex.args)), exception=ex, level=ERROR)
                 except Exception as ex2:
-                    log_msg("Error while joining pipeline process : {}".format(str(ex2.args)))
+                    log_msg("Error while joining pipeline process : {}".format(str(ex2.args)), exception=ex2, level=ERROR)
         log_msg("Closing saver objects",  level=INFO)
         # Closing saver object
         for p in pipelines:
@@ -242,9 +246,9 @@ def run_pipelines_blocking(pipelines: list):
                     try:
                        t.terminate()
                     except Exception as ex:
-                        log_msg("Error while terminate tasks process : {}".format(str(ex.args)))
+                        log_msg("Error while terminate tasks process : {}".format(str(ex.args)), exception=ex, level=ERROR)
                 p['queue'].close()
             except Exception as ex2:
-                log_msg("Error while terminate save process or/and queue : {}".format(str(ex2.args)))
+                log_msg("Error while terminate save process or/and queue : {}".format(str(ex2.args)), exception=ex2, level=ERROR)
     finally:
         log_msg("run_pipelines_blocking End executing",  level=INFO)

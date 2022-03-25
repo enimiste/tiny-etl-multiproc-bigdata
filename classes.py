@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from logging import INFO, WARN
+from logging import INFO, WARN, ERROR
 from utils import log_msg
  
 class AbstractWordSaver(ABC):
@@ -35,7 +35,7 @@ class WordsSaverToDB(AbstractWordSaver):
             return self.connection
 
         except mysql.connector.Error as error:
-            log_msg("Failed to connect to database {}".format(str(error.args)))
+            log_msg("Failed to connect to database {}".format(str(error.args)), exception=error, level=ERROR)
             raise error
 
     def save_words(self, job_uuid: str, words: list):
@@ -63,12 +63,12 @@ class WordsSaverToDB(AbstractWordSaver):
             cursor.close()
 
         except mysql.connector.Error as error:
-            log_msg("Failed to insert records {}".format(error))
+            log_msg("Failed to insert records {}".format(error), exception=error, level=ERROR)
             if not connection is None and connection.in_transaction():
                 try:
                     connection.rollback()
                 except Exception as ex:
-                    log_msg("Failed to rollback inserted records {}".format(str(ex.args)))
+                    log_msg("Failed to rollback inserted records {}".format(str(ex.args)), exception=ex, level=ERROR)
 
     def close(self, job_uuid: str):
         if self.job_uuid != job_uuid:
@@ -78,9 +78,10 @@ class WordsSaverToDB(AbstractWordSaver):
         if not self.connection is None and self.connection.is_connected():
             try:
                 self.connection.close()
-            except Exception:
-                pass
-            log_msg("MySQL connection is closed successfully",  level=INFO)
+                log_msg("MySQL connection is closed successfully",  level=INFO)
+            except Exception as ex:
+                log_msg("Error closing MySQL connection", exception=ex , level=ERROR)
+            
 
 class WordsSaverToFile(AbstractWordSaver):
     def __init__(self, job_uuid: str, out_dir: str):
@@ -111,8 +112,9 @@ class WordsSaverToFile(AbstractWordSaver):
         if not self.file_hd is None:
             try:
                 self.file_hd.close()
-            except Exception:
-                pass
+                log_msg("File closed successfully")
+            except Exception as ex:
+                log_msg("Error closing File handler", exception=ex , level=ERROR)
 
 class WordSaverFactory:
     def __init__(self, config: dict):

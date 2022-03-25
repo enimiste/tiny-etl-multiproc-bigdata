@@ -24,7 +24,7 @@ def save_words(queue: Queue, job_uuid: str, words_saver: AbstractWordSaver):
             words = queue.get(block=True, timeout=MAX_QUEUE_GET_TIMEOUT_SEC)
             words_saver.save_words(job_uuid, words)
     except Exception as e:
-        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)), level=INFO)
+        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)), exception=e, level=ERROR)
 
 def read_arabic_words_many_corpus_dir(bdall_dir: str, 
                                         tokenizer_fn, 
@@ -212,7 +212,7 @@ if __name__=="__main__":
                                         show_only_summary=show_summary,
                                         has_base_dirs=in_dir_has_base_dirs)
     except Exception as ex:
-        log_msg("Error : {}".format(str(ex.args)),  level=ERROR)
+        log_msg("Error : {}".format(str(ex.args)), exception=ex, level=ERROR)
     end_exec_time=time.perf_counter()
     log_msg('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))),  level=INFO)
 
