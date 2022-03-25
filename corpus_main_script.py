@@ -8,13 +8,13 @@ import os
 import signal
 import uuid
 import time
-from utils import DATA_BY_PROCESS_CHUNK_SIZE, MAX_QUEUE_GET_TIMEOUT_SEC
+from utils import DATA_BY_PROCESS_CHUNK_SIZE, MAX_QUEUE_GET_TIMEOUT_SEC, run_pipelines_blocking
 from utils import MAX_QUEUE_PUT_TIMEOUT_SEC, MAX_QUEUE_SIZE, PROC_JOIN_TIMEOUT
 from utils import log_msg, read_arabic_words_in_txt_files
 from classes import AbstractWordSaver, WordSaverFactory
 from utils import remove_diac_from_word, tokenize_arabic_words_as_array_bis
 
-def split_list(items: list, chunk_size: int) -> list:
+def split_list(items: list, chunk_size: int):
   for i in range(0, len(items), chunk_size):
       yield items[i:i + chunk_size]
 
@@ -43,7 +43,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
     processes_count = 0
     bdall_files_count=0
     nbr_total_dom=0
-    orphan_txt_files_paths=set()
+    orphan_txt_files_paths=list()
     if not os.path.isdir(bdall_dir):
         raise RuntimeError("{} should be a valid directory".format(bdall_dir))
 
@@ -52,7 +52,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
         corpus_dir=os.path.join(bdall_dir, corpus)
         if not os.path.isdir(corpus_dir):
             if os.path.isfile(corpus_dir) and corpus_dir.endswith(".txt"):
-                orphan_txt_files_paths.add(corpus_dir)
+                orphan_txt_files_paths.append(corpus_dir)
                 log_msg("Txt file {} found on Corpus folder : {}".format(corpus_dir, os.path.basename(bdall_dir)))
             continue
 
@@ -66,7 +66,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
             base_dir=os.path.join(corpus_dir, base)
             if not os.path.isdir(base_dir):
                 if os.path.isfile(base_dir) and base_dir.endswith(".txt"):
-                    orphan_txt_files_paths.add(base_dir)
+                    orphan_txt_files_paths.append(base_dir)
                     log_msg("Txt file {} found on Corpus/Base folder : {}".format(base_dir, corpus))
                 continue
 
@@ -76,7 +76,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                 dom_dir=os.path.join(base_dir, dom)
                 if not os.path.isdir(dom_dir):
                     if os.path.isfile(dom_dir) and dom_dir.endswith(".txt"):
-                        orphan_txt_files_paths.add(dom_dir)
+                        orphan_txt_files_paths.append(dom_dir)
                         log_msg("Txt file found {} on Base/Corpus folder : {}".format(dom_dir, base))
                     continue
                 nbr_dom+=1
@@ -96,7 +96,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                     per_dir=os.path.join(dom_dir, per)
                     if not os.path.isdir(per_dir): 
                         if os.path.isfile(per_dir) and per_dir.endswith(".txt"):
-                            orphan_txt_files_paths.add(per_dir)
+                            orphan_txt_files_paths.append(per_dir)
                             log_msg("Txt file {} found on Dom folder : {}".format(per_dir, dom))
                         continue
                     nbr_pers+=1
@@ -129,7 +129,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
     # Generate processes for the orphan txt files
     orphan_chunks = split_list(orphan_txt_files_paths, DATA_BY_PROCESS_CHUNK_SIZE * 10)
     for orph_chnks in orphan_chunks:
-        if len(orphan_chunks)>0:
+        if len(orph_chnks)>0:
             queue = Queue(maxsize=queue_max_size)
             job_uuid = str(uuid.uuid1())
             words_saver = words_saver_factory.create(job_uuid)
@@ -167,92 +167,6 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
     end_time = time.perf_counter()
     log_msg(console=True, msg="Process end in {} sec".format(round(end_time-start_time, 2)))
 
-def run_pipelines_blocking(pipelines: list):
-    try:
-        # Start processes
-        log_msg("Start processes", console=True)
-        nbr_proc=0
-        for p in pipelines:
-            try:
-                p['save_proc'].start()
-                nbr_proc+=1
-                one_started = False
-                for t in p['tasks']:
-                    try:
-                        t.start()
-                        one_started=True
-                        nbr_proc+=1
-                    except Exception as ex:
-                        log_msg("Error while starting task process : {}".format(str(ex.args)), error=True)
-                if not one_started:
-                    p['save_proc'].terminate()
-                    p['queue'].close()
-            except Exception as ex2:
-                log_msg("Error while starting pipeline process : {}".format(str(ex2.args)), error=True)
-        log_msg("{} processes started".format(nbr_proc), console=True)
-        # Joining processes
-        log_msg("Joining processes", console=True)
-        working = True
-        joined = set()
-        while working:
-            working = False
-            for p in pipelines:
-                try:
-                    #Save process
-                    sp = p['save_proc']
-                    if not sp.pid in joined:
-                        sp.join(timeout=PROC_JOIN_TIMEOUT)
-                        if not sp.exitcode is None:
-                            joined.add(sp.pid)
-                            log_msg("{} processes were joined".format(len(joined)), console=True)
-                            try:
-                                sp.terminate()
-                            except Exception as tex:
-                                log_msg("Error while terminate tasks process : {}".format(str(tex.args)), error=True)
-                        else:
-                            working=True
-
-                    # Tasks
-                    for t in p['tasks']:
-                        try:
-                            if not t.pid in joined:
-                                t.join(timeout=PROC_JOIN_TIMEOUT)
-                                if not t.exitcode is None:
-                                    joined.add(t.pid)
-                                    log_msg("{} processes were joined".format(len(joined)), console=True)
-                                    try:
-                                        sp.terminate()
-                                    except Exception as tex:
-                                        log_msg("Error while terminate tasks process : {}".format(str(tex.args)), error=True)
-                                else:
-                                    working=True
-                        except Exception as ex:
-                            log_msg("Error while joining task process : {}".format(str(ex.args)), error=True)
-                except Exception as ex2:
-                    log_msg("Error while joining pipeline process : {}".format(str(ex2.args)), error=True)
-        log_msg("Closing saver objects", console=True)
-        # Closing saver object
-        for p in pipelines:
-            try:
-                p['saver'].close()
-            except Exception:
-                pass
-    except KeyboardInterrupt:
-        log_msg(error=True, console=True, msg="Caught KeyboardInterrupt, terminating workers ...")
-        for p in pipelines:
-            try:
-                p['save_proc'].terminate()
-                p['saver'].close()
-                for t in p['tasks']:
-                    try:
-                       t.terminate()
-                    except Exception as ex:
-                        log_msg("Error while terminate tasks process : {}".format(str(ex.args)), error=True)
-                p['queue'].close()
-            except Exception as ex2:
-                log_msg("Error while terminate save process or/and queue : {}".format(str(ex2.args)), error=True)
-    finally:
-        log_msg("run_pipelines_blocking End executing", console=True)
 
 # --------------------- Program :
 if __name__=="__main__":
