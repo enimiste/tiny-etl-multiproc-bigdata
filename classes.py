@@ -1,0 +1,141 @@
+from abc import ABC, abstractmethod
+
+from utils import log_msg
+ 
+class AbstractWordSaver(ABC):
+    @abstractmethod
+    def save_words(self, job_uuid: str, words: list):
+        pass
+
+    @abstractmethod
+    def close(self, job_uuid: str):
+        pass
+
+class WordsSaverToDB(AbstractWordSaver):
+    def __init__(self, job_uuid: str, chunk_size: int, host: str, database: str, user: str, password: str):
+        self.job_uuid = job_uuid
+        self.connection = None
+        self.chunk_size=chunk_size
+        self.host=host
+        self.user=user
+        self.password=password
+        self.database = database
+        self.query = """INSERT INTO allwordstemp (word, filename, filecount)
+                                VALUES(%s,%s,%s)"""
+    def _connect(self):
+        import mysql.connector
+        from mysql.connector import Error
+
+        try:
+            if self.connection is None:
+                self.connection = mysql.connector.connect(host=self.host, database=self.database, user=self.user, password=self.password)
+                log_msg("MySQL connection is opened successfully", console=True)   
+            
+            if not self.connection.is_connected():
+                self.connection.reconnect()
+            return self.connection
+
+        except mysql.connector.Error as error:
+            log_msg("Failed to insert record {}".format(error))
+            raise error
+
+    def save_words(self, job_uuid: str, words: list):
+        import mysql.connector
+
+        if self.job_uuid != job_uuid:
+            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid), console=True, error=True)
+            return
+        connection = self._connect()
+        try:
+            data=[[word, file_name, file_words_count] for (word, file_name, file_words_count, corpus, dom, per) in words]
+            
+            data_len=len(data)
+            inserted_data = 0
+            log_msg("{0} rows available to be inserted".format(data_len))
+            cursor = connection.cursor()
+            for ln in range(0, data_len, self.chunk_size):  
+                chunk = data[ln:ln+self.chunk_size]
+                connection.start_transaction()
+                cursor.executemany(self.query, chunk)   
+                connection.commit()
+                inserted_data+=cursor.rowcount
+                log_msg("{} Record inserted successfully".format(cursor.rowcount))
+            log_msg("{} Total record inserted successfully".format(inserted_data))
+            cursor.close()
+
+        except mysql.connector.Error as error:
+            log_msg("Failed to insert records {}".format(error), error=True)
+            if not connection is None and connection.in_transaction():
+                try:
+                    connection.rollback()
+                except Exception as ex:
+                    log_msg("Failed to rollback inserted records {}".format(ex), error=True)
+
+    def close(self, job_uuid: str):
+        if self.job_uuid != job_uuid:
+            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid), console=True, error=True)
+            return
+
+        if not self.connection is None and self.connection.is_connected():
+            try:
+                self.connection.close()
+            except Exception:
+                pass
+            log_msg("MySQL connection is closed successfully", console=True)
+
+class WordsSaverToFile(AbstractWordSaver):
+    def __init__(self, job_uuid: str, out_dir: str):
+        self.out_dir=out_dir
+        self.job_uuid = job_uuid
+        self.file_hd = None
+
+    def save_words(self, job_uuid: str, words: list):
+        import codecs
+        import os
+
+        if self.job_uuid != job_uuid:
+            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid), console=True, error=True)
+            return
+
+        if self.file_hd is None:
+            file_name = "out_{}.txt".format(job_uuid)
+            file_path = os.path.join(self.out_dir, file_name)
+            self.file_hd = codecs.open(file_path, 'a', encoding = "utf-8", buffering=1)
+
+        self.file_hd.write('\n'.join([';'.join([w, fl, str(fwc), corpus, dom, per])  for (w, fl, fwc, corpus, dom, per) in words]))
+
+    def close(self, job_uuid: str):
+        if self.job_uuid != job_uuid:
+            log_msg("Trying to save words from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid), console=True, error=True)
+            return
+
+        if not self.file_hd is None:
+            try:
+                self.file_hd.close()
+            except Exception:
+                pass
+
+class WordSaverFactory:
+    def __init__(self, config: dict):
+        import os
+        self.config = {
+            'save_to_db': False, 
+            'chunk_size': 1000, 
+            'db_host': None, 
+            'db_name': None, 
+            'db_user': None, 
+            'db_password': None,
+            'out_dir': os.getcwd()
+        }
+        self.config.update(config)
+
+    def create(self, job_uuid):
+        if self.config['save_to_db']:
+            return WordsSaverToDB(job_uuid, 
+                                    self.config['chunk_size'], 
+                                    self.config['db_host'], 
+                                    self.config['db_name'], 
+                                    self.config['db_user'], 
+                                    self.config['db_password'])
+        else:
+            return WordsSaverToFile(job_uuid, self.config['out_dir'])
