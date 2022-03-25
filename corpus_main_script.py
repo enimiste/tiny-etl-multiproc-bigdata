@@ -193,7 +193,7 @@ if __name__=="__main__":
     db_user='root'
     db_password='root'
     chunk_size=1000
-    show_summary=True
+    show_summary=False
 
     log_msg("Script started : {}".format(in_dir),  level=INFO)
     log_msg("- MAX_QUEUE_SIZE : {}".format(MAX_QUEUE_SIZE),  level=INFO)

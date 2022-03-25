@@ -32,9 +32,10 @@ if not 'DEFINED' in globals():
 def log_msg_sync(msg: str, exception: Exception = None, level: int = logging.DEBUG):
     global LOGGER
     if not LOGGER is None:
-        LOGGER.log(level, msg)
         if not exception is None and level==ERROR:
             LOGGER.log(level, "{}, Trace : {}".format(msg, str(traceback.format_exception(exception))))
+        else:
+            LOGGER.log(level, msg)
         
     else:
         print(msg)
