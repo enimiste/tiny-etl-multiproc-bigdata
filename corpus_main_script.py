@@ -1,6 +1,11 @@
 """
+Python 3.x
 pip install mysql-connector-python
 pip install concurrent-log-handler
+
+pip install cchardet wia :
+    - Download this file first https://files.pythonhosted.org/packages/19/c7/fa589626997dd07bd87d9269342ccb74b1720384a4d739a1872bd84fbe68/chardet-4.0.0-py2.py3-none-any.whl
+    - pip install .\chardet-4.0.0-py2.py3-none-any.whl
 """
 from multiprocessing import Queue, Process
 import os
@@ -13,6 +18,7 @@ from utils import log_msg, read_arabic_words_in_txt_files
 from classes import AbstractWordSaver, WordSaverFactory
 from utils import remove_diac_from_word, tokenize_arabic_words_as_array_bis
 from logging import INFO, WARN, ERROR
+import glob
 
 def split_list(items: list, chunk_size: int):
   for i in range(0, len(items), chunk_size):
@@ -26,19 +32,13 @@ def save_words(queue: Queue, job_uuid: str, words_saver: AbstractWordSaver):
     except Exception as e:
         log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)), exception=e, level=ERROR)
 
-def read_arabic_words_many_corpus_dir(bdall_dir: str, 
+def build_read_arabic_words_pipelines(bdall_dir: str, 
                                         tokenizer_fn, 
                                         remove_diac_from_word_fn, 
                                         words_saver_factory: WordSaverFactory, 
                                         queue_max_size, 
-                                        show_only_summary=False,
+                                        infos: dict,
                                         has_base_dirs=False):
-    import glob
-
-    start_time = time.perf_counter()
-    original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
-    signal.signal(signal.SIGINT, original_sigint_handler)
-
     pipelines = [] # [{'queue': Queue, 'save_proc': Process, 'tasks': [Process, ...]}]
     processes_count = 0
     bdall_files_count=0
@@ -115,7 +115,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                             p1 = Process(target=read_arabic_words_in_txt_files, args=(chunk, 
                                                                                     tokenizer_fn, 
                                                                                     remove_diac_from_word_fn, 
-                                                                                    [corpus, dom, per], 
+                                                                                    {'corpus': corpus, 'domaine':dom, 'periode': per}.update(infos), 
                                                                                     queue))
                             pipeline['tasks'].append(p1)
                             processes_count+=1
@@ -144,19 +144,37 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                     p1 = Process(target=read_arabic_words_in_txt_files, args=(chunk, 
                                                                                     tokenizer_fn, 
                                                                                     remove_diac_from_word_fn, 
-                                                                                    [corpus, dom, per], 
+                                                                                    {'corpus': corpus, 'domaine':dom, 'periode': per}.update(infos), 
                                                                                     queue))
                     pipeline['tasks'].append(p1)
                     processes_count+=1
             pipelines.append(pipeline)
+    return (pipelines, processes_count, bdall_files_count, len(orphan_txt_files_paths))
 
+def read_arabic_words_many_corpus_dir(bdall_dir: str, 
+                                        tokenizer_fn, 
+                                        remove_diac_from_word_fn, 
+                                        words_saver_factory: WordSaverFactory, 
+                                        queue_max_size, 
+                                        show_only_summary=False,
+                                        has_base_dirs=False):
 
-    # Logs    
-    orphan_txt_files_count = len(orphan_txt_files_paths)
-    bdall_files_count += orphan_txt_files_count
-    log_msg("{} domaines au total sur tous les corpus found in {}".format(nbr_total_dom, bdall_dir),  level=INFO)
-                
-    log_msg("{} processes will be started over {} total number of files ({} files found out of the standard folders)...".format(processes_count, bdall_files_count, orphan_txt_files_count), level=INFO)
+    start_time = time.perf_counter()
+    original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+    signal.signal(signal.SIGINT, original_sigint_handler)
+
+    (pipelines, processes_count, bdall_files_count, orphan_txt_files_count) = build_read_arabic_words_pipelines(bdall_dir, 
+                                                                                                tokenizer_fn, 
+                                                                                                remove_diac_from_word_fn, 
+                                                                                                words_saver_factory, 
+                                                                                                queue_max_size, 
+                                                                                                {'corpus': '', 'domaine':'', 'periode': ''},
+                                                                                                has_base_dirs)
+
+    log_msg("{} processes will be started over {} total number of files ({} files found out of the standard folders)...".format(processes_count, 
+                                                                                                                                bdall_files_count, 
+                                                                                                                                orphan_txt_files_count), 
+                                                                                                                                level=INFO)
     if show_only_summary:
         log_msg("Files & processes summary", level=INFO)
     else:
@@ -184,7 +202,7 @@ if __name__=="__main__":
     db_user='root'
     db_password='root'
     chunk_size=1000
-    show_summary=False
+    show_summary=True
 
     log_msg("Script started : {}".format(in_dir),  level=INFO)
     log_msg("- MAX_QUEUE_SIZE : {}".format(MAX_QUEUE_SIZE),  level=INFO)

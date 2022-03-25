@@ -94,34 +94,14 @@ def read_file_with_encoding(filepath, expected_encoding) -> tuple:
 
     return (text, encoding, confidence)
 
-def read_arabic_words_dom_dir(dom_in_dir: str, 
-                            tokenizer_fn, 
-                            remove_diac_from_word_fn, 
-                            prepend_per_item: list, 
-                            queue: Queue) -> bool:
-    import os
-    import glob
-
-    for per in os.listdir(dom_in_dir):
-        per_dir=os.path.join(dom_in_dir, per)
-        for txt_file in glob.glob(per_dir + '/*.txt'):
-            try:
-                words = read_arabic_words(txt_file, tokenizer_fn, remove_diac_from_word_fn, prepend_per_item + [per])
-                if len(words) > 0:
-                    queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
-            except Exception as e:
-                log_msg("Error processing File {} : {}".format(txt_file, str(e.args)), exception=e, level=ERROR)
-
-    return True
-
 def read_arabic_words_in_txt_files(files_paths: list, 
                                     tokenizer_fn, 
                                     remove_diac_from_word_fn, 
-                                    prepend_per_item: list, 
+                                    infos: dict, 
                                     queue: Queue) -> bool:
     for txt_file in files_paths:
         try:
-            words = read_arabic_words(txt_file, tokenizer_fn, remove_diac_from_word_fn, prepend_per_item)
+            words = read_arabic_words(txt_file, tokenizer_fn, remove_diac_from_word_fn, infos)
             if len(words) > 0:
                 queue.put(words, timeout=MAX_QUEUE_PUT_TIMEOUT_SEC)
         except Exception as e:
@@ -132,17 +112,17 @@ def read_arabic_words_in_txt_files(files_paths: list,
 def read_arabic_words_per_dir(per_in_dir: str, 
                                 tokenizer_fn, 
                                 remove_diac_from_word_fn, 
-                                prepend_per_item: list, 
+                                infos: dict, 
                                 queue: Queue) -> bool:
     import glob
     return read_arabic_words_in_txt_files(glob.glob(per_in_dir + '/*.txt'),
                                             tokenizer_fn, 
                                             remove_diac_from_word_fn, 
-                                            prepend_per_item, 
+                                            infos, 
                                             queue)
                     
             
-def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn, prepend_per_item: list)->list:
+def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn, infos: dict)->list:
     import os
     res_words = []
     try:
@@ -159,7 +139,7 @@ def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn
         for word in uniqueWords:
             len_word = len(word)
             if(len_word < 16 and len_word > 1):  
-                res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount] + prepend_per_item))
+                res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount], infos))
         return res_words
     except Exception as e:
         log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)), exception=e, level=ERROR)

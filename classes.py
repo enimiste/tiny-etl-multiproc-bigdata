@@ -46,7 +46,7 @@ class WordsSaverToDB(AbstractWordSaver):
             return
         connection = self._connect()
         try:
-            data=[[word, file_name, file_words_count] for (word, file_name, file_words_count, corpus, dom, per) in words]
+            data=[[word, file_name, file_words_count] for (word, file_name, file_words_count, infos_dict) in words]
             
             data_len=len(data)
             inserted_data = 0
@@ -102,7 +102,7 @@ class WordsSaverToFile(AbstractWordSaver):
             file_path = os.path.join(self.out_dir, file_name)
             self.file_hd = codecs.open(file_path, 'a', encoding = "utf-8", buffering=1)
 
-        self.file_hd.write('\n'.join([';'.join([w, fl, str(fwc), corpus, dom, per])  for (w, fl, fwc, corpus, dom, per) in words]))
+        self.file_hd.write('\n'.join([';'.join([w, fl, str(fwc), infos_dict['corpus'], infos_dict['domaine'], infos_dict['periode']])  for (w, fl, fwc, infos_dict) in words]))
 
     def close(self, job_uuid: str):
         if self.job_uuid != job_uuid:
