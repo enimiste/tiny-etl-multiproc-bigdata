@@ -1,0 +1,34 @@
+from abc import abstractmethod
+from logging import Logger
+from typing import Generator
+from core.commons import WithLogging
+import os
+from multiprocessing import Queue
+
+class AbstractExtractor(WithLogging):
+    def __init__(self, logger: Logger) -> None:
+        super().__init__(logger)
+        
+    @abstractmethod
+    def extract(self) -> Generator[dict, None, None]:
+        pass
+
+    def close(self) -> None:
+        pass
+
+
+class FilesListExtractor(AbstractExtractor):
+    def __init__(self, logger: Logger, intput_dir: str, pattern: str) -> None:
+        super().__init__(logger)
+        self.input_dir = intput_dir
+        self.pattern = pattern
+        if not os.path.isdir(intput_dir):
+            raise RuntimeError("{} should be a valid directory".format(intput_dir))
+
+    def extract(self) -> Generator[dict, None, None]:
+        for root_dir, dirs, files in os.walk(self.input_dir):
+            if len(files)>0:
+                for file in files:
+                    if file.endswith(self.pattern):
+                        file_path = os.path.join(root_dir, file)
+                        yield {'_':file_path}
