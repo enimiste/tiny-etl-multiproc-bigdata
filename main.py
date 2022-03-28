@@ -60,6 +60,7 @@ if __name__=="__main__":
                                     ],
                             loaders=[WordsCSVFileLoader(LOGGER, os.path.abspath(out_dir))])
         pipeline.start()
+        pipeline.join()
     except Exception as ex:
         LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(ex))))
     end_exec_time=time.perf_counter()
