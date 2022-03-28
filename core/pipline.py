@@ -1,11 +1,13 @@
 
 from abc import ABC, abstractmethod
+from concurrent.futures import thread
 from logging import Logger, INFO, WARN, ERROR
 from multiprocessing import Process, Queue
 from multiprocessing.sharedctypes import Value
 import queue
 import signal
 from threading import Thread
+import threading
 from typing import Any, Callable, Generator
 
 import uuid
@@ -115,12 +117,12 @@ class ThreadedPipeline(AbstractPipeline):
             in_queues = [Queue(maxsize=100_000) for i in range(self.max_extraction_queues)]
             out_queues = [Queue(maxsize=100_000) for i in range(len(self.loaders))]
 
-            extract_threads.append(Thread(target=ThreadedPipeline.extract_items, args=(in_queues, self.extractor, self.closed, self.logger)))
+            extract_threads.append(Process(target=ThreadedPipeline.extract_items, args=(in_queues, self.extractor, self.closed, self.logger)))
             for (idx, in_queue) in enumerate(in_queues):
-                trans_threads.append(Thread(target=ThreadedPipeline.transform_items, args=(in_queue, out_queues, self.transformers, self.closed, self.logger)))
+                trans_threads.append(Process(target=ThreadedPipeline.transform_items, args=(in_queue, out_queues, self.transformers, self.closed, self.logger)))
 
             for (idx, out_queue) in enumerate(out_queues):
-                load_threads.append(Thread(target=ThreadedPipeline.load_items, args=(self.job_uuid, out_queue, self.loaders[idx], self.closed, self.logger)))
+                load_threads.append(Process(target=ThreadedPipeline.load_items, args=(self.job_uuid, out_queue, self.loaders[idx], self.closed, self.logger)))
 
             threads = load_threads +  trans_threads + extract_threads
             self.logger.log_msg("Starting {} threads of the pipeline {}.".format(len(threads), self.job_uuid), level=INFO)
@@ -160,18 +162,29 @@ class ThreadedPipeline(AbstractPipeline):
         except KeyboardInterrupt:
             self.logger.log_msg("Caught KeyboardInterrupt, terminating workers ...", level=INFO)
             self.close()
+
             threads = extract_threads + trans_threads + load_threads
+            self.logger.log_msg("Threads killing ...", level=INFO)
             for t in threads:
                 try:
                     t.kill()
                 except Exception:
                     pass
-            closables = in_queues + out_queue + self.transformers + self.loaders
-            for t in closables:
-                try:
+            self.logger.log_msg("Threads killed", level=INFO)
+            
+            closables = in_queues + out_queues + self.transformers + self.loaders
+            self.logger.log_msg("Closables closing ...", level=INFO)
+            timer = threading.Timer(interval=1, function=lambda : thread.interrupt_main())#in seconds
+            timer.start()
+            try:
+                for t in closables:
                     t.close()
-                except Exception:
-                    pass
+            except Exception:
+                pass
+            finally:
+                timer.cancel()
+            self.logger.log_msg("Closables closed", level=INFO)
+
         finally:
             self.logger.log_msg("Pipline {} End executing".format(self.job_uuid),  level=INFO)
 
