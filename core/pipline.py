@@ -60,7 +60,7 @@ class ThreadedPipeline(AbstractPipeline):
                     try:
                         out_queue.put(item, timeout=0.1)
                         break
-                    except queue.Empty:
+                    except queue.Full:
                         pass
 
     def flatMap(item:Any, mappers: list[Callable[[Any], Generator[Any, None, None]]]) -> Generator[Any, None, None]:
@@ -88,7 +88,7 @@ class ThreadedPipeline(AbstractPipeline):
                                         if idx in pushed_idx:
                                             out_queue.put(x, block=False, timeout=1)
                                             pushed_idx.remove(idx)
-                                    except queue.Empty:
+                                    except queue.Full:
                                         pass
                         else:
                             logger.log_msg("Item found None after applying all transformers")
