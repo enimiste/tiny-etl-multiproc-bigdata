@@ -119,7 +119,7 @@ class ThreadedPipeline(AbstractPipeline):
 
             extract_threads.append(Process(target=ThreadedPipeline.extract_items, args=(in_queues, self.extractor, self.closed, self.logger)))
             for (idx, in_queue) in enumerate(in_queues):
-                trans_threads.append(Thread(target=ThreadedPipeline.transform_items, args=(in_queue, out_queues, self.transformers, self.closed, self.logger)))
+                trans_threads.append(Process(target=ThreadedPipeline.transform_items, args=(in_queue, out_queues, self.transformers, self.closed, self.logger)))
 
             for (idx, out_queue) in enumerate(out_queues):
                 load_threads.append(Process(target=ThreadedPipeline.load_items, args=(self.job_uuid, out_queue, self.loaders[idx], self.closed, self.logger)))
@@ -137,21 +137,21 @@ class ThreadedPipeline(AbstractPipeline):
                         t.join()
                 self.logger.log_msg("Extract threads joined", level=INFO)
                 
-                
                 while len([x for x in filter(lambda x: x.qsize()>0, in_queues)])>0:
                     pass
                 self.logger.log_msg("IN Queues joined", level=INFO)
 
-                while len([x for x in filter(lambda x: x.qsize()>0, out_queues)])>0:
-                    pass
-                self.logger.log_msg("OUT Queues joined", level=INFO)
-
+                #TODO
                 self.close()
 
                 for t in trans_threads:
                     if self.closed.value==0:
                         t.join()
                 self.logger.log_msg("Transformation threads joined", level=INFO)
+
+                while len([x for x in filter(lambda x: x.qsize()>0, out_queues)])>0:
+                    pass
+                self.logger.log_msg("OUT Queues joined", level=INFO)
 
                 for t in load_threads:
                     if self.closed.value==0:

@@ -63,6 +63,7 @@ if __name__=="__main__":
         pipeline.join()
     except Exception as ex:
         LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(ex))))
-    end_exec_time=time.perf_counter()
-    LOGGER.info('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))))
+    finally:
+        end_exec_time=time.perf_counter()
+        LOGGER.info('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))))
     
