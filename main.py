@@ -9,7 +9,7 @@ import sys
 from core.extractors import FilesListExtractor
 from core.loaders import CSVFileLoader
 from core.pipline import ThreadedPipeline
-from core.transformers import FileToLinesTransformer
+from core.transformers import FilePathToBasenameTransformer, FileToLinesTransformer, TextWordTokenizerTransformer
 from loaders import WordsCSVFileLoader
 from transformers import ArabicRemoveDiacFromWordTransformer, ArabicTextWordsTokenizerTransformer
 
@@ -55,12 +55,15 @@ if __name__=="__main__":
                             extractor=FilesListExtractor(LOGGER, in_dir, ".txt"),
                             transformers=[
                                     FileToLinesTransformer(LOGGER, ".txt"), 
-                                    ArabicTextWordsTokenizerTransformer(LOGGER),
-                                    ArabicRemoveDiacFromWordTransformer(LOGGER)
+                                    TextWordTokenizerTransformer(LOGGER, "\\s+"),
+                                    FilePathToBasenameTransformer(LOGGER)
                                     ],
                             loaders=[WordsCSVFileLoader(LOGGER, os.path.abspath(out_dir))])
-        pipeline.run()
+        pipeline.start()
+        pipeline.join()
+        pipeline.close()
     except Exception as ex:
         LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(ex))))
     end_exec_time=time.perf_counter()
     LOGGER.info('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))))
+    

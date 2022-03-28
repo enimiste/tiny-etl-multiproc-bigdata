@@ -20,9 +20,8 @@ class WordsCSVFileLoader(CSVFileLoader):
     def __init__(self, logger: Logger, out_dir: str):
         super().__init__(logger, out_dir)
 
-    def _row_from_item(self, item: dict) -> list:
-        print(item)
-        return [item['_'], os.path.basename(item['file_path'])]
+    def _row_from_item(self, item: dict) -> list[str]:
+        return [item['_'], item['file_path']]
 
     def _filter(self, item: dict) -> bool:
         return item is not None and '_' in item and 'file_path' in item

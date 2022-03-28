@@ -1,4 +1,5 @@
 from abc import abstractmethod
+import codecs
 from logging import Logger, ERROR
 import os
 from typing import Generator
@@ -27,6 +28,12 @@ class AbstractTransformer(WithLogging):
     def close(self) -> None:
         pass
 
+    def updateItem(item: dict, item_key: str, item_value) -> dict:
+        res =  {}
+        res.update(item)
+        res[item_key] = item_value
+        return res
+
 class FileToLinesTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, pattern: str, item_key: str = '_') -> None:
         super().__init__(logger, item_key)
@@ -34,30 +41,32 @@ class FileToLinesTransformer(AbstractTransformer):
 
     def _map_item(self, item: dict, context: dict = {}) -> Generator[dict, None, None]:
         if not self.item_key in item:
-            self.log_msg("Key {} not found in the item dict".format(self.item_key))
+            super().log_msg("Key {} not found in the item dict".format(self.item_key))
             return
         file_path = item[self.item_key]
 
         if file_path is None:
-            self.log_msg("Item value is None")
+            super().log_msg("Item value is None")
             return
 
         if not os.path.isfile(file_path):
-            self.log_msg("File not found {}".format(file_path))
+            super().log_msg("File not found {}".format(file_path))
             return
         
         if not file_path.endswith(self.pattern):
-            self.log_msg("File {} should ends with {}".format(file_path, self.pattern))
+            super().log_msg("File {} should ends with {}".format(file_path, self.pattern))
 
         try:
-            with open(file_path, mode="r") as fh:
+            with codecs.open(file_path, mode="r", encoding="utf-8") as fh:
                 while True:
                     line = fh.readline()
                     if not line:
                         break
-                    yield {'_': line, 'file_path': file_path}
+                    line = line.strip()
+                    if line!='' and line!='\n':
+                        yield {'_': line, 'file_path': file_path}
         except Exception as e:
-            self.log_msg("File error {} : {}".format(file_path, str(e.args)), exception=e, level=ERROR)
+            super().log_msg("File error {} : {}".format(file_path, str(e.args)), exception=e, level=ERROR)
 
 class AbstractTextWordTokenizerTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, item_key: str = '_') -> None:
@@ -65,17 +74,44 @@ class AbstractTextWordTokenizerTransformer(AbstractTransformer):
 
     def _map_item(self, item: dict, context: dict = {}) -> Generator[dict, None, None]:
         if not self.item_key in item:
-            self.log_msg("Key {} not found in the item dict".format(self.item_key))
+            super().log_msg("Key {} not found in the item dict".format(self.item_key))
             return
+
         text = item[self.item_key]
 
         if text is None:
-            self.log_msg("Item value is None")
+            super().log_msg("Item value is None")
             return
 
-        return self._tokenize_text(text, context)
+        return self._tokenize_text(text, item, context)
 
     @abstractmethod
-    def _tokenize_text(self, text: str, item: dict) -> Generator[list[dict], None, None]:
+    def _tokenize_text(self, text: str, item: dict, context: dict) -> Generator[list[dict], None, None]:
         pass
+
+class TextWordTokenizerTransformer(AbstractTextWordTokenizerTransformer):
+    def __init__(self, logger: Logger, pattern: str, item_key: str = '_') -> None:
+        super().__init__(logger, item_key)
+        self.pattern = pattern
+
+    def _tokenize_text(self, text: str, item: dict, context: dict) -> Generator[list[dict], None, None]:
+        import re
+        for x in re.split(self.pattern, text):
+            yield AbstractTransformer.updateItem(item, self.item_key, x)
+
+class FilePathToBasenameTransformer(AbstractTransformer):
+    def __init__(self, logger: Logger, item_key: str = 'file_path') -> None:
+        super().__init__(logger, item_key)
+
+    def _map_item(self, item: dict, context: dict = {}) -> Generator[dict, None, None]:
+        if not self.item_key in item:
+            super().log_msg("Key {} not found in the item dict".format(self.item_key))
+            yield item
+
+        file_path = item[self.item_key]
+
+        if file_path is None:
+            yield item
+        else:
+            yield AbstractTransformer.updateItem(item, self.item_key, os.path.basename(file_path))
         
