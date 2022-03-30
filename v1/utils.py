@@ -20,8 +20,8 @@ if not 'DEFINED' in globals():
     console_handler.setFormatter(logging.Formatter(LOGGING_FORMAT))
     console_handler.setLevel(logging.INFO)
     logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
-                                                                        filename=os.path.abspath(f'logs/log-{date.today()}.log'),
-                                                                        maxBytes=50*1024*1024, backupCount=100), console_handler],
+                                                                filename=os.path.abspath(f'logs/log-{date.today()}.log'),
+                                                                maxBytes=50*1024*1024, backupCount=100), console_handler],
                                                     level=logging.DEBUG,
                                                     encoding='utf-8',
                                                     format=LOGGING_FORMAT)
@@ -64,9 +64,9 @@ def pipeline_builder(queue: Queue, words_saver, saver_process: Process) -> dict:
     words_saver : AbstractWordSaver
     """
     return {'queue': queue, 
-                            'tasks': [], 
-                            'saver': words_saver,  
-                            'save_proc': saver_process}
+            'tasks': [], 
+            'saver': words_saver,  
+            'save_proc': saver_process}
 
          
 def read_file_with_encoding(filepath, expected_encoding) -> tuple:
@@ -81,7 +81,8 @@ def read_file_with_encoding(filepath, expected_encoding) -> tuple:
     text = bytes_content.decode(encoding)
     
     if expected_encoding.upper() != encoding.upper():
-        log_msg("File {} has a diff. encoding {} with confid {}%. Expected {}".format(filepath, 
+        log_msg("File {} has a diff. encoding {} with confid {}%. Expected {}".format(
+                                                                                    filepath, 
                                                                                     encoding, 
                                                                                     round(100*confidence, 2),
                                                                                     expected_encoding))
