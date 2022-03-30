@@ -21,7 +21,7 @@ if not 'DEFINED' in globals():
     console_handler.setLevel(logging.INFO)
     logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
                                                                         filename=os.path.abspath(f'logs/log-{date.today()}.log'),
-                                                                        maxBytes=50*1024*1024, backupCount=100), console_handler], 
+                                                                        maxBytes=50*1024*1024, backupCount=100), console_handler],
                                                     level=logging.DEBUG,
                                                     encoding='utf-8',
                                                     format=LOGGING_FORMAT)
