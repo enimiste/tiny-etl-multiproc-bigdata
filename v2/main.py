@@ -28,7 +28,7 @@ LOGGER = logging.getLogger("my-logger")
                           
 if __name__=="__main__":
 
-    in_dir='bdall_test_data'
+    in_dir='../bdall_test_data'
     out_dir = 'out_dir'
     save_to_db=True
     db_host='localhost'

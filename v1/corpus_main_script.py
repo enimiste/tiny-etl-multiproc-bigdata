@@ -167,8 +167,8 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
 if __name__=="__main__":
     import time
 
-    #in_dir='bdall_test_data'
-    in_dir='bdall_real_data'
+    in_dir='../bdall_test_data'
+    #in_dir='bdall_real_data'
     #in_dir='bdall'
     in_dir_has_base_dirs = True # bdall > corpus > base > D > D > *.txt
     out_dir = 'out_dir'
