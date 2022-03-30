@@ -1,3 +1,4 @@
+import codecs
 from multiprocessing import Queue, Process
 import logging
 from logging import INFO, ERROR
@@ -69,25 +70,11 @@ def pipeline_builder(queue: Queue, words_saver, saver_process: Process) -> dict:
             'save_proc': saver_process}
 
          
-def read_file_with_encoding(filepath, expected_encoding) -> tuple:
-    import cchardet as chardet
-    from pathlib import Path
-    file_path_ = Path(filepath)
-    
-    bytes_content = file_path_.read_bytes()
-    detection = chardet.detect(bytes_content)
-    encoding = detection['encoding']
-    confidence = detection['confidence']
-    text = bytes_content.decode(encoding)
-    
-    if expected_encoding.upper() != encoding.upper():
-        log_msg("File {} has a diff. encoding {} with confid {}%. Expected {}".format(
-                                                                                    filepath, 
-                                                                                    encoding, 
-                                                                                    round(100*confidence, 2),
-                                                                                    expected_encoding))
-
-    return (text, encoding, confidence)
+def read_file_with_encoding(filepath, expected_encoding) -> list[str]:
+    res = []
+    with codecs.open(filepath, mode="r", encoding=expected_encoding) as fh:
+        res= fh.readlines()
+    return res
 
 def run_pipelines_blocking(pipelines: list):
     try:
@@ -177,11 +164,12 @@ def run_pipelines_blocking(pipelines: list):
         log_msg("run_pipelines_blocking End executing",  level=INFO)
 
 # ======================================= Metier ========================= :                   
-def tokenize_arabic_words_as_array(txt_content) -> list:
+def tokenize_arabic_words_as_array(txt_lines) -> list:
     import re
-                
+    
+    txt_content = ' '.join(txt_lines)
+    all_words=[]   
     arabic_words = re.findall("[^a-zA-Z\^0-9\\^١-٩\^[()•\+-@،?!|É°¢$£\éè¡àêâ\{\}%€–_`\",ä/'''<®>*:\$\[\~\-Ò©#¬¹±²\\ª·´¶º»µ¼&¨¤¾¦¿\À´ËÂ\\¥]+", txt_content)
-    all_words=[]
     # [[words.append(word) for word in txt.replace(' ', '\n').replace('\t', '\n').split('\n') if word and word.strip() ] for txt in arabic_words]
     for txt in arabic_words:
         wrds = txt.replace('×', '').replace(' ', '\n').replace('\r', '\n').replace('\t', '\n').replace('َ', '').replace('ّ', '').replace('ِ', '').replace('ُ', '').replace('ْ', '').replace('ً', '').replace('ٌ', '').replace('ٍ', '').split('\n')
@@ -191,11 +179,11 @@ def tokenize_arabic_words_as_array(txt_content) -> list:
             
     return all_words
 
-def tokenize_arabic_words_as_array_bis(txt_content) -> list:
+def tokenize_arabic_words_as_array_bis(txt_lines) -> list:
     import re
-                
-    arabic_words = re.findall(r'[َُِْـًٌٍّؤائءآىإأبتثجحخدذرزسشصضطظعغفقكلمنهـوي]+', txt_content)
+    txt_content = ' '.join(txt_lines)
     all_words=[]
+    arabic_words = re.findall(r'[َُِْـًٌٍّؤائءآىإأبتثجحخدذرزسشصضطظعغفقكلمنهـوي]+', txt_content)
     # [[words.append(word) for word in txt.replace(' ', '\n').replace('\t', '\n').split('\n') if word and word.strip() ] for txt in arabic_words]
     for txt in arabic_words:
         wrds = txt.replace('×', '').replace(' ', '\n').replace('\r', '\n').replace('\t', '\n').split('\n')
@@ -246,9 +234,9 @@ def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn
         if not txt_file_path is None and not txt_file_path.endswith('.txt'):
             raise RuntimeError("Only *.txt files are allowed. File {0} given".format(txt_file_path))
             
-        (txt_file_content, encod, confid) = read_file_with_encoding(txt_file_path, "utf-8")
+        txt_file_lines = read_file_with_encoding(txt_file_path, "utf-8")
     
-        words = tokenizer_fn(txt_file_content)
+        words = tokenizer_fn(txt_file_lines)
         wordsCount = len(words)
         log_msg("{} words found on {}".format(wordsCount, txt_file_path))
         uniqueWords = set([remove_diac_from_word_fn(word) for word in words])
@@ -256,7 +244,7 @@ def read_arabic_words(txt_file_path: str, tokenizer_fn, remove_diac_from_word_fn
         for word in uniqueWords:
             len_word = len(word)
             if(len_word < 16 and len_word > 1):  
-                res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount], infos))
+                res_words.append(tuple([word, os.path.basename(txt_file_path), wordsCount] + [infos]))
         return res_words
     except Exception as e:
         log_msg("File extracted words will be ignored due to an error {} : {}".format(txt_file_path, str(e.args)), exception=e, level=ERROR)

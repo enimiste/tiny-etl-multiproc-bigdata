@@ -167,8 +167,8 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
 if __name__=="__main__":
     import time
 
-    in_dir='bdall_test_data'
-    #in_dir='bdall_real_data'
+    #in_dir='bdall_test_data'
+    in_dir='bdall_real_data'
     #in_dir='bdall'
     in_dir_has_base_dirs = True # bdall > corpus > base > D > D > *.txt
     out_dir = 'out_dir'
@@ -177,7 +177,7 @@ if __name__=="__main__":
     db_name='arabic_lang'
     db_user='root'
     db_password='root'
-    chunk_size=1000
+    chunk_size=1500
     show_summary=False
 
     log_msg("Script started : {}".format(in_dir),  level=INFO)

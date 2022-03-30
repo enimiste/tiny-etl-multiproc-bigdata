@@ -8,7 +8,7 @@ class AbstractWordSaver(ABC):
         pass
 
     @abstractmethod
-    def close(self, job_uuid: str):
+    def close(self):
         pass
 
 class WordsSaverToDB(AbstractWordSaver):
@@ -70,11 +70,7 @@ class WordsSaverToDB(AbstractWordSaver):
                 except Exception as ex:
                     log_msg("Failed to rollback inserted records {}".format(str(ex.args)), exception=ex, level=ERROR)
 
-    def close(self, job_uuid: str):
-        if self.job_uuid != job_uuid:
-            log_msg("Trying to close save words saver from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid),  level=WARN)
-            return
-
+    def close(self):
         if not self.connection is None and self.connection.is_connected():
             try:
                 self.connection.close()
@@ -104,11 +100,7 @@ class WordsSaverToFile(AbstractWordSaver):
 
         self.file_hd.write('\n'.join([';'.join([w, fl, str(fwc), infos_dict['corpus'], infos_dict['domaine'], infos_dict['periode']])  for (w, fl, fwc, infos_dict) in words]))
 
-    def close(self, job_uuid: str):
-        if self.job_uuid != job_uuid:
-            log_msg("Trying to close words saver from different job. Actual {}, caller {}".format(self.job_uuid, job_uuid),  level=WARN)
-            return
-
+    def close(self):
         if not self.file_hd is None:
             try:
                 self.file_hd.close()
