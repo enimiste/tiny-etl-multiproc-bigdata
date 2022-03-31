@@ -1,4 +1,5 @@
 import codecs
+import gc
 from multiprocessing import Queue, Process
 import logging
 from logging import INFO, ERROR
@@ -176,7 +177,10 @@ def tokenize_arabic_words_as_array(txt_lines) -> list:
         for w in wrds:
             if w and w.strip():
                 all_words.append(w)
-            
+    
+    del(txt_lines)
+    gc.collect()
+    
     return all_words
 
 def tokenize_arabic_words_as_array_bis(txt_lines) -> list:
@@ -190,7 +194,10 @@ def tokenize_arabic_words_as_array_bis(txt_lines) -> list:
         for w in wrds:
             if w and w.strip():
                 all_words.append(w)
-            
+    
+    del(txt_lines)
+    gc.collect()
+
     return all_words
 
 def remove_diac_from_word(word) -> str:
