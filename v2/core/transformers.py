@@ -2,7 +2,7 @@ from abc import abstractmethod
 import codecs
 from logging import Logger, ERROR
 import os
-from typing import Any, Generator
+from typing import Any, Generator, Tuple
 from core.commons import WithLogging
 from core.commons import dict_deep_get, dict_deep_set
 
@@ -12,11 +12,21 @@ class AbstractTransformer(WithLogging):
     def __init__(self, logger: Logger, 
                 input_key_path: list[str], 
                 input_value_type: Any,
-                output_key: str) -> None:
+                output_key: str,
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
         super().__init__(logger)
         self.input_key_path = input_key_path
         self.output_key = output_key
         self._input_value_type = input_value_type
+        self.copy_values_key_paths = copy_values_key_paths
+
+    def _copy_input_values_to_output(self, dest: dict, source: dict):
+        if self.copy_values_key_paths is not None:
+            for (key, path) in self.copy_values_key_paths:
+                x = dict_deep_get(source, path)
+                if x is not None:
+                    dest[key] = x
+        return dest
 
     def transform(self, item: dict, context: dict={}) -> Generator[dict, None, None]:
         if item is None:
@@ -33,9 +43,9 @@ class AbstractTransformer(WithLogging):
         for res in self._map_item(input_value, context):
             if res != IgnoreTransformationResult:
                 item_ = {}
-                item_.update(item)
+                item = self._copy_input_values_to_output(item_, item)
                 item_[self.output_key] = res
-                yield item
+                yield item_
             else:
                 super().log_msg("Result ignored <IgnoreTransformationResult> : {}".format(str(res)))
         if "__input_item__" in context:
@@ -55,11 +65,12 @@ class FileToLinesTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
                  pattern: str, 
                  input_key_path: list[str], 
-                 output_key: str) -> None:
+                 output_key: str,
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
         """
         Yield elements : {line: str, file_path: str}
         """
-        super().__init__(logger, input_key_path, (str), output_key)
+        super().__init__(logger, input_key_path, (str), output_key, copy_values_key_paths)
         self.pattern = pattern
 
     def _map_item(self, file_path: str, context: dict = {}) -> Generator[dict, None, None]:
@@ -85,8 +96,9 @@ class FileToLinesTransformer(AbstractTransformer):
 class AbstractTextWordTokenizerTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
                 input_key_path: list[str],
-                output_key: str) -> None:
-        super().__init__(logger, input_key_path, (str), output_key)
+                output_key: str,
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
+        super().__init__(logger, input_key_path, (str), output_key, copy_values_key_paths)
 
     def _map_item(self, text: str, context: dict = {}) -> Generator[dict, None, None]:
         if text is None:
@@ -106,8 +118,9 @@ class TextWordTokenizerTransformer(AbstractTextWordTokenizerTransformer):
     def __init__(self, logger: Logger, 
                 pattern: str, 
                 input_key_path: list[str],
-                output_key: str) -> None:
-        super().__init__(logger, input_key_path, output_key)
+                output_key: str,
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
+        super().__init__(logger, input_key_path, output_key, copy_values_key_paths)
         self.pattern = pattern
 
     def _tokenize_text(self, text: str, item: dict, context: dict) -> Generator[str, None, None]:
@@ -123,7 +136,7 @@ class ItemUpdaterCallbackTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
                 input_key_path: list[str],
                 callback) -> None:
-        super().__init__(logger, input_key_path, None, None)
+        super().__init__(logger, input_key_path, None, None, None)
         self.callback = callback
 
     def transform(self, item: dict, context: dict={}) -> Generator[dict, None, None]:

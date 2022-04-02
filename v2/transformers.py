@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Any, Callable, Generator
+from typing import Any, Callable, Generator, Tuple
 
 from core.transformers import AbstractTextWordTokenizerTransformer, AbstractTransformer
 from core.transformers import ItemUpdaterCallbackTransformer
@@ -7,8 +7,9 @@ from core.transformers import ItemUpdaterCallbackTransformer
 class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
     def __init__(self, logger: Logger, 
                 input_key_path: list[str],
-                output_key: str) -> None:
-        super().__init__(logger, input_key_path, output_key)
+                output_key: str,
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
+        super().__init__(logger, input_key_path, output_key, copy_values_key_paths)
 
     def _tokenize_text(self, text: str, item: dict, context: dict) -> Generator[list[dict], None, None]:
         import re

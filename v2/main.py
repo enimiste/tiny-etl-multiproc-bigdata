@@ -56,11 +56,13 @@ if __name__=="__main__":
                             extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
                                     FileToLinesTransformer(LOGGER, pattern=".txt", input_key_path=['_'], output_key='_'), 
-                                    TextWordTokenizerTransformer(LOGGER, pattern="\\s+", input_key_path=['_'], output_key='_'),
+                                    TextWordTokenizerTransformer(LOGGER, pattern="\\s+", input_key_path=['_', 'line'], output_key='_', 
+                                                                copy_values_key_paths=[('file_path', ['_', 'file_path'])]),
                                     ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['_', 'file_path'], callback=os.path.basename)
                                     ],
                             loaders=[ConditionalLoader( LOGGER, 
-                                                        not config['save_to_db'],
+                                                        #not config['save_to_db'],
+                                                        True,
                                                         CSV_FileLoader( LOGGER,
                                                                         input_key_path=['_'],
                                                                         values_path=[('word', ['_']), 

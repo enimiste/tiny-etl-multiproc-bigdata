@@ -34,4 +34,5 @@ class FilesListExtractor(AbstractExtractor):
                 for file in files:
                     if file.endswith(self.pattern):
                         file_path = os.path.join(root_dir, file)
-                        yield dict([(self.output_key,file_path)])
+                        res = dict([(self.output_key,file_path)])
+                        yield res

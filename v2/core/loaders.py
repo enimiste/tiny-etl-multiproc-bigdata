@@ -129,10 +129,17 @@ class CSV_FileLoader(AbstractLoader):
                 logger: Logger, 
                 input_key_path: list[str],
                 values_path: list[tuple[str, list[str]]],
-                out_dir: str):
+                out_dir: str,
+                col_sep: str=";",
+                out_file_ext="txt",
+                out_file_name_prefix="out_",
+                ):
         super().__init__(logger, input_key_path, values_path)
         self.out_dir=out_dir
         self.file_hd = None
+        self.col_sep = col_sep
+        self.out_file_ext = out_file_ext
+        self.out_file_name_prefix = out_file_name_prefix
 
     def _row_from_item(self, item: dict) -> list[str]:
         row = []
@@ -148,12 +155,12 @@ class CSV_FileLoader(AbstractLoader):
             file_name = self._out_filename(job_uuid)
             file_path = os.path.join(self.out_dir, file_name)
             self.file_hd = codecs.open(file_path, 'a', encoding = "utf-8")
-
+            super().log_msg("File {} opened".format(file_path))
         rows = []
         for item in items:
             x = dict_deep_get(item, self.input_key_path)
             if x is not None and self._filter(x):
-                rows.append(self._col_sep().join(self._row_from_item(x)))
+                rows.append(self.col_sep.join(self._row_from_item(x)))
 
         rows_nbr = len(rows)  
         if rows_nbr>0:
@@ -161,10 +168,7 @@ class CSV_FileLoader(AbstractLoader):
             super().log_msg("{}/input_dat={} total rows written in the file".format(rows_nbr, len(items)))
 
     def _out_filename(self, job_uuid: str) -> str:
-        return "out_{}.txt".format(job_uuid)
-
-    def _col_sep(self) -> str:
-        return ';'
+        return "{}_{}.{}".format(self.out_file_name_prefix, job_uuid, self.out_file_ext)
 
     def _filter(self, item: dict) -> bool:
         return item is not None
