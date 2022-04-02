@@ -61,9 +61,6 @@ class WordsSaverToDB(AbstractWordSaver):
                 inserted_data+=cursor.rowcount
                 log_msg("{} Record inserted successfully".format(cursor.rowcount))
             log_msg("{} Total record inserted successfully".format(inserted_data))
-            del(data)
-            del(words)
-            gc.collect()
             cursor.close()
 
         except mysql.connector.Error as error:
@@ -103,8 +100,6 @@ class WordsSaverToFile(AbstractWordSaver):
             self.file_hd = codecs.open(file_path, 'a', encoding = "utf-8", buffering=1)
 
         self.file_hd.write('\n'.join([';'.join([w, fl, str(fwc), infos_dict['corpus'], infos_dict['domaine'], infos_dict['periode']])  for (w, fl, fwc, infos_dict) in words]))
-        del(words)
-        gc.collect()
 
     def close(self):
         if not self.file_hd is None:
