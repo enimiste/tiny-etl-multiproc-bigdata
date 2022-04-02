@@ -1,6 +1,2 @@
-# Requirements :
-- Python 3.10.x
-- pip install mysql-connector-python
-- pip install concurrent-log-handler
-- pip install cchardet
+- https://www.vinta.com.br/blog/2021/etl-with-asyncio-asyncpg/
 
