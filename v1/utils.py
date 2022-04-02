@@ -3,6 +3,7 @@ import gc
 from multiprocessing import Queue, Process
 import logging
 from logging import INFO, ERROR
+from ntpath import join
 import sys
 import threading
 from concurrent_log_handler import ConcurrentRotatingFileHandler
@@ -15,7 +16,7 @@ if not 'DEFINED' in globals():
     MAX_QUEUE_PUT_TIMEOUT_SEC = 30
     MAX_QUEUE_GET_TIMEOUT_SEC = 30
     DATA_BY_PROCESS_CHUNK_SIZE = 4_000
-    MAX_QUEUE_SIZE = 100_000
+    MAX_QUEUE_SIZE = 10_000
 
     LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
     console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -50,7 +51,7 @@ def split_list(items: list, chunk_size: int):
   for i in range(0, len(items), chunk_size):
       yield items[i:i + chunk_size]
 
-def save_words(queue: Queue, job_uuid: str, words_saver):
+def save_words_worker(queue: Queue, job_uuid: str, words_saver):
     """
     words_saver : AbstractWordSaver
     """
@@ -61,14 +62,18 @@ def save_words(queue: Queue, job_uuid: str, words_saver):
     except Exception as e:
         log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)), exception=e, level=ERROR)
 
-def pipeline_builder(queue: Queue, words_saver, saver_process: Process) -> dict:
+def pipeline_builder(job_uuid: str, queue: Queue, words_saver) -> dict:
     """
     words_saver : AbstractWordSaver
+        {'queue': queue, 
+        'tasks': [], 
+        'resource': words_saver,  
+        'process': saver_process}
     """
     return {'queue': queue, 
             'tasks': [], 
-            'saver': words_saver,  
-            'save_proc': saver_process}
+            'resource': words_saver,  
+            'process': Process(target=save_words_worker, args=(queue, job_uuid, words_saver))}
 
          
 def read_file_with_encoding(filepath, expected_encoding) -> list[str]:
@@ -83,8 +88,9 @@ def run_pipelines_blocking(pipelines: list):
         log_msg("Start processes",  level=INFO)
         nbr_proc=0
         for p in pipelines:
+            sp = p['process']
             try:
-                p['save_proc'].start()
+                sp.start()
                 nbr_proc+=1
                 one_started = False
                 for t in p['tasks']:
@@ -93,12 +99,12 @@ def run_pipelines_blocking(pipelines: list):
                         one_started=True
                         nbr_proc+=1
                     except Exception as ex:
-                        log_msg("Error while starting task process : {}".format(str(ex.args)), exception=ex, level=ERROR)
+                        log_msg("Error while starting task {} : {}".format(type(t).__name__, str(ex.args)), exception=ex, level=ERROR)
                 if not one_started:
-                    p['save_proc'].terminate()
+                    sp.terminate()
                     p['queue'].close()
             except Exception as ex2:
-                log_msg("Error while starting pipeline process : {}".format(str(ex2.args)), exception=ex2, level=ERROR)
+                log_msg("Error while starting pipeline {} : {}".format(type(sp).__name__, str(ex2.args)), exception=ex2, level=ERROR)
         log_msg("{} processes started".format(nbr_proc),  level=INFO)
         # Joining processes
         log_msg("Joining processes",  level=INFO)
@@ -107,55 +113,69 @@ def run_pipelines_blocking(pipelines: list):
         while working:
             working = False
             for p in pipelines:
+                #Save process
+                sp = p['process']
                 try:
-                    #Save process
-                    sp = p['save_proc']
                     if not sp.pid in joined:
                         sp.join(timeout=PROC_JOIN_TIMEOUT)
                         if not sp.exitcode is None:
                             joined.add(sp.pid)
-                            log_msg("{} processes were joined".format(len(joined)),  level=INFO)
+                            log_msg("{} total {}(e)s joined at now".format( len(joined), type(sp).__name__),  level=INFO)
                             try:
                                 sp.terminate()
                             except Exception as tex:
-                                log_msg("Error while terminate tasks process : {}".format(str(tex.args)), level=ERROR, exception=tex)
+                                log_msg("Error while terminate tasks {} : {}".format(type(sp).__name__, str(tex.args)), level=ERROR, exception=tex)
                         else:
                             working=True
 
                     # Tasks
                     for t in p['tasks']:
                         try:
-                            if not t.pid in joined:
+                            x_id = None
+                            if type(t) is threading.Thread:
+                                x_id = t.getName()
+                            else:
+                                x_id = t.pid
+
+                            if not x_id in joined:
                                 t.join(timeout=PROC_JOIN_TIMEOUT)
-                                if not t.exitcode is None:
-                                    joined.add(t.pid)
-                                    log_msg("{} processes were joined".format(len(joined)),  level=INFO)
+                                is_joined = None
+                                if type(t) is threading.Thread:
+                                    is_joined = not t.is_alive()
+                                else:
+                                    is_joined = t.exitcode is not None
+                                if is_joined:
+                                    joined.add(x_id)
+                                    log_msg("{} total {}(e)s joined at now".format(len(joined), type(t).__name__),  level=INFO)
                                     try:
                                         sp.terminate()
                                     except Exception as tex:
-                                        log_msg("Error while terminate tasks process : {}".format(str(tex.args)), exception=tex, level=ERROR)
+                                        log_msg("Error while terminate tasks {} : {}".format(type(t).__name__, str(tex.args)), exception=tex, level=ERROR)
                                 else:
                                     working=True
                         except Exception as ex:
-                            log_msg("Error while joining task process : {}".format(str(ex.args)), exception=ex, level=ERROR)
+                            log_msg("Error while joining task {} : {}".format(type(t).__name__, str(ex.args)), exception=ex, level=ERROR)
                 except Exception as ex2:
-                    log_msg("Error while joining pipeline process : {}".format(str(ex2.args)), exception=ex2, level=ERROR)
+                    log_msg("Error while joining pipeline {} : {}".format(type(sp).__name__, str(ex2.args)), exception=ex2, level=ERROR)
         log_msg("Closing saver objects",  level=INFO)
         # Closing saver object
         for p in pipelines:
             try:
-                p['saver'].close()
+                p['resource'].close()
             except Exception:
                 pass
     except KeyboardInterrupt:
         log_msg("Caught KeyboardInterrupt, terminating workers ...", level=INFO)
         for p in pipelines:
             try:
-                p['save_proc'].terminate()
-                p['saver'].close()
+                p['process'].terminate()
+                p['resource'].close()
                 for t in p['tasks']:
                     try:
-                       t.terminate()
+                        if type(t) is threading.Thread:
+                            t._stop()
+                        else:
+                            t.terminate()
                     except Exception as ex:
                         log_msg("Error while terminate tasks process : {}".format(str(ex.args)), exception=ex, level=ERROR)
                 p['queue'].close()

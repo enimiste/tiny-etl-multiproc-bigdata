@@ -4,3 +4,4 @@ __pycache__
 bdall_test_data
 **/*.zip
 *.txt
+*.lock
