@@ -7,11 +7,12 @@ from datetime import date
 import os
 import sys
 from core.extractors import FilesListExtractor
-from core.loaders import CSVFileLoader
+from core.loaders import CSV_FileLoader
 from core.pipline import ThreadedPipeline
-from core.transformers import FilePathToBasenameTransformer, FileToLinesTransformer, TextWordTokenizerTransformer
-from loaders import WordsCSVFileLoader
+from core.transformers import  FileToLinesTransformer, TextWordTokenizerTransformer
 from transformers import ArabicRemoveDiacFromWordTransformer, ArabicTextWordsTokenizerTransformer
+from core.transformers import ItemUpdaterCallbackTransformer
+from core.loaders import ConditionalLoader, MySQL_DBLoader
 
 LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -30,7 +31,7 @@ if __name__=="__main__":
 
     in_dir='../bdall_test_data'
     out_dir = 'out_dir'
-    save_to_db=True
+    save_to_db=False
     db_host='localhost'
     db_name='arabic_lang'
     db_user='root'
@@ -52,13 +53,32 @@ if __name__=="__main__":
     LOGGER.log(INFO, "Script started : {}".format(in_dir))
     try:
         pipeline = ThreadedPipeline(LOGGER, 
-                            extractor=FilesListExtractor(LOGGER, in_dir, ".txt"),
+                            extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
-                                    FileToLinesTransformer(LOGGER, ".txt"), 
-                                    TextWordTokenizerTransformer(LOGGER, "\\s+"),
-                                    FilePathToBasenameTransformer(LOGGER)
+                                    FileToLinesTransformer(LOGGER, pattern=".txt", input_key_path=['_'], output_key='_'), 
+                                    TextWordTokenizerTransformer(LOGGER, pattern="\\s+", input_key_path=['_'], output_key='_'),
+                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['_', 'file_path'], callback=os.path.basename)
                                     ],
-                            loaders=[WordsCSVFileLoader(LOGGER, os.path.abspath(out_dir))])
+                            loaders=[ConditionalLoader( LOGGER, 
+                                                        not config['save_to_db'],
+                                                        CSV_FileLoader( LOGGER,
+                                                                        input_key_path=['_'],
+                                                                        values_path=[('word', ['_']), 
+                                                                                     ('file', ['file_path'])],
+                                                                        out_dir=os.path.abspath(out_dir))),
+
+                                     ConditionalLoader( LOGGER, 
+                                                        config['save_to_db'],
+                                                        MySQL_DBLoader( LOGGER, 
+                                                                        input_key_path=['_'], 
+                                                                        sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
+                                                                                        VALUES(%s,%s,%s)""",
+                                                                        chunk_size=config['chunk_size'],
+                                                                        host=config['db_host'],
+                                                                        database=config['db_name'],
+                                                                        user=config['db_user'],
+                                                                        password=config['db_password']))
+                                                            ])
         pipeline.start()
         pipeline.join()
     except Exception as ex:

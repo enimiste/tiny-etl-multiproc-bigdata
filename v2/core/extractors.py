@@ -3,7 +3,6 @@ from logging import Logger
 from typing import Generator
 from core.commons import WithLogging
 import os
-from multiprocessing import Queue
 
 class AbstractExtractor(WithLogging):
     def __init__(self, logger: Logger) -> None:
@@ -18,9 +17,13 @@ class AbstractExtractor(WithLogging):
 
 
 class FilesListExtractor(AbstractExtractor):
-    def __init__(self, logger: Logger, intput_dir: str, pattern: str) -> None:
+    """
+    yields a dict
+    """
+    def __init__(self, logger: Logger, intput_dir: str, pattern: str, output_key: str) -> None:
         super().__init__(logger)
         self.input_dir = intput_dir
+        self.output_key = output_key
         self.pattern = pattern
         if not os.path.isdir(intput_dir):
             raise RuntimeError("{} should be a valid directory".format(intput_dir))
@@ -31,4 +34,4 @@ class FilesListExtractor(AbstractExtractor):
                 for file in files:
                     if file.endswith(self.pattern):
                         file_path = os.path.join(root_dir, file)
-                        yield {'_':file_path}
+                        yield dict([(self.output_key,file_path)])

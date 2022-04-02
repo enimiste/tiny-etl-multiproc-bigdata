@@ -6,7 +6,6 @@ from multiprocessing import Process, Queue
 from multiprocessing.sharedctypes import Value
 import queue
 import signal
-from threading import Thread
 import threading
 from typing import Any, Callable, Generator
 
@@ -16,7 +15,6 @@ from core.commons import LoggerWrapper, WithLogging, rotary_iter
 from core.extractors import AbstractExtractor
 from core.loaders import AbstractLoader
 from transformers import AbstractTransformer
-
 
 
 class AbstractPipeline(Process, ABC):
@@ -70,8 +68,10 @@ class ThreadedPipeline(AbstractPipeline):
             mapper = mappers[0]
             g = mapper(item)
             for x in g:
-                for a in  ThreadedPipeline.flatMap(x, mappers[1:]):
-                    yield a
+                if x is not None:
+                    for a in  ThreadedPipeline.flatMap(x, mappers[1:]):
+                        if a is not None:
+                            yield a
 
     @staticmethod
     def transform_items(in_queue: Queue, out_queues: list[Queue], trans: list[AbstractTransformer], closed: Value, logger: WithLogging) -> None:

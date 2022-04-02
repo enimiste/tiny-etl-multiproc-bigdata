@@ -1,11 +1,14 @@
 from logging import Logger
-from typing import Generator
+from typing import Any, Callable, Generator
 
 from core.transformers import AbstractTextWordTokenizerTransformer, AbstractTransformer
+from core.transformers import ItemUpdaterCallbackTransformer
 
 class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
-    def __init__(self, logger: Logger, item_key: str = '_') -> None:
-        super().__init__(logger, item_key)
+    def __init__(self, logger: Logger, 
+                input_key_path: list[str],
+                output_key: str) -> None:
+        super().__init__(logger, input_key_path, output_key)
 
     def _tokenize_text(self, text: str, item: dict, context: dict) -> Generator[list[dict], None, None]:
         import re
@@ -15,22 +18,16 @@ class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
             words = txt.replace('×', '').replace(' ', '\n').replace('\r', '\n').replace('\t', '\n').split('\n')
             for w in words:
                 if w and w.strip():
-                    yield AbstractTransformer.updateItem(item, self.item_key, w)
+                    yield w
 
-class ArabicRemoveDiacFromWordTransformer(AbstractTransformer):
-    def __init__(self, logger: Logger, item_key: str = '_') -> None:
-        super().__init__(logger, item_key)
+class ArabicRemoveDiacFromWordTransformer(ItemUpdaterCallbackTransformer):
+    def __init__(self, logger: Logger, 
+                input_key_path: list[str], 
+                input_value_type: Any, 
+                output_key: str) -> None:
+        super().__init__(logger, input_key_path, input_value_type, output_key, callback=ArabicRemoveDiacFromWordTransformer.remove_diac)
 
-    def _map_item(self, item: dict, context: dict = {}) -> Generator[dict, None, None]:
-        if not self.item_key in item:
-            super().log_msg("Key {} not found in the item dict".format(self.item_key))
-            return
-        text = item[self.item_key]
-
+    def remove_diac(text: str) -> str:
         if text is None:
-            super().log_msg("Item value is None")
-            return
-
-        text = text.replace('َ', '').replace('ّ', '').replace('ِ', '').replace('ُ', '').replace('ْ', '').replace('ً', '').replace('ٌ', '').replace('ٍ', '')
-        
-        yield AbstractTransformer.updateItem(item, self.item_key, text)
+            return text
+        return text.replace('َ', '').replace('ّ', '').replace('ِ', '').replace('ُ', '').replace('ْ', '').replace('ً', '').replace('ٌ', '').replace('ٍ', '')
