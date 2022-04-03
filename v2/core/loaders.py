@@ -20,11 +20,33 @@ class AbstractLoader(WithLogging):
     def close(self, job_uuid: str) -> None:
         pass
 
+
+class NoopLoader(AbstractLoader):
+    def __init__(self, logger, 
+                input_key_path: list[str],
+                values_path: list[tuple[str, list[str]]] = [],
+                log: bool = False) -> None:
+        super().__init__(logger, input_key_path, values_path)
+        self.log = log
+
+    def load(self, job_uuid: str, items: list[dict]) -> None:
+        if self.log:
+            for item in items:
+                super().log_msg("Loading Item : {}".format(str(dict_deep_get(item, self.input_key_path))))
+
+    def close(self, job_uuid: str) -> None:
+        pass
+
+
 class ConditionalLoader(AbstractLoader):
-    def __init__(self, logger, condition, loader: AbstractLoader) -> None:
+    def __init__(self, 
+                    logger, condition, 
+                    loader: AbstractLoader, 
+                    else_log: bool = False) -> None:
         super().__init__(logger, None, None)
         self.condition = condition
         self.loader = loader
+        self.else_log = else_log
 
     def _condition(self):
         if hasattr(self.condition, '__call__'):
@@ -35,6 +57,8 @@ class ConditionalLoader(AbstractLoader):
     def load(self, job_uuid: str, items: list[dict]) -> None:
         if self._condition():
             return self.load(job_uuid, items)
+        elif self.else_log:
+            super().log_msg("Loading : {}".format(str(items)))
 
     def close(self, job_uuid: str) -> None:
         if self._condition():

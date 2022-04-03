@@ -58,6 +58,20 @@ class AbstractTransformer(WithLogging):
     def close(self) -> None:
         pass
 
+class NoopTransformer(AbstractTransformer):
+    """
+    It is transparent,
+    Yields the same input without any changes
+    """
+    def __init__(self, logger: Logger) -> None:
+        super().__init__(logger, None, None, None, None)
+
+    def transform(self, item: dict, context: dict={}) -> Generator[dict, None, None]:
+        yield item
+
+    def _map_item(self, item, context: dict = {}) -> Generator[dict, None, None]:
+        pass
+
 class FileToLinesTransformer(AbstractTransformer):
     """
     Yield elements : {line: str, file_path: str}
@@ -141,15 +155,15 @@ class ItemUpdaterCallbackTransformer(AbstractTransformer):
 
     def transform(self, item: dict, context: dict={}) -> Generator[dict, None, None]:
         if item is None:
-            return IgnoreTransformationResult
+            return None
         input_value = dict_deep_get(item, self.input_key_path)
         
         if input_value is None:
-            return IgnoreTransformationResult
+            return None
 
         new_val = self.callback(input_value)
         if new_val is None:
-            return IgnoreTransformationResult
+            return None
 
         item_ = {}
         item_.update(item)
