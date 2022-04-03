@@ -198,23 +198,33 @@ class ThreadedPipeline(AbstractPipeline):
             
             self.logger.log_msg("Pipeline {} running".format(self.job_uuid), level=INFO)
 
+            extractor_joined=False
+            transformators_joined=False
+            loaders_joined=False
             while self.pipeline_closed.value==0:
-                for t in extract_threads:
-                    if self.pipeline_closed.value==0:
-                        t.join()
-                self.logger.log_msg("Extract threads joined", level=INFO)
+                if not extractor_joined and self.extractor_finished.value==1:
+                    for t in extract_threads:
+                        if self.pipeline_closed.value==0:
+                            t.join()
+                    extractor_joined=True
+                    self.logger.log_msg("Extract threads joined", level=INFO)
 
-                for t in trans_threads:
-                    if self.pipeline_closed.value==0:
-                        t.join()
-                self.logger.log_msg("Transformation threads joined", level=INFO)
+                if not transformators_joined and  self.transformation_pipeline_alive.value==0:
+                    for t in trans_threads:
+                        if self.pipeline_closed.value==0:
+                            t.terminate()
+                    transformators_joined = True
+                    self.logger.log_msg("Transformation threads joined", level=INFO)
 
-                for t in load_threads:
-                    if self.pipeline_closed.value==0:
-                        t.join()
-                self.logger.log_msg("Load threads joined", level=INFO)
+                if not loaders_joined and self.loaders_alive.value==0:
+                    for t in load_threads:
+                        if self.pipeline_closed.value==0:
+                            t.join()
+                    loaders_joined = True
+                    self.logger.log_msg("Load threads joined", level=INFO)
 
-                self.close()
+                if extractor_joined and transformators_joined and loaders_joined:
+                    self.close()
 
         except KeyboardInterrupt:
             self.logger.log_msg("Caught KeyboardInterrupt, terminating workers ...", level=INFO)
