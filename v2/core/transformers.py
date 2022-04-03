@@ -150,6 +150,9 @@ class FileTextReaderTransformer(AbstractTransformer):
             super().log_msg("File error {} : {}".format(file_path, str(e.args)), exception=e, level=ERROR)
 
 class ReduceTransformer(AbstractTransformer):
+    """
+    Avoid using lambda as reducer
+    """
     def __init__(self, logger: Logger, 
                  input_key_path: list[str], 
                  input_value_type: Any,
