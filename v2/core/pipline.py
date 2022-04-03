@@ -1,13 +1,13 @@
 
 from abc import ABC, abstractmethod
-from asyncio.log import logger
 from concurrent.futures import thread
 from logging import Logger, INFO, WARN, ERROR
 from multiprocessing import Process, Queue
 from multiprocessing.sharedctypes import Value
 import queue
 import signal
-import threading
+from sqlite3 import paramstyle
+from threading import Thread, Timer
 from typing import Any, Callable, Generator
 
 import uuid
@@ -43,12 +43,14 @@ class ThreadedPipeline(AbstractPipeline):
                 extractor: AbstractExtractor, 
                 transformers: list[AbstractTransformer],
                 loaders: list[AbstractLoader],
-                max_transformation_pipelines: int = 5) -> None:
+                max_transformation_pipelines: int = 5,
+                use_threads_as_transformation_pipelines: bool = False) -> None:
         super().__init__(logger)
         self.job_uuid = str(uuid.uuid1())
         self.extractor = extractor
         self.transformers = transformers
         self.loaders = loaders
+        self.use_threads_as_transformation_pipelines = use_threads_as_transformation_pipelines
         self.max_transformation_pipelines = max(1, max_transformation_pipelines)
         self.pipeline_started = Value('i', 0)
         self.pipeline_closed = Value('i', 0)
@@ -182,14 +184,23 @@ class ThreadedPipeline(AbstractPipeline):
 
             self.transformation_pipeline_alive.value = self.max_transformation_pipelines
             for (idx, in_queue) in enumerate(in_queues):
-                trans_threads.append(Process(target=ThreadedPipeline.transform_items, args=(in_queue, 
-                                                                                            out_queues, 
-                                                                                            self.transformers, 
-                                                                                            self.pipeline_started,
-                                                                                            self.pipeline_closed, 
-                                                                                            self.extractor_finished,
-                                                                                            self.transformation_pipeline_alive,
-                                                                                            self.logger)))
+                params = {
+                    'target': ThreadedPipeline.transform_items, 
+                    'args': (in_queue, 
+                            out_queues, 
+                            self.transformers, 
+                            self.pipeline_started,
+                            self.pipeline_closed, 
+                            self.extractor_finished,
+                            self.transformation_pipeline_alive,
+                            self.logger)
+                }
+                if self.use_threads_as_transformation_pipelines:
+                    p = Thread(target=params["target"], args=params["args"])
+                else:
+                    p = Process(target=params["target"], args=params["args"])
+                    
+                trans_threads.append(p)
             self.logger.log_msg("{} transformation pipelines created".format(self.transformation_pipeline_alive.value), level=INFO)
 
             self.loaders_alive.value = len(self.loaders)
@@ -225,7 +236,7 @@ class ThreadedPipeline(AbstractPipeline):
                 if not transformators_joined and  self.transformation_pipeline_alive.value==0:
                     for t in trans_threads:
                         if self.pipeline_closed.value==0:
-                            t.terminate()
+                            t.join()
                     transformators_joined = True
                     self.logger.log_msg("Transformation threads joined", level=INFO)
 
@@ -247,14 +258,17 @@ class ThreadedPipeline(AbstractPipeline):
             self.logger.log_msg("Threads killing ...", level=INFO)
             for t in threads:
                 try:
-                    t.kill()
+                    if type(t) is Thread:
+                        t._stop()
+                    else:
+                        t.kill()
                 except Exception:
                     pass
             self.logger.log_msg("Threads killed", level=INFO)
             
             closables = in_queues + out_queues + self.transformers + self.loaders
             self.logger.log_msg("Closables closing ...", level=INFO)
-            timer = threading.Timer(interval=1, function=lambda : thread.interrupt_main())#in seconds
+            timer = Timer(interval=1, function=lambda : thread.interrupt_main())#in seconds
             timer.start()
             try:
                 for t in closables:

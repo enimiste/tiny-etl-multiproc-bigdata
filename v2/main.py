@@ -55,6 +55,7 @@ if __name__=="__main__":
     try:
         pipeline = ThreadedPipeline(LOGGER, 
                             max_transformation_pipelines=1,
+                            use_threads_as_transformation_pipelines=True,
                             extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
                                     #NoopTransformer(LOGGER),
@@ -66,26 +67,26 @@ if __name__=="__main__":
                                                                    copy_values_key_paths=[('file_path', ['_', 'file_path'])]),
                                     ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename)
                                     ],
-                            loaders=[ConditionalLoader( LOGGER, 
-                                                        #not config['save_to_db'],
-                                                        True,
+                            loaders=[
+                                    ConditionalLoader( LOGGER, 
+                                                        not config['save_to_db'],
                                                         CSV_FileLoader( LOGGER,
                                                                         input_key_path=None,
                                                                         values_path=[('word', ['_', 'word']), 
                                                                                      ('file', ['file_path'])],
                                                                         out_dir=os.path.abspath(out_dir))),
 
-                                     #ConditionalLoader( LOGGER, 
-                                     #                   config['save_to_db'],
-                                     #                   MySQL_DBLoader( LOGGER, 
-                                     #                                   input_key_path=['_'], 
-                                     #                                   sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
-                                     #                                                   VALUES(%s,%s,%s)""",
-                                     #                                   chunk_size=config['chunk_size'],
-                                     #                                   host=config['db_host'],
-                                     #                                   database=config['db_name'],
-                                     #                                   user=config['db_user'],
-                                     #                                   password=config['db_password']))
+                                    # ConditionalLoader( LOGGER, 
+                                    #                    config['save_to_db'],
+                                    #                    MySQL_DBLoader( LOGGER, 
+                                    #                                    input_key_path=['_'], 
+                                    #                                    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
+                                    #                                                    VALUES(%s,%s,%s)""",
+                                    #                                    chunk_size=config['chunk_size'],
+                                    #                                    host=config['db_host'],
+                                    #                                    database=config['db_name'],
+                                    #                                    user=config['db_user'],
+                                    #                                    password=config['db_password']))
                                                             ])
         pipeline.start()
         pipeline.join()
