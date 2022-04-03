@@ -6,9 +6,7 @@ from multiprocessing import Process, Queue
 from multiprocessing.sharedctypes import Value
 import queue
 import signal
-from sqlite3 import paramstyle
 from threading import Thread, Timer
-from typing import Any, Callable, Generator
 
 import uuid
 
@@ -16,6 +14,7 @@ from core.commons import LoggerWrapper, WithLogging, rotary_iter
 from core.extractors import AbstractExtractor
 from core.loaders import AbstractLoader
 from transformers import AbstractTransformer
+from core.commons import flatMapApply
 
 QUEUE_BLOCK_TIMEOUT_SEC = 0.1
 QUEUE_NO_BLOCK_TIMEOUT_SEC = 0.05
@@ -89,18 +88,6 @@ class ThreadedPipeline(AbstractPipeline):
         extractor_finished.value=1
         logger.log_msg("Extractor finished his work")
 
-    def flatMap(item:Any, mappers: list[Callable[[Any], Generator[Any, None, None]]]) -> Generator[Any, None, None]:
-        if len(mappers)==0:
-            yield item
-        else:
-            mapper = mappers[0]
-            g = mapper(item)
-            for x in g:
-                if x is not None:
-                    for a in  ThreadedPipeline.flatMap(x, mappers[1:]):
-                        if a is not None:
-                            yield a
-
     @staticmethod
     def transform_items(in_queue: Queue, 
                         out_queues: list[Queue], 
@@ -114,8 +101,9 @@ class ThreadedPipeline(AbstractPipeline):
         while pipeline_closed.value==0:
             try:
                 item = in_queue.get(timeout=QUEUE_BLOCK_TIMEOUT_SEC)
+                context = {}
                 if item is not None:
-                    for x in ThreadedPipeline.flatMap(item, list(map(lambda mapper: mapper.transform, trans))):
+                    for x in flatMapApply(item, list(map(lambda mapper: mapper.transform, trans)), context=context):
                         if x is not None:
                             pushed_idx = {i for i in range(len(out_queues))}
                             while not pipeline_closed.value and len(pushed_idx)>0:
@@ -199,7 +187,7 @@ class ThreadedPipeline(AbstractPipeline):
                     p = Thread(target=params["target"], args=params["args"])
                 else:
                     p = Process(target=params["target"], args=params["args"])
-                    
+
                 trans_threads.append(p)
             self.logger.log_msg("{} transformation pipelines created".format(self.transformation_pipeline_alive.value), level=INFO)
 

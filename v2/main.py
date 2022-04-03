@@ -9,11 +9,13 @@ import sys
 from core.extractors import FilesListExtractor
 from core.loaders import CSV_FileLoader
 from core.pipline import ThreadedPipeline
-from core.transformers import  FileToLinesTransformer, TextWordTokenizerTransformer
+from core.transformers import  FileToTextLinesTransformer, TextWordTokenizerTransformer
 from transformers import ArabicRemoveDiacFromWordTransformer, ArabicTextWordsTokenizerTransformer
 from core.transformers import ItemUpdaterCallbackTransformer
 from core.loaders import ConditionalLoader, MySQL_DBLoader
 from core.transformers import NoopTransformer
+from core.transformers import ReduceTransformer
+from core.transformers import FileTextReaderTransformer
 
 LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -58,30 +60,56 @@ if __name__=="__main__":
                             use_threads_as_transformation_pipelines=True,
                             extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
-                                    #NoopTransformer(LOGGER),
-                                    FileToLinesTransformer(LOGGER, pattern=".txt", input_key_path=['_'], output_key='_'), 
+                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['_'], callback=os.path.abspath),
+                                    ReduceTransformer(  LOGGER,
+                                                        input_key_path=['_'], 
+                                                        input_value_type=(str),
+                                                        output_key='words_count', 
+                                                        copy_values_key_paths=[('file_path', ['_'])],
+                                                        transformers=[
+                                                                        FileTextReaderTransformer(LOGGER, 
+                                                                                                pattern=".txt", 
+                                                                                                input_key_path=None, 
+                                                                                                output_key=None),
+                                                                        TextWordTokenizerTransformer(   LOGGER, 
+                                                                                                    pattern="\\s+", 
+                                                                                                    input_key_path=['_', 'content'], 
+                                                                                                    output_key=None)
+                                                                    ],
+                                                        initial_value=0,
+                                                        reducer=ReduceTransformer.count),
+                                    NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='B'),
+                                    FileToTextLinesTransformer(LOGGER, pattern=".txt", input_key_path=['file_path'], output_key='_',
+                                                            copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]), 
+                                    NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='C'),
                                     TextWordTokenizerTransformer(LOGGER, 
                                                                    pattern="\\s+", 
                                                                    input_key_path=['_', 'line'], 
                                                                    output_key='_', 
-                                                                   copy_values_key_paths=[('file_path', ['_', 'file_path'])]),
-                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename)
+                                                                   copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]),
+                                    NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='D'),
+                                    #ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename)
                                     ],
                             loaders=[
-                                    ConditionalLoader( LOGGER, 
-                                                        not config['save_to_db'],
+                                    ConditionalLoader(  LOGGER, 
+                                                        # not config['save_to_db'],
+                                                        True,
                                                         CSV_FileLoader( LOGGER,
                                                                         input_key_path=None,
                                                                         values_path=[('word', ['_', 'word']), 
-                                                                                     ('file', ['file_path'])],
+                                                                                        ('file', ['file_path']),
+                                                                                        ('words_count', ['words_count'])],
                                                                         out_dir=os.path.abspath(out_dir))),
 
                                     # ConditionalLoader( LOGGER, 
                                     #                    config['save_to_db'],
                                     #                    MySQL_DBLoader( LOGGER, 
                                     #                                    input_key_path=['_'], 
+                                    #                                    values_path=[('word', ['_', 'word']), 
+                                    #                                                  ('file', ['file_path']),
+                                    #                                                  ('words_count', ['words_count'])],
                                     #                                    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
-                                    #                                                    VALUES(%s,%s,%s)""",
+                                    #                                                    VALUES(%s,%s,0)""",
                                     #                                    chunk_size=config['chunk_size'],
                                     #                                    host=config['db_host'],
                                     #                                    database=config['db_name'],

@@ -70,13 +70,14 @@ class MySQL_DBLoader(AbstractLoader):
     def __init__(self, 
                 logger: Logger, 
                 input_key_path: list[str],
+                values_path: list[tuple[str, list[str]]],
                 sql_query: str,
                 chunk_size: int, 
                 host: str, 
                 database: str, 
                 user: str, 
                 password: str):
-        super().__init__(logger, input_key_path, values_path=None)
+        super().__init__(logger, input_key_path, values_path)
         self.connection = None
         self.sql_query = sql_query
         self.chunk_size=chunk_size
@@ -169,7 +170,7 @@ class CSV_FileLoader(AbstractLoader):
     def _row_from_item(self, item: dict) -> list[str]:
         row = []
         for (title, key_path) in self.values_path:
-            row.append(dict_deep_get(item, key_path))
+            row.append(str(dict_deep_get(item, key_path)))
         return row
 
     def load(self, job_uuid: str, items: list[dict]):

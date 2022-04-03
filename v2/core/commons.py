@@ -4,6 +4,7 @@ import logging
 from logging import ERROR, Logger
 import threading
 import traceback
+from typing import Any, Callable, Generator
 
 class WithLogging(ABC):
     def __init__(self, logger: Logger) -> None:
@@ -43,3 +44,15 @@ def dict_deep_set(dictionary: dict, keys: list[str], value):
         return
     container = reduce(lambda d, key: d.get(key) if (type(d) is dict and key in d) else {}, keys[:-1], dictionary)
     container[keys[-1]] = value
+
+def flatMapApply(item:Any, mappers: list[Callable[[Any], Generator[Any, None, None]]], **kwargs) -> Generator[Any, None, None]:
+        if len(mappers)==0:
+            yield item
+        else:
+            mapper = mappers[0]
+            g = mapper(item, **kwargs)
+            for x in g:
+                if x is not None:
+                    for a in  flatMapApply(x, mappers[1:], **kwargs):
+                        if a is not None:
+                            yield a
