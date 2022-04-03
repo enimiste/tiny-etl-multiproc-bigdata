@@ -16,6 +16,7 @@ from core.loaders import ConditionalLoader, MySQL_DBLoader
 from core.transformers import NoopTransformer
 from core.transformers import ReduceTransformer
 from core.transformers import FileTextReaderTransformer
+from core.transformers import AddStaticValuesTransformer
 
 LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -32,7 +33,8 @@ LOGGER = logging.getLogger("my-logger")
                           
 if __name__=="__main__":
 
-    in_dir='../bdall_test_data/corpusB/base1'
+    in_dir='../bdall_test_data'
+    #in_dir='../bdall_test_data/corpusB/base1'
     out_dir = 'out_dir'
     save_to_db=False
     db_host='localhost'
@@ -56,11 +58,16 @@ if __name__=="__main__":
     LOGGER.log(INFO, "Script started : {}".format(in_dir))
     try:
         pipeline = ThreadedPipeline(LOGGER, 
-                            max_transformation_pipelines=1,
+                            max_transformation_pipelines=2,
                             use_threads_as_transformation_pipelines=True,
                             extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
+                                    #NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='X'),
                                     ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['_'], callback=os.path.abspath),
+                                    # AddStaticValuesTransformer(LOGGER,
+                                    #                             static_values=[(['words_count'], 0)],
+                                    #                             copy_values_key_paths=[('file_path', ['_'])],
+                                    #                             remove_key_paths = [['_']]),
                                     ReduceTransformer(  LOGGER,
                                                         input_key_path=['_'], 
                                                         input_value_type=(str),
@@ -78,29 +85,34 @@ if __name__=="__main__":
                                                                     ],
                                                         initial_value=0,
                                                         reducer=ReduceTransformer.count),
-                                    NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='B'),
                                     FileToTextLinesTransformer(LOGGER, pattern=".txt", input_key_path=['file_path'], output_key='_',
                                                             copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]), 
-                                    NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='C'),
                                     TextWordTokenizerTransformer(LOGGER, 
                                                                    pattern="\\s+", 
                                                                    input_key_path=['_', 'line'], 
                                                                    output_key='_', 
                                                                    copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]),
-                                    NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='D'),
-                                    #ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename)
+                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename)
                                     ],
                             loaders=[
                                     ConditionalLoader(  LOGGER, 
-                                                        # not config['save_to_db'],
-                                                        True,
+                                                        not config['save_to_db'],
                                                         CSV_FileLoader( LOGGER,
                                                                         input_key_path=None,
                                                                         values_path=[('word', ['_', 'word']), 
                                                                                         ('file', ['file_path']),
                                                                                         ('words_count', ['words_count'])],
-                                                                        out_dir=os.path.abspath(out_dir))),
-
+                                                                        out_dir=os.path.abspath(out_dir),
+                                                                        out_file_ext='txt')),
+                                    # ConditionalLoader(  LOGGER, 
+                                    #                     not config['save_to_db'],
+                                    #                     CSV_FileLoader( LOGGER,
+                                    #                                     input_key_path=None,
+                                    #                                     values_path=[('word', ['_', 'word']), 
+                                    #                                                     ('file', ['file_path']),
+                                    #                                                     ('words_count', ['words_count'])],
+                                    #                                     out_dir=os.path.abspath(out_dir),
+                                    #                                     out_file_ext='csv')),
                                     # ConditionalLoader( LOGGER, 
                                     #                    config['save_to_db'],
                                     #                    MySQL_DBLoader( LOGGER, 

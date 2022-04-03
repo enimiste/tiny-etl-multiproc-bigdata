@@ -45,6 +45,14 @@ def dict_deep_set(dictionary: dict, keys: list[str], value):
     container = reduce(lambda d, key: d.get(key) if (type(d) is dict and key in d) else {}, keys[:-1], dictionary)
     container[keys[-1]] = value
 
+def dict_deep_remove(dictionary: dict, keys: list[str]):
+    if keys is not None:
+        if len(keys)==0:
+            return
+        container = dict_deep_get(dictionary, keys[:-1])
+        if container is not None and keys[-1] in container:
+            del container[keys[-1]]
+
 def flatMapApply(item:Any, mappers: list[Callable[[Any], Generator[Any, None, None]]], **kwargs) -> Generator[Any, None, None]:
         if len(mappers)==0:
             yield item

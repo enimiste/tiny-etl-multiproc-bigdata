@@ -8,8 +8,9 @@ class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
     def __init__(self, logger: Logger, 
                 input_key_path: list[str],
                 output_key: str,
-                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
-        super().__init__(logger, input_key_path, output_key, copy_values_key_paths)
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None,
+                remove_key_paths: list[list[str]]=None) -> None:
+        super().__init__(logger, input_key_path, output_key, copy_values_key_paths, remove_key_paths)
 
     def _tokenize_text(self, text: str, context: dict) -> Generator[list[str], None, None]:
         import re
@@ -25,8 +26,9 @@ class ArabicRemoveDiacFromWordTransformer(ItemUpdaterCallbackTransformer):
     def __init__(self, logger: Logger, 
                 input_key_path: list[str], 
                 input_value_type: Any, 
-                output_key: str) -> None:
-        super().__init__(logger, input_key_path, input_value_type, output_key, callback=ArabicRemoveDiacFromWordTransformer.remove_diac)
+                output_key: str,
+                remove_key_paths: list[list[str]]=None) -> None:
+        super().__init__(logger, input_key_path, input_value_type, output_key, callback=ArabicRemoveDiacFromWordTransformer.remove_diac, remove_key_paths=remove_key_paths)
 
     def remove_diac(text: str) -> str:
         if text is None:

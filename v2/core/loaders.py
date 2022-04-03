@@ -191,7 +191,7 @@ class CSV_FileLoader(AbstractLoader):
         rows_nbr = len(rows)  
         if rows_nbr>0:
             self.file_hd.write("\n".join(rows) + "\n")
-            super().log_msg("{}/input_dat={} total rows written in the file".format(rows_nbr, len(items)))
+            super().log_msg("{}/input_data={} total rows written in the file".format(rows_nbr, len(items)))
 
     def _out_filename(self, job_uuid: str) -> str:
         return "{}_{}.{}".format(self.out_file_name_prefix, job_uuid, self.out_file_ext)

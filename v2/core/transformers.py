@@ -2,10 +2,12 @@ from abc import abstractmethod
 import codecs
 from logging import Logger, ERROR, DEBUG
 import os
+import re
 from typing import Any, Callable, Generator, Tuple
 from core.commons import WithLogging
 from core.commons import dict_deep_get, dict_deep_set
 from core.commons import flatMapApply
+from core.commons import dict_deep_remove
 
 IgnoreTransformationResult = object()
 
@@ -14,16 +16,18 @@ class AbstractTransformer(WithLogging):
                 input_key_path: list[str], 
                 input_value_type: Any,
                 output_key: str,
-                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None,
+                remove_key_paths: list[list[str]]=None) -> None:
         super().__init__(logger)
         self.input_key_path = input_key_path
         self.output_key = output_key
         self._input_value_type = input_value_type
         self.copy_values_key_paths = copy_values_key_paths
+        self.remove_key_paths = remove_key_paths
 
-    def _copy_input_values_to_output(self, dest: dict, source: dict):
-        if self.copy_values_key_paths is not None:
-            for (key, path) in self.copy_values_key_paths:
+    def _copy_input_values_to_output(copy_values_key_paths: list[Tuple[str, list[str]]], dest: dict, source: dict):
+        if copy_values_key_paths is not None:
+            for (key, path) in copy_values_key_paths:
                 x = dict_deep_get(source, path)
                 if x is not None:
                     dest[key] = x
@@ -44,7 +48,10 @@ class AbstractTransformer(WithLogging):
         for res in self._map_item(input_value, context):
             if res != IgnoreTransformationResult:
                 item_ = {}
-                item_ = self._copy_input_values_to_output(item_, item)
+                item_ = AbstractTransformer._copy_input_values_to_output(self.copy_values_key_paths, item_, item)
+                if self.remove_key_paths is not None:
+                    for remove_key_path in self.remove_key_paths:
+                        dict_deep_remove(item, remove_key_path)
                 item_[self.output_key] = res
                 yield item_
             else:
@@ -92,11 +99,12 @@ class FileToTextLinesTransformer(AbstractTransformer):
                  pattern: str, 
                  input_key_path: list[str], 
                  output_key: str,
-                 copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
+                 copy_values_key_paths: list[Tuple[str, list[str]]] = None,
+                 remove_key_paths: list[list[str]]=None) -> None:
         """
         Yield elements : {line: str}
         """
-        super().__init__(logger, input_key_path, (str), output_key, copy_values_key_paths)
+        super().__init__(logger, input_key_path, (str), output_key, copy_values_key_paths, remove_key_paths)
         self.pattern = pattern
 
     def _map_item(self, file_path: str, context: dict = {}) -> Generator[dict, None, None]:
@@ -127,11 +135,12 @@ class FileTextReaderTransformer(AbstractTransformer):
                  pattern: str, 
                  input_key_path: list[str], 
                  output_key: str,
-                 copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
+                 copy_values_key_paths: list[Tuple[str, list[str]]] = None,
+                 remove_key_paths: list[list[str]]=None) -> None:
         """
         Yield elements : {content: str}
         """
-        super().__init__(logger, input_key_path, (str), output_key, copy_values_key_paths)
+        super().__init__(logger, input_key_path, (str), output_key, copy_values_key_paths, remove_key_paths)
         self.pattern = pattern
 
     def _map_item(self, file_path: str, context: dict = {}) -> Generator[dict, None, None]:
@@ -160,8 +169,9 @@ class ReduceTransformer(AbstractTransformer):
                  transformers: list[AbstractTransformer], 
                  initial_value: Any, 
                  reducer: Callable[[Any], Any],
-                 copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
-        super().__init__(logger, input_key_path, input_value_type, output_key, copy_values_key_paths)
+                 copy_values_key_paths: list[Tuple[str, list[str]]] = None,
+                remove_key_paths: list[list[str]]=None) -> None:
+        super().__init__(logger, input_key_path, input_value_type, output_key, copy_values_key_paths, remove_key_paths)
         self.transformers = transformers
         self.initial_value = initial_value
         self.reducer = reducer
@@ -187,7 +197,7 @@ class ReduceTransformer(AbstractTransformer):
         for res in flatMapApply({'_': input_value}, list(map(lambda mapper: mapper.transform, self.transformers)), context=context):
             init_val = self.reducer(init_val, dict_deep_get(res, ['_']))
         item_ = {}
-        item_ = self._copy_input_values_to_output(item_, item)
+        item_ = AbstractTransformer._copy_input_values_to_output(self.copy_values_key_paths, item_, item)
         item_[self.output_key] = init_val
         yield item_
 
@@ -204,8 +214,9 @@ class AbstractTextWordTokenizerTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
                 input_key_path: list[str],
                 output_key: str,
-                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
-        super().__init__(logger, input_key_path, (str), output_key, copy_values_key_paths)
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None,
+                remove_key_paths: list[list[str]]=None) -> None:
+        super().__init__(logger, input_key_path, (str), output_key, copy_values_key_paths, remove_key_paths)
 
     def _map_item(self, text: str, context: dict = {}) -> Generator[dict, None, None]:
         if text is None:
@@ -227,8 +238,9 @@ class TextWordTokenizerTransformer(AbstractTextWordTokenizerTransformer):
                 pattern: str, 
                 input_key_path: list[str],
                 output_key: str,
-                copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
-        super().__init__(logger, input_key_path, output_key, copy_values_key_paths)
+                copy_values_key_paths: list[Tuple[str, list[str]]] = None,
+                remove_key_paths: list[list[str]]=None) -> None:
+        super().__init__(logger, input_key_path, output_key, copy_values_key_paths, remove_key_paths)
         self.pattern = pattern
 
     def _tokenize_text(self, text: str, context: dict) -> Generator[str, None, None]:
@@ -243,8 +255,9 @@ class ItemUpdaterCallbackTransformer(AbstractTransformer):
     """
     def __init__(self, logger: Logger, 
                 input_key_path: list[str],
-                callback) -> None:
-        super().__init__(logger, input_key_path, None, None, None)
+                callback,
+                remove_key_paths: list[list[str]]=None) -> None:
+        super().__init__(logger, input_key_path, None, None, None, remove_key_paths)
         self.callback = callback
 
     def transform(self, item: dict, context: dict={}) -> Generator[dict, None, None]:
@@ -262,8 +275,31 @@ class ItemUpdaterCallbackTransformer(AbstractTransformer):
         item_ = {}
         item_.update(item)
         dict_deep_set(item_, self.input_key_path, new_val)
+        if self.remove_key_paths is not None:
+            for remove_key_path in self.remove_key_paths:
+                dict_deep_remove(item, remove_key_path)
+
         yield item_
 
     def _map_item(self, item, context: dict = {}) -> Generator[dict, None, None]:
         yield item
         
+class AddStaticValuesTransformer(AbstractTransformer):
+    def __init__(self, logger: Logger, 
+                    static_values: list[Tuple[list[str], Any]],
+                    copy_values_key_paths: list[Tuple[str, list[str]]] = None,
+                    remove_key_paths: list[list[str]]=None) -> None:
+        super().__init__(logger, None, None, None, copy_values_key_paths=copy_values_key_paths, remove_key_paths=remove_key_paths)
+        self.static_values = static_values
+
+    def transform(self, item: dict, context: dict = {}) -> Generator[dict, None, None]:
+        item = AbstractTransformer._copy_input_values_to_output(self.copy_values_key_paths, item, item)
+        for (path, val) in self.static_values:
+            dict_deep_set(item, path, value=val)
+        if self.remove_key_paths is not None:
+            for remove_key_path in self.remove_key_paths:
+                dict_deep_remove(item, remove_key_path)
+        yield item
+
+    def _map_item(self, item, context: dict = {}) -> Generator[dict, None, None]:
+        yield item
