@@ -33,8 +33,8 @@ LOGGER = logging.getLogger("my-logger")
                           
 if __name__=="__main__":
 
-    # in_dir='../bdall_test_data'
-    in_dir='../bdall_test_data/corpusB/base1'
+    in_dir='../bdall_test_data'
+    #in_dir='../bdall_test_data/corpusB/base1'
     out_dir = 'out_dir'
     save_to_db=False
     db_host='localhost'
@@ -60,7 +60,7 @@ if __name__=="__main__":
         pipeline = ThreadedPipeline(LOGGER, 
                             max_transformation_pipelines=5,
                             use_threads_as_transformation_pipelines=True,
-                            trans_in_queue_max_size=100,
+                            trans_in_queue_max_size=1_000,
                             extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
                                     #NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='X'),

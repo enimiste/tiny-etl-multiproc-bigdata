@@ -21,7 +21,7 @@ class WithLogging(ABC):
             print(msg)
         
     def log_msg(self, msg: str, exception: Exception = None, level: int = logging.DEBUG):
-        pass
+        WithLogging.log_msg_sync(self.logger, msg, exception, level)
         # threading.Thread(target=WithLogging.log_msg_sync, args=(self.logger, msg, exception, level)).start()
     
 

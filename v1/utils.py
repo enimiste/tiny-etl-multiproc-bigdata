@@ -44,7 +44,8 @@ def log_msg_sync(msg: str, exception: Exception = None, level: int = logging.DEB
         print(msg)
     
 def log_msg(msg: str, exception: Exception = None, level: int = logging.DEBUG):
-    threading.Thread(target=log_msg_sync, args=(msg, exception, level)).start()
+    log_msg_sync(msg, exception, level)
+    # threading.Thread(target=log_msg_sync, args=(msg, exception, level)).start()
     
 
 def split_list(items: list, chunk_size: int):
