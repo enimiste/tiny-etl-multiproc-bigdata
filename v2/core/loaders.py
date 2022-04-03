@@ -32,7 +32,7 @@ class NoopLoader(AbstractLoader):
     def load(self, job_uuid: str, items: list[dict]) -> None:
         if self.log:
             for item in items:
-                super().log_msg("Loading Item : {}".format(str(dict_deep_get(item, self.input_key_path))))
+                super().log_msg("Loading Item : {}".format(str(dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item)))
 
     def close(self, job_uuid: str) -> None:
         pass
@@ -40,29 +40,30 @@ class NoopLoader(AbstractLoader):
 
 class ConditionalLoader(AbstractLoader):
     def __init__(self, 
-                    logger, condition, 
-                    loader: AbstractLoader, 
+                    logger,
+                    condition, 
+                    wrapped_loader: AbstractLoader, 
                     else_log: bool = False) -> None:
         super().__init__(logger, None, None)
         self.condition = condition
-        self.loader = loader
+        self.wrapped_loader = wrapped_loader
         self.else_log = else_log
 
-    def _condition(self):
-        if hasattr(self.condition, '__call__'):
+    def check_condition(self):
+        if callable(self.condition):
             return self.condition()
         else:
-             return self.condition
+            return self.condition
 
     def load(self, job_uuid: str, items: list[dict]) -> None:
-        if self._condition():
-            return self.load(job_uuid, items)
+        if self.check_condition():
+            return self.wrapped_loader.load(job_uuid, items)
         elif self.else_log:
             super().log_msg("Loading : {}".format(str(items)))
 
     def close(self, job_uuid: str) -> None:
         if self._condition():
-            self.loader.close()
+            self.wrapped_loader.close()
 
 
 class MySQL_DBLoader(AbstractLoader):
@@ -84,7 +85,7 @@ class MySQL_DBLoader(AbstractLoader):
         self.password=password
         self.database = database
 
-    def _row_from_data(self, item:dict)->list:
+    def _row_from_data(self, item: dict)->list:
         row = []
         for (title, key_path) in self.values_path:
             row.append(dict_deep_get(item, key_path))
@@ -113,7 +114,7 @@ class MySQL_DBLoader(AbstractLoader):
         try:
             data = []
             for item in items:
-                x = dict_deep_get(item, self.input_key_path)
+                x = dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item
                 if x is not None:
                     data.append(self._row_from_data(x))
 
@@ -182,7 +183,7 @@ class CSV_FileLoader(AbstractLoader):
             super().log_msg("File {} opened".format(file_path))
         rows = []
         for item in items:
-            x = dict_deep_get(item, self.input_key_path)
+            x = dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item
             if x is not None and self._filter(x):
                 rows.append(self.col_sep.join(self._row_from_item(x)))
 

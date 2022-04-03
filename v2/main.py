@@ -13,6 +13,7 @@ from core.transformers import  FileToLinesTransformer, TextWordTokenizerTransfor
 from transformers import ArabicRemoveDiacFromWordTransformer, ArabicTextWordsTokenizerTransformer
 from core.transformers import ItemUpdaterCallbackTransformer
 from core.loaders import ConditionalLoader, MySQL_DBLoader
+from core.transformers import NoopTransformer
 
 LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -29,7 +30,7 @@ LOGGER = logging.getLogger("my-logger")
                           
 if __name__=="__main__":
 
-    in_dir='../bdall_test_data'
+    in_dir='../bdall_test_data/corpusB/base1'
     out_dir = 'out_dir'
     save_to_db=False
     db_host='localhost'
@@ -53,34 +54,38 @@ if __name__=="__main__":
     LOGGER.log(INFO, "Script started : {}".format(in_dir))
     try:
         pipeline = ThreadedPipeline(LOGGER, 
+                            max_transformation_pipelines=1,
                             extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
+                                    #NoopTransformer(LOGGER),
                                     FileToLinesTransformer(LOGGER, pattern=".txt", input_key_path=['_'], output_key='_'), 
-                                    TextWordTokenizerTransformer(LOGGER, pattern="\\s+", input_key_path=['_', 'line'], output_key='_', 
-                                                                copy_values_key_paths=[('file_path', ['_', 'file_path'])]),
-                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['_', 'file_path'], callback=os.path.basename)
+                                    TextWordTokenizerTransformer(LOGGER, 
+                                                                   pattern="\\s+", 
+                                                                   input_key_path=['_', 'line'], 
+                                                                   output_key='_', 
+                                                                   copy_values_key_paths=[('file_path', ['_', 'file_path'])]),
+                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename)
                                     ],
                             loaders=[ConditionalLoader( LOGGER, 
                                                         #not config['save_to_db'],
-                                                        False,
+                                                        True,
                                                         CSV_FileLoader( LOGGER,
-                                                                        input_key_path=['_'],
-                                                                        values_path=[('word', ['_']), 
+                                                                        input_key_path=None,
+                                                                        values_path=[('word', ['_', 'word']), 
                                                                                      ('file', ['file_path'])],
-                                                                        out_dir=os.path.abspath(out_dir)),
-                                                        else_log=True),
+                                                                        out_dir=os.path.abspath(out_dir))),
 
-                                     ConditionalLoader( LOGGER, 
-                                                        config['save_to_db'],
-                                                        MySQL_DBLoader( LOGGER, 
-                                                                        input_key_path=['_'], 
-                                                                        sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
-                                                                                        VALUES(%s,%s,%s)""",
-                                                                        chunk_size=config['chunk_size'],
-                                                                        host=config['db_host'],
-                                                                        database=config['db_name'],
-                                                                        user=config['db_user'],
-                                                                        password=config['db_password']))
+                                     #ConditionalLoader( LOGGER, 
+                                     #                   config['save_to_db'],
+                                     #                   MySQL_DBLoader( LOGGER, 
+                                     #                                   input_key_path=['_'], 
+                                     #                                   sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
+                                     #                                                   VALUES(%s,%s,%s)""",
+                                     #                                   chunk_size=config['chunk_size'],
+                                     #                                   host=config['db_host'],
+                                     #                                   database=config['db_name'],
+                                     #                                   user=config['db_user'],
+                                     #                                   password=config['db_password']))
                                                             ])
         pipeline.start()
         pipeline.join()

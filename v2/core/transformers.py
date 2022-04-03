@@ -43,7 +43,7 @@ class AbstractTransformer(WithLogging):
         for res in self._map_item(input_value, context):
             if res != IgnoreTransformationResult:
                 item_ = {}
-                item = self._copy_input_values_to_output(item_, item)
+                item_ = self._copy_input_values_to_output(item_, item)
                 item_[self.output_key] = res
                 yield item_
             else:
@@ -70,7 +70,7 @@ class NoopTransformer(AbstractTransformer):
         yield item
 
     def _map_item(self, item, context: dict = {}) -> Generator[dict, None, None]:
-        pass
+        yield item
 
 class FileToLinesTransformer(AbstractTransformer):
     """
@@ -108,6 +108,9 @@ class FileToLinesTransformer(AbstractTransformer):
             super().log_msg("File error {} : {}".format(file_path, str(e.args)), exception=e, level=ERROR)
 
 class AbstractTextWordTokenizerTransformer(AbstractTransformer):
+    """
+    Yield {'word': str}
+    """
     def __init__(self, logger: Logger, 
                 input_key_path: list[str],
                 output_key: str,
@@ -119,15 +122,16 @@ class AbstractTextWordTokenizerTransformer(AbstractTransformer):
             super().log_msg("Item value is None")
             return IgnoreTransformationResult
 
-        return self._tokenize_text(text, text, context)
+        for x in self._tokenize_text(text, context):
+            yield {'word': x}
 
     @abstractmethod
-    def _tokenize_text(self, text: str, item: dict, context: dict) -> Generator[list[dict], None, None]:
+    def _tokenize_text(self, text: str, context: dict) -> Generator[list[str], None, None]:
         pass
 
 class TextWordTokenizerTransformer(AbstractTextWordTokenizerTransformer):
     """
-    Yield elements : str
+    Yield {'word': str}
     """
     def __init__(self, logger: Logger, 
                 pattern: str, 
@@ -137,7 +141,7 @@ class TextWordTokenizerTransformer(AbstractTextWordTokenizerTransformer):
         super().__init__(logger, input_key_path, output_key, copy_values_key_paths)
         self.pattern = pattern
 
-    def _tokenize_text(self, text: str, item: dict, context: dict) -> Generator[str, None, None]:
+    def _tokenize_text(self, text: str, context: dict) -> Generator[str, None, None]:
         import re
         for x in re.split(self.pattern, text):
             yield x
@@ -167,10 +171,9 @@ class ItemUpdaterCallbackTransformer(AbstractTransformer):
 
         item_ = {}
         item_.update(item)
-        dict_deep_set(item_, self.input_key_path, )
-
+        dict_deep_set(item_, self.input_key_path, new_val)
         yield item_
 
     def _map_item(self, item, context: dict = {}) -> Generator[dict, None, None]:
-        pass
+        yield item
         

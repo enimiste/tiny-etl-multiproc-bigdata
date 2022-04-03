@@ -11,7 +11,7 @@ class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
                 copy_values_key_paths: list[Tuple[str, list[str]]] = None) -> None:
         super().__init__(logger, input_key_path, output_key, copy_values_key_paths)
 
-    def _tokenize_text(self, text: str, item: dict, context: dict) -> Generator[list[dict], None, None]:
+    def _tokenize_text(self, text: str, context: dict) -> Generator[list[str], None, None]:
         import re
                     
         arabic_words = re.findall(r'[َُِْـًٌٍّؤائءآىإأبتثجحخدذرزسشصضطظعغفقكلمنهـوي]+', text)
