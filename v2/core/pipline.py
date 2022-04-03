@@ -16,10 +16,6 @@ from core.loaders import AbstractLoader
 from transformers import AbstractTransformer
 from core.commons import flatMapApply
 
-QUEUE_BLOCK_TIMEOUT_SEC = 0.1
-QUEUE_NO_BLOCK_TIMEOUT_SEC = 0.05
-TRANS_IN_QUEUE_MAX_SIZE = 1_000
-
 class AbstractPipeline(Process, ABC):
     def __init__(self, logger: Logger) -> None:
         self.logger = LoggerWrapper(logger)
@@ -43,14 +39,20 @@ class ThreadedPipeline(AbstractPipeline):
                 transformers: list[AbstractTransformer],
                 loaders: list[AbstractLoader],
                 max_transformation_pipelines: int = 5,
-                use_threads_as_transformation_pipelines: bool = False) -> None:
+                use_threads_as_transformation_pipelines: bool = False,
+                queue_block_timeout_sec: int = 0.1,
+                queue_no_block_timeout_sec: int = 0.05,
+                trans_in_queue_max_size: int = 1_000) -> None:
         super().__init__(logger)
         self.job_uuid = str(uuid.uuid1())
         self.extractor = extractor
         self.transformers = transformers
         self.loaders = loaders
         self.use_threads_as_transformation_pipelines = use_threads_as_transformation_pipelines
+        self.queue_block_timeout_sec = max(0.1, queue_block_timeout_sec)
+        self.queue_no_block_timeout_sec = max(0.01, queue_no_block_timeout_sec)
         self.max_transformation_pipelines = max(1, max_transformation_pipelines)
+        self.trans_in_queue_max_size = max(1_000, trans_in_queue_max_size)
         self.pipeline_started = Value('i', 0)
         self.pipeline_closed = Value('i', 0)
         self.extractor_finished = Value('i', 0)
@@ -72,6 +74,7 @@ class ThreadedPipeline(AbstractPipeline):
                         pipeline_started: Value,
                         pipeline_closed: Value, 
                         extractor_finished: Value, 
+                        queue_no_block_timeout_sec: int,
                         logger: WithLogging) -> None:
         out_queues_iter = rotary_iter(out_queues)
 
@@ -81,12 +84,12 @@ class ThreadedPipeline(AbstractPipeline):
             if item is not None:
                 for out_queue in out_queues_iter:
                     try:
-                        out_queue.put(item, timeout=QUEUE_NO_BLOCK_TIMEOUT_SEC)
+                        out_queue.put(item, timeout=queue_no_block_timeout_sec)
                         break
                     except queue.Full:
                         pass
         extractor_finished.value=1
-        logger.log_msg("Extractor finished his work")
+        logger.log_msg("Extractor finished his work", level=INFO)
 
     @staticmethod
     def transform_items(in_queue: Queue, 
@@ -96,11 +99,13 @@ class ThreadedPipeline(AbstractPipeline):
                         pipeline_closed: Value, 
                         extractor_finished: Value,
                         transformation_pipeline_alive: Value,
+                        queue_block_timeout_sec: int,
+                        queue_no_block_timeout_sec: int,
                         logger: WithLogging) -> None:
         finished = False
         while pipeline_closed.value==0:
             try:
-                item = in_queue.get(timeout=QUEUE_BLOCK_TIMEOUT_SEC)
+                item = in_queue.get(timeout=queue_block_timeout_sec)
                 context = {}
                 if item is not None:
                     for x in flatMapApply(item, list(map(lambda mapper: mapper.transform, trans)), context=context):
@@ -110,7 +115,7 @@ class ThreadedPipeline(AbstractPipeline):
                                 for (idx, out_queue) in enumerate(out_queues):
                                     try:
                                         if idx in pushed_idx:
-                                            out_queue.put(x, timeout=QUEUE_NO_BLOCK_TIMEOUT_SEC)
+                                            out_queue.put(x, timeout=queue_no_block_timeout_sec)
                                             pushed_idx.remove(idx)
                                     except queue.Full:
                                         pass
@@ -122,7 +127,7 @@ class ThreadedPipeline(AbstractPipeline):
                 if extractor_finished.value==1:
                     finished=pipeline_started.value==1
         transformation_pipeline_alive.value -= 1
-        logger.log_msg("A transformation pipeline finished her work")
+        logger.log_msg("A transformation pipeline finished her work", level=INFO)
     
     @staticmethod
     def load_items(job_uuid: str, 
@@ -132,19 +137,22 @@ class ThreadedPipeline(AbstractPipeline):
                     pipeline_closed: Value, 
                     transformation_pipeline_alive: Value,
                     loaders_alive: Value,
+                    queue_block_timeout_sec: int,
                     logger: WithLogging) -> None:
         finished = False
         while pipeline_closed.value==0:
             try:
-                item = out_queue.get(timeout=QUEUE_BLOCK_TIMEOUT_SEC)
+                item = out_queue.get(timeout=queue_block_timeout_sec)
                 loader.load(job_uuid, [item])
             except queue.Empty:
                 if finished is True:
+                    logger.log_msg("Closing loader <{}>".format(str(loader.__class__.__name__)), level=INFO)
+                    loader.close()
                     break
                 if transformation_pipeline_alive.value==0: # no more transformers to push data to loaders
                     finished=pipeline_started.value==1
         loaders_alive.value -= 1
-        logger.log_msg("A loader <{}> finished his work".format(str(loader.__class__.__name__)))
+        logger.log_msg("A loader <{}> finished his work".format(str(loader.__class__.__name__)), level=INFO)
     
     def _run(self) -> None:
         extract_threads = []
@@ -159,14 +167,15 @@ class ThreadedPipeline(AbstractPipeline):
             original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
             signal.signal(signal.SIGINT, original_sigint_handler)
 
-            in_queues = [Queue(maxsize=TRANS_IN_QUEUE_MAX_SIZE) for i in range(self.max_transformation_pipelines)]
-            out_queues = [Queue(maxsize=(TRANS_IN_QUEUE_MAX_SIZE * self.max_transformation_pipelines)) for i in range(len(self.loaders))]
-
+            in_queues = [Queue(maxsize=self.trans_in_queue_max_size) for i in range(self.max_transformation_pipelines)]
+            out_queues = [Queue(maxsize=(self.trans_in_queue_max_size * self.max_transformation_pipelines)) for i in range(len(self.loaders))]
+            
             extract_threads.append(Process(target=ThreadedPipeline.extract_items, args=(in_queues, 
                                                                                         self.extractor, 
                                                                                         self.pipeline_started,
                                                                                         self.pipeline_closed, 
                                                                                         self.extractor_finished,
+                                                                                        self.queue_no_block_timeout_sec,
                                                                                         self.logger)))                                                                            
             self.logger.log_msg("1 extraction process created", level=INFO)
 
@@ -181,6 +190,8 @@ class ThreadedPipeline(AbstractPipeline):
                             self.pipeline_closed, 
                             self.extractor_finished,
                             self.transformation_pipeline_alive,
+                            self.queue_block_timeout_sec,
+                            self.queue_no_block_timeout_sec,
                             self.logger)
                 }
                 if self.use_threads_as_transformation_pipelines:
@@ -200,6 +211,7 @@ class ThreadedPipeline(AbstractPipeline):
                                                                                         self.pipeline_closed, 
                                                                                         self.transformation_pipeline_alive,
                                                                                         self.loaders_alive,
+                                                                                        self.queue_block_timeout_sec,
                                                                                         self.logger)))
             self.logger.log_msg("{} loading processes created".format(len(self.loaders)), level=INFO)
 
@@ -253,21 +265,20 @@ class ThreadedPipeline(AbstractPipeline):
                 except Exception:
                     pass
             self.logger.log_msg("Threads killed", level=INFO)
-            
-            closables = in_queues + out_queues + self.transformers + self.loaders
-            self.logger.log_msg("Closables closing ...", level=INFO)
+        
+        finally:
+            queues = in_queues + out_queues
+            self.logger.log_msg("Queues closing ...", level=INFO)
             timer = Timer(interval=1, function=lambda : thread.interrupt_main())#in seconds
             timer.start()
             try:
-                for t in closables:
-                    t.close()
+                for q in queues:
+                    q.close()
             except Exception:
                 pass
             finally:
                 timer.cancel()
-            self.logger.log_msg("Closables closed", level=INFO)
-
-        finally:
+            self.logger.log_msg("Queues closed", level=INFO)
             self.logger.log_msg("Pipline {} End executing".format(self.job_uuid),  level=INFO)
 
     def _close(self) -> None:

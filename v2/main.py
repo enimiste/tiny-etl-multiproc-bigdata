@@ -33,22 +33,22 @@ LOGGER = logging.getLogger("my-logger")
                           
 if __name__=="__main__":
 
-    in_dir='../bdall_test_data'
-    #in_dir='../bdall_test_data/corpusB/base1'
+    # in_dir='../bdall_test_data'
+    in_dir='../bdall_test_data/corpusB/base1'
     out_dir = 'out_dir'
     save_to_db=False
     db_host='localhost'
     db_name='arabic_lang'
     db_user='root'
     db_password='root'
-    chunk_size=1000
+    buffer_size=1000
     show_summary=False
 
     start_exec_time = time.perf_counter()
     words_saver = None
     config = {
         'save_to_db': save_to_db, 
-        'chunk_size': chunk_size, 
+        'buffer_size': buffer_size, 
         'db_host': db_host, 
         'db_name': db_name, 
         'db_user': db_user, 
@@ -58,8 +58,9 @@ if __name__=="__main__":
     LOGGER.log(INFO, "Script started : {}".format(in_dir))
     try:
         pipeline = ThreadedPipeline(LOGGER, 
-                            max_transformation_pipelines=2,
+                            max_transformation_pipelines=5,
                             use_threads_as_transformation_pipelines=True,
+                            trans_in_queue_max_size=100,
                             extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
                                     #NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='X'),
@@ -97,13 +98,15 @@ if __name__=="__main__":
                             loaders=[
                                     ConditionalLoader(  LOGGER, 
                                                         not config['save_to_db'],
+                                                        # False,
                                                         CSV_FileLoader( LOGGER,
                                                                         input_key_path=None,
                                                                         values_path=[('word', ['_', 'word']), 
                                                                                         ('file', ['file_path']),
                                                                                         ('words_count', ['words_count'])],
                                                                         out_dir=os.path.abspath(out_dir),
-                                                                        out_file_ext='txt')),
+                                                                        out_file_ext='txt',
+                                                                        buffer_size=config['buffer_size'])),
                                     # ConditionalLoader(  LOGGER, 
                                     #                     not config['save_to_db'],
                                     #                     CSV_FileLoader( LOGGER,
@@ -122,7 +125,7 @@ if __name__=="__main__":
                                     #                                                  ('words_count', ['words_count'])],
                                     #                                    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
                                     #                                                    VALUES(%s,%s,0)""",
-                                    #                                    chunk_size=config['chunk_size'],
+                                    #                                    buffer_size=config['buffer_size'],
                                     #                                    host=config['db_host'],
                                     #                                    database=config['db_name'],
                                     #                                    user=config['db_user'],

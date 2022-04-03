@@ -1,6 +1,6 @@
 from abc import abstractmethod
 import codecs
-from logging import Logger, ERROR, DEBUG
+from logging import Logger, ERROR, DEBUG, INFO
 import os
 import re
 from typing import Any, Callable, Generator, Tuple
@@ -64,7 +64,7 @@ class AbstractTransformer(WithLogging):
         pass
 
     def close(self) -> None:
-        pass
+        super().log_msg("Closing loader <>".format(__class__.__name__), level=INFO)
 
     def set_input_key_path(self, v: list[str]):
         self.input_key_path = v

@@ -1,5 +1,8 @@
 from abc import abstractmethod
+import io
 from logging import INFO, WARN, ERROR, Logger
+from multiprocessing.sharedctypes import Value
+import threading
 
 from core.commons import WithLogging
 from core.commons import dict_deep_get
@@ -17,7 +20,7 @@ class AbstractLoader(WithLogging):
         pass
 
     @abstractmethod
-    def close(self, job_uuid: str) -> None:
+    def close(self) -> None:
         pass
 
 
@@ -34,7 +37,7 @@ class NoopLoader(AbstractLoader):
             for item in items:
                 super().log_msg("Loading Item : {}".format(str(dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item)))
 
-    def close(self, job_uuid: str) -> None:
+    def close(self) -> None:
         pass
 
 
@@ -61,8 +64,8 @@ class ConditionalLoader(AbstractLoader):
         elif self.else_log:
             super().log_msg("Loading : {}".format(str(items)))
 
-    def close(self, job_uuid: str) -> None:
-        if self._condition():
+    def close(self) -> None:
+        if self.check_condition():
             self.wrapped_loader.close()
 
 
@@ -72,7 +75,7 @@ class MySQL_DBLoader(AbstractLoader):
                 input_key_path: list[str],
                 values_path: list[tuple[str, list[str]]],
                 sql_query: str,
-                chunk_size: int, 
+                buffer_size: int, 
                 host: str, 
                 database: str, 
                 user: str, 
@@ -80,11 +83,13 @@ class MySQL_DBLoader(AbstractLoader):
         super().__init__(logger, input_key_path, values_path)
         self.connection = None
         self.sql_query = sql_query
-        self.chunk_size=chunk_size
+        self.buffer_size=buffer_size
         self.host=host
         self.user=user
         self.password=password
         self.database = database
+        self.buffer = []
+        self.calling_thread = Value('i', -1)
 
     def _row_from_data(self, item: dict)->list:
         row = []
@@ -109,29 +114,40 @@ class MySQL_DBLoader(AbstractLoader):
             raise error
 
     def load(self, job_uuid: str, items: list[dict]) -> None:
+        id = threading.get_ident()
+        if self.calling_thread.value==-1:
+            self.calling_thread.value=id
+        elif id != self.calling_thread.value:
+            raise RuntimeError('Calling the same loader from diffrent threads')
+
+        data = []
+        for item in items:
+            x = dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item
+            if x is not None:
+                data.append(self._row_from_data(x))
+
+        if len(data)>0:
+            self.buffer = self.buffer + data
+
+        if len(self.buffer) > self.buffer_size:
+            self.write_buffered_data_to_disk()
+
+    def write_buffered_data_to_disk(self) -> None:
         import mysql.connector
 
         connection = self._connect()
         try:
-            data = []
-            for item in items:
-                x = dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item
-                if x is not None:
-                    data.append(self._row_from_data(x))
-
-            data_len=len(data)
+            data_len=len(self.buffer)
             inserted_data = 0
-            input_data = len(items)
             super().log_msg("{0} rows available to be inserted".format(data_len))
             cursor = connection.cursor()
-            for ln in range(0, data_len, self.chunk_size):  
-                chunk = data[ln:ln+self.chunk_size]
-                connection.start_transaction()
-                cursor.executemany(self.sql_query, chunk)   
-                connection.commit()
-                inserted_data+=cursor.rowcount
-                super().log_msg("{} Record inserted successfully".format(cursor.rowcount))
-            super().log_msg("{}/input_data={} Total record inserted successfully".format(input_data))
+            connection.start_transaction()
+            cursor.executemany(self.sql_query, self.buffer)   
+            connection.commit()
+            inserted_data+=cursor.rowcount
+            super().log_msg("{} Record inserted successfully".format(cursor.rowcount))
+            super().log_msg("{} Total record inserted successfully".format(data_len))
+            self.buffer.clear()
             cursor.close()
 
         except mysql.connector.Error as error:
@@ -145,6 +161,9 @@ class MySQL_DBLoader(AbstractLoader):
     def close(self) -> None:
         if not self.connection is None and self.connection.is_connected():
             try:
+                if len(self.buffer) > 0:
+                    self.write_buffered_data_to_disk()
+                    self.buffer.clear()
                 self.connection.close()
                 super().log_msg("MySQL connection is closed successfully",  level=INFO)
             except Exception as ex:
@@ -159,6 +178,7 @@ class CSV_FileLoader(AbstractLoader):
                 col_sep: str=";",
                 out_file_ext="txt",
                 out_file_name_prefix="out_",
+                buffer_size: int = 1000
                 ):
         super().__init__(logger, input_key_path, values_path)
         self.out_dir=out_dir
@@ -166,6 +186,9 @@ class CSV_FileLoader(AbstractLoader):
         self.col_sep = col_sep
         self.out_file_ext = out_file_ext
         self.out_file_name_prefix = out_file_name_prefix
+        self.calling_thread = Value('i', -1)
+        self.buffer_size=buffer_size
+        self.buffer = []
 
     def _row_from_item(self, item: dict) -> list[str]:
         row = []
@@ -177,31 +200,47 @@ class CSV_FileLoader(AbstractLoader):
         import codecs
         import os
 
+        id = threading.get_ident()
+        if self.calling_thread.value==-1:
+            self.calling_thread.value=id
+        elif id != self.calling_thread.value:
+            raise RuntimeError('Calling the same loader from diffrent threads')
+
         if self.file_hd is None:
             file_name = self._out_filename(job_uuid)
             file_path = os.path.join(self.out_dir, file_name)
             self.file_hd = codecs.open(file_path, 'a', encoding = "utf-8")
-            super().log_msg("File {} opened".format(file_path))
+            super().log_msg("File {} opened using the buffering {}bytes".format(file_path, io.DEFAULT_BUFFER_SIZE))
+        
         rows = []
         for item in items:
             x = dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item
-            if x is not None and self._filter(x):
+            if x is not None:
                 rows.append(self.col_sep.join(self._row_from_item(x)))
 
-        rows_nbr = len(rows)  
-        if rows_nbr>0:
-            self.file_hd.write("\n".join(rows) + "\n")
-            super().log_msg("{}/input_data={} total rows written in the file".format(rows_nbr, len(items)))
+        if len(rows) >0: 
+            self.buffer = self.buffer + rows
+
+        if len(self.buffer) > self.buffer_size:
+            self.write_buffered_data_to_disk()
 
     def _out_filename(self, job_uuid: str) -> str:
         return "{}_{}.{}".format(self.out_file_name_prefix, job_uuid, self.out_file_ext)
 
-    def _filter(self, item: dict) -> bool:
-        return item is not None
+    def write_buffered_data_to_disk(self):
+        rows_nbr = len(self.buffer)  
+        if rows_nbr>0:
+            self.file_hd.write("\n".join(self.buffer) + "\n")
+            super().log_msg("{} total rows written in the file".format(rows_nbr))
+        self.buffer.clear()
 
     def close(self) -> None:
+        super().log_msg("Closing loader <>".format(__class__.__name__), level=INFO)
         if not self.file_hd is None:
             try:
+                if len(self.buffer) > 0:
+                    self.write_buffered_data_to_disk()
+                    self.buffer.clear()
                 self.file_hd.flush()
                 self.file_hd.close()
                 super().log_msg("File closed successfully")

@@ -21,7 +21,8 @@ class WithLogging(ABC):
             print(msg)
         
     def log_msg(self, msg: str, exception: Exception = None, level: int = logging.DEBUG):
-        threading.Thread(target=WithLogging.log_msg_sync, args=(self.logger, msg, exception, level)).start()
+        pass
+        # threading.Thread(target=WithLogging.log_msg_sync, args=(self.logger, msg, exception, level)).start()
     
 
 class LoggerWrapper(WithLogging):
