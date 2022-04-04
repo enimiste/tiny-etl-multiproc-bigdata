@@ -140,12 +140,14 @@ class ThreadedPipeline(AbstractPipeline):
                     queue_block_timeout_sec: int,
                     logger: WithLogging) -> None:
         finished = False
+        ack_counter = Value('i', 0)
         while pipeline_closed.value==0:
             try:
                 item = out_queue.get(timeout=queue_block_timeout_sec)
-                loader.load(job_uuid, [item])
+                ack_counter.value += 1
+                loader.loadWithAck(job_uuid, [item], ack_counter, last_call=finished)
             except queue.Empty:
-                if finished is True:
+                if finished is True and ack_counter.value==0:
                     logger.log_msg("Closing loader <{}>".format(str(loader.__class__.__name__)), level=INFO)
                     loader.close()
                     break

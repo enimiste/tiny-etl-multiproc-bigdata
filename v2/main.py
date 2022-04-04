@@ -14,11 +14,13 @@ from transformers import ArabicRemoveDiacFromWordTransformer, ArabicTextWordsTok
 from core.transformers import ItemUpdaterCallbackTransformer
 from core.loaders import ConditionalLoader, MySQL_DBLoader
 from core.transformers import NoopTransformer
-from core.transformers import ReduceTransformer
+from core.transformers import ReduceItemTransformer
 from core.transformers import FileTextReaderTransformer
 from core.transformers import AddStaticValuesTransformer
+from core.loaders import LoadBalanceLoader
+from core.loaders import NoopLoader
 
-LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
+LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
 console_handler.setFormatter(logging.Formatter(LOGGING_FORMAT))
 console_handler.setLevel(logging.INFO)
@@ -29,62 +31,70 @@ logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
                                                 encoding='utf-8',
                                                 format=LOGGING_FORMAT)
 LOGGER = logging.getLogger("my-logger")
-
                           
 if __name__=="__main__":
-
-    #in_dir='../bdall_test_data'
-    in_dir='../bdall_test_data/one_book'
-    out_dir = 'out_dir'
-    save_to_db=True
-    db_host='localhost'
-    db_name='words'
-    db_user='root'
-    db_password='root'
-    buffer_size=1_000
+    config = {
+        'in_dir': '../bdall_test_data/one_book',
+        # 'in_dir': '../bdall_test_data',
+        'out_dir': 'out_dir',
+        'save_to_db': True, 
+        'buffer_size': 2_000, 
+        'db_host': 'localhost', 
+        'db_name': 'words', 
+        'db_user': 'root', 
+        'db_password': 'root',
+        'parallel_loader_count': 2
+    }
 
     start_exec_time = time.perf_counter()
     words_saver = None
-    config = {
-        'save_to_db': save_to_db, 
-        'buffer_size': buffer_size, 
-        'db_host': db_host, 
-        'db_name': db_name, 
-        'db_user': db_user, 
-        'db_password': db_password,
-        'out_dir': out_dir
-    }
-    LOGGER.log(INFO, "Script started : {}".format(in_dir))
+    
+    mysql_db_loader_config =  {
+            'input_key_path': None, 
+            'values_path': [('word', ['_', 'word'], True), 
+                            ('file', ['file_path'], True),
+                            ('words_count', ['words_count'], True)],
+        #    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
+        #                    VALUES(%s,%s,0)""",
+            'sql_query': """INSERT INTO words (word, file_path, file_words_count)
+                            VALUES(%s,%s,%s)""",
+            'buffer_size': config['buffer_size'],
+            'host': config['db_host'],
+            'database': config['db_name'],
+            'user': config['db_user'],
+            'password': config['db_password']}
+            
+    LOGGER.log(INFO, "Script started : {}".format(config['in_dir']))
     try:
         pipeline = ThreadedPipeline(LOGGER, 
-                            max_transformation_pipelines=5,
-                            use_threads_as_transformation_pipelines=True,
+                            max_transformation_pipelines=1,
+                            use_threads_as_transformation_pipelines=False,
                             trans_in_queue_max_size=config['buffer_size'],
-                            extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
+                            extractor=FilesListExtractor(LOGGER, intput_dir=config['in_dir'], pattern=".txt", output_key='_'),
                             transformers=[
                                     #NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='X'),
                                     ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['_'], callback=os.path.abspath),
-                                    # AddStaticValuesTransformer(LOGGER,
-                                    #                             static_values=[(['words_count'], 0)],
-                                    #                             copy_values_key_paths=[('file_path', ['_'])],
-                                    #                             remove_key_paths = [['_']]),
-                                    ReduceTransformer(  LOGGER,
-                                                        input_key_path=['_'], 
-                                                        input_value_type=(str),
-                                                        output_key='words_count', 
-                                                        copy_values_key_paths=[('file_path', ['_'])],
-                                                        transformers=[
-                                                                        FileTextReaderTransformer(LOGGER, 
-                                                                                                pattern=".txt", 
-                                                                                                input_key_path=None, 
-                                                                                                output_key=None),
-                                                                        TextWordTokenizerTransformer(   LOGGER, 
-                                                                                                    pattern="\\s+", 
-                                                                                                    input_key_path=['_', 'content'], 
-                                                                                                    output_key=None)
-                                                                    ],
-                                                        initial_value=0,
-                                                        reducer=ReduceTransformer.count),
+                                    AddStaticValuesTransformer(LOGGER,
+                                                                static_values=[(['words_count'], 0)],
+                                                                copy_values_key_paths=[('file_path', ['_'])],
+                                                                remove_key_paths = [['_']]),
+                                    # ReduceItemTransformer(  LOGGER,
+                                    #                     input_key_path=['_'], 
+                                    #                     input_value_type=(str),
+                                    #                     output_key='words_count', 
+                                    #                     copy_values_key_paths=[('file_path', ['_'])],
+                                    #                     transformers=[
+                                    #                                     FileTextReaderTransformer(LOGGER, 
+                                    #                                                             pattern=".txt", 
+                                    #                                                             input_key_path=None, 
+                                    #                                                             output_key=None),
+                                    #                                     TextWordTokenizerTransformer(   LOGGER, 
+                                    #                                                                 pattern="\\s+", 
+                                    #                                                                 input_key_path=['_', 'content'], 
+                                    #                                                                 output_key=None)
+                                    #                                 ],
+                                    #                     initial_value=0,
+                                    #                     reducer=ReduceItemTransformer.count),
                                     FileToTextLinesTransformer(LOGGER, pattern=".txt", input_key_path=['file_path'], output_key='_',
                                                             copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]), 
                                     TextWordTokenizerTransformer(LOGGER, 
@@ -96,34 +106,38 @@ if __name__=="__main__":
                                     ],
                             loaders=[
                                     # ConditionalLoader(  LOGGER, 
-                                    #                     not config['save_to_db'],
-                                    #                     # False,
-                                    #                     CSV_FileLoader( LOGGER,
-                                    #                                     input_key_path=None,
-                                    #                                     values_path=[('word', ['_', 'word'], True), 
-                                    #                                                     ('file', ['file_path'], True),
-                                    #                                                     ('words_count', ['words_count'], True)],
-                                    #                                     out_dir=os.path.abspath(out_dir),
-                                    #                                     out_file_ext='txt',
-                                    #                                     buffer_size=config['buffer_size'])),
+                                    #                     condition = not config['save_to_db'],
+                                    #                     # condition = False,
+                                    #                     wrapped_loader= CSV_FileLoader( LOGGER,
+                                    #                                                     input_key_path=None,
+                                    #                                                     values_path=[('word', ['_', 'word'], True), 
+                                    #                                                                     ('file', ['file_path'], True),
+                                    #                                                                     ('words_count', ['words_count'], True)],
+                                    #                                                     out_dir=os.path.abspath(out_dir),
+                                    #                                                     out_file_ext='txt',
+                                    #                                                     buffer_size=config['buffer_size'])),
                                     
                                     ConditionalLoader( LOGGER, 
                                                        config['save_to_db'],
-                                                       MySQL_DBLoader( LOGGER, 
-                                                                       input_key_path=None, 
-                                                                       values_path=[('word', ['_', 'word'], True), 
-                                                                                     ('file', ['file_path'], True),
-                                                                                     ('words_count', ['words_count'], True)],
-                                                                    #    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
-                                                                    #                    VALUES(%s,%s,0)""",
-                                                                       sql_query= """INSERT INTO words (word, file_path, file_words_count)
-                                                                                       VALUES(%s,%s,%s)""",
-                                                                       buffer_size=config['buffer_size'],
-                                                                       host=config['db_host'],
-                                                                       database=config['db_name'],
-                                                                       user=config['db_user'],
-                                                                       password=config['db_password']))
-                                                            ])
+                                                    #  False,
+                                                       LoadBalanceLoader(LOGGER, 
+                                                                        queue_no_block_timeout_sec = 0.09,
+                                                                        loaders= [(
+                                                                                    config['buffer_size']*10, 
+                                                                                    MySQL_DBLoader( LOGGER, **mysql_db_loader_config)) 
+                                                                                    for i in range(0, max(1, config['parallel_loader_count']))]
+                                                                        # loaders= [(
+                                                                        #             config['buffer_size']*10, 
+                                                                        #             NoopLoader( LOGGER, 
+                                                                        #                         input_key_path=None,
+                                                                        #                         values_path=[('word', ['_', 'word'], None), 
+                                                                        #                                     ('file', ['file_path'], None),
+                                                                        #                                     ('words_count', ['words_count'], None)],
+                                                                        #                         log=True,
+                                                                        #                         log_level=INFO)) 
+                                                                        #                         for i in range(0, max(1, config['parallel_loader_count']))]
+                                                                        ))
+                                    ])
         pipeline.start()
         pipeline.join()
     except Exception as ex:

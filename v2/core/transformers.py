@@ -25,6 +25,7 @@ class AbstractTransformer(WithLogging):
         self.copy_values_key_paths = copy_values_key_paths
         self.remove_key_paths = remove_key_paths
 
+    @staticmethod
     def _copy_input_values_to_output(copy_values_key_paths: list[Tuple[str, list[str]]], dest: dict, source: dict):
         if copy_values_key_paths is not None:
             for (key, path) in copy_values_key_paths:
@@ -158,7 +159,7 @@ class FileTextReaderTransformer(AbstractTransformer):
         except Exception as e:
             super().log_msg("File error {} : {}".format(file_path, str(e.args)), exception=e, level=ERROR)
 
-class ReduceTransformer(AbstractTransformer):
+class ReduceItemTransformer(AbstractTransformer):
     """
     Avoid using lambda as reducer
     """
