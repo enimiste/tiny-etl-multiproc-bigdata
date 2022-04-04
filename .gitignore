@@ -1,8 +1,8 @@
 __pycache__
 *.log
 /logs
-bdall_test_data
+/bdall_test_data
 **/*.zip
-*.txt
-*.csv
-*.lock
+**/out_dir/*.txt
+**/out_dir/*.csv
+**/logs/*.lock

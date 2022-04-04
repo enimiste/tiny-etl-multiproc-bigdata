@@ -1,0 +1,3996 @@
+﻿The Project Gutenberg eBook of Hand-book of Sanitary Information for
+Householders, by Roger Sherman Tracy
+
+This eBook is for the use of anyone anywhere in the United States and
+most other parts of the world at no cost and with almost no restrictions
+whatsoever. You may copy it, give it away or re-use it under the terms
+of the Project Gutenberg License included with this eBook or online at
+www.gutenberg.org. If you are not located in the United States, you
+will have to check the laws of the country where you are located before
+using this eBook.
+
+Title: Hand-book of Sanitary Information for Householders
+       Containing facts and suggestions about ventilation, drainage,
+       care of contageous diseases,
+
+Author: Roger Sherman Tracy
+
+Release Date: April 3, 2022 [eBook #67768]
+
+Language: English
+
+Produced by: Charlene Taylor, Les Galloway and the Online Distributed
+             Proofreading Team at https://www.pgdp.net (This file was
+             produced from images generously made available by The
+             Internet Archive/American Libraries.)
+
+*** START OF THE PROJECT GUTENBERG EBOOK HAND-BOOK OF SANITARY
+INFORMATION FOR HOUSEHOLDERS ***
+
+                          Transcriber’s Notes
+
+Obvious typographical errors have been silently corrected. Variations
+in hyphenation have been standardised but all other spelling and
+punctuation remains unchanged.
+
+Italics are represented thus _italic_, bold thus =bold=.
+
+There are many apparent subsections within the text variously indicated
+by bold, italic and capital text. There is some, inconsistent,
+correspondence between these and the sup-topics in the Contents.
+Because of this no attempt has been made to establish a hierarchy of
+these headings and they remain as printed in the original. Equally,
+paragraph numbering is not always consistent but remains unchanged.
+
+
+
+
+                               HAND-BOOK
+
+                                  OF
+
+                         SANITARY INFORMATION
+
+                                  FOR
+
+                             HOUSEHOLDERS,
+
+                              CONTAINING
+
+               FACTS AND SUGGESTIONS ABOUT VENTILATION,
+                DRAINAGE, CARE OF CONTAGIOUS DISEASES,
+                    DISINFECTION, FOOD, AND WATER.
+
+                          WITH APPENDICES ON
+
+                DISINFECTANTS AND PLUMBERS’ MATERIALS.
+
+                                  BY
+
+                        ROGER S. TRACY, M. D.,
+
+      SANITARY INSPECTOR OF THE NEW YORK CITY HEALTH DEPARTMENT.
+
+                               NEW YORK:
+                       D. APPLETON AND COMPANY,
+                       1, 3, AND 5 BOND STREET.
+                                 1884.
+
+
+                             COPYRIGHT BY
+                         ROGER S. TRACY, M. D.
+                                 1884.
+
+
+
+
+PREFACE.
+
+
+The preparation of this hand-book was suggested by persistent
+questioning about the matters it contains. Its purpose is to furnish
+householders with information which has been so scattered, or buried so
+deep in technical discussions, that it has not been easy for them to
+find it for themselves. It is, of course, mainly a compilation, and the
+only difficulties met with have been those incident to the arrangement
+and condensation of a large mass of material. I have intended to give
+credit, where credit seemed to be due, for everything borrowed, and,
+if I have failed to do so in any case, it is not my fault, but my
+misfortune.
+
+  R. S. T.
+
+
+
+
+CONTENTS.
+
+
+  CHAPTER                                                           PAGE
+
+  I.—AIR                                                            7-21
+
+  Normal Air.—Contamination of the Air.—Test for
+  Carbonic Acid in Air.—Diseases caused by Foul
+  Air.—Composition of Sewer-Air.—Ground Air.—Ventilation.—Smoky
+  Chimneys.
+
+  II.—DRAINAGE                                                     21-66
+
+  Privy-Vaults.—Tanks.—Pails.—Earth-Closets.—Water-Carriage.—Plumbing
+  Regulations of New York City Board of Health.—Explanatory
+  Remarks.—Drainage of Country Houses.—Subsoil
+  Drainage.—Defective Drainage.—Sources of Bad
+  Odors.—Examination of House-Drainage.—Peppermint
+  Test.—Summary.—Exclusion of Ground-Air.
+
+  III.—DISINFECTION                                                66-73
+
+  Directions issued by the National Board of
+  Health.—Comments.—Precautions in Special Diseases.
+
+  IV.—FOOD                                                         73-85
+
+  Adulterations, and Methods of detecting them.
+
+  V.—WATER                                                         86-90
+
+  Pollution of Water.—Filters.—Tests for Impurities.—Precautions.
+
+  APPENDIX A.—DISINFECTANTS                                        91-99
+
+      ”    B.—PLUMBERS’ MATERIALS                                100-102
+
+  INDEX                                                              103
+
+
+
+
+                               HAND-BOOK
+
+                                  OF
+
+                         SANITARY INFORMATION.
+
+
+Necessary to continued good health are GOOD AIR, GOOD FOOD, and GOOD
+WATER. It is the object of Sanitary Science to secure these.
+
+
+
+
+                              CHAPTER I.
+
+                                 AIR.
+
+
+Normal air contains 79 per cent of nitrogen, 20.96 per cent of oxygen,
+and .04 per cent (4 parts in 10,000) of carbonic acid.
+
+Oxygen supports animal life; carbonic acid, vegetable life; and the use
+of the nitrogen, otherwise than as a diluent, is not known.
+
+Very pure air contains 78.98 per cent of nitrogen, 20.99 per cent of
+oxygen, and .03 per cent of carbonic acid.
+
+Air begins to be very bad when the oxygen is reduced to 20.60 parts in
+100. In mines, where candles go out, oxygen is reduced to 18.50 parts
+in 100, and, in the worst specimen yet examined by Angus Smith, to
+18.27. Air in which the percentage of oxygen has been reduced to 17.20
+is very difficult to remain in for many minutes.
+
+Aside from impurities due to local causes, the purest air is found from
+six to forty feet above the ground, and the most impure from seventy to
+ninety feet, where the air from chimneys is poured forth.
+
+
+=Air is contaminated by the products of respiration and the bodily
+emanations of healthy persons, and by the products of combustion.=
+
+An adult man, in ordinary work, gives off in twenty-four hours from
+twelve to eighteen cubic feet of carbonic acid, according to his size;
+women, children, and old persons less.
+
+Edward Smith found that an adult asleep exhaled about nineteen grains
+of carbonic acid per hour, and, when he walked three miles an hour, the
+amount was increased to 100.6 grains.
+
+W. R. Nichols, of Boston, found in passenger-cars 23.2 parts of
+carbonic acid to 10,000 parts of air, and in the Berkeley Street sewer
+10.4 parts per 10,000. Wilson found in Portsmouth Prison, in cells
+containing six hundred and fourteen cubic feet of air, always occupied,
+7.20 parts per 10,000, and in cells containing two hundred and ten
+cubic feet, occupied only at night, 10.44 per 10,000.
+
+Besides the carbonic acid, there is exhaled from the lungs a small
+amount of organic matter, of unknown composition. It forms a glutinous
+coating on the furniture, walls, and windows of closed rooms,
+decomposes rapidly, imparts a peculiarly offensive odor to the air of
+a badly-ventilated room, and poisons those who inhale it. Its quantity
+is so small that it has so far defied analysis. In a room contaminated
+by respiration alone, the odor of this substance begins to be perceived
+when the carbonic acid has increased to about 7 parts in 10,000, and 10
+parts in 10,000 may be considered the maximum amount of carbonic acid
+allowable in dwellings.
+
+The following table shows how much carbonic acid artificial lights
+produce per hour:
+
+  Petroleum, slit-burner,   10   candle-light,  1.98 cubic feet,
+  Petroleum, round-burner,   7.6       ”        2.15      ”
+  Oil-lamp,                  4         ”        1.09      ”
+  Candle,                    1         ”         .39      ”
+  Coal-gas, slit-burner,     7.8       ”        3.25      ”
+  Coal-gas, flat-burner,    10         ”        3         ”
+
+A five-foot gas-burner produces as much carbonic acid per hour as five
+men.
+
+As the most poisonous element of the breath can not readily be detected
+by analysis, the amount of carbonic acid is taken as a measure of the
+impurity of air contaminated by respiration.
+
+
+=Test for carbonic acid in air= (Pettenkofer’s method):
+
+Shake up a definite volume of the air in a closed vessel with a
+definite amount of lime-water. The carbonic acid unites with the
+lime, forming carbonate of lime. This compound, being insoluble in
+water, renders it turbid. The degree of turbidity may be judged of
+by looking through the water at a cross marked in lead-pencil on the
+inside of a piece of paper pasted on the opposite side of the bottle,
+and a standard may be fixed by shaking up ordinary external air in a
+sixteen-ounce bottle, as described below, which will show the degree of
+turbidity produced by 4 parts of carbonic acid in 10,000. Lime-water
+can be bought of a druggist, or made by shaking distilled water with
+slaked lime, allowing it to settle, and pouring off the clear liquid.
+With a common hand-ball syringe, the end of the rubber tube resting
+on the bottom of the bottle, pump in air, until the bottle is filled
+with the air to be tested. Put in half an ounce of lime-water, cork the
+bottle, and shake it up well. Let it stand for five minutes, and if the
+water becomes turbid, as if a little milk had been dropped into it, the
+presence of carbonic acid in the air will be indicated in the following
+proportions.
+
+  Size of bottle.   Amount of lime-water.     Parts in 10,000.
+
+  16 ounces               1-2 ounce         A little less than  4
+  12   ”                     ”              A little more than  5
+  10   ”                     ”                 ”      ”     ”   6
+   8   ”                     ”                                  8
+   6   ”                     ”              A little more than 10
+   4   ”                     ”                 ”      ”     ”  15
+
+
+                   _Dangers of such Contamination._
+
+Air contaminated by the products of respiration and by bodily
+emanations (perspiration, etc.) contains substances which have been
+ejected from human bodies as useless or injurious. What all systems
+reject can not be healthy for any, and it is found that long-continued
+exposure in an atmosphere laden with these impurities produces anæmia,
+general debility, and poor nutrition, conditions likely to result in
+the development of scrofula and consumption. It is believed, too, that
+typhus fever may originate in this manner, while when such poisons are
+inhaled in a more concentrated form, as in the famous Black Hole of
+Calcutta, nausea, vertigo, convulsions, and even death are produced.
+
+=The air is at certain times and places contaminated by the products of
+respiration and the bodily emanations of diseased persons.=
+
+In certain diseases, commonly known as =contagious=, organic matters
+are thrown off by the lungs and skin of the sick, which tend to
+reproduce these diseases in the bodies of other persons. The exact
+nature of these poisons is in most cases unknown, but they are
+generally believed to be living microscopic organisms (bacteria,
+bacilli, micrococci, etc.), which multiply their kind in the blood of
+the person who has inhaled them.
+
+Of such diseases, the dangerous ones are small-pox, measles, scarlet
+fever, typhus fever, and diphtheria, and their contagious quality is
+marked very nearly in the order in which they are here mentioned.
+
+The less harmful of these diseases are whooping-cough, chicken-pox,
+mumps, and German measles.
+
+There is strong evidence that consumption is contagious, though not as
+markedly so as the diseases above enumerated.
+
+
+=The air may be contaminated by the products of the decomposition of
+the excreta of healthy persons.=
+
+The contents of cesspools, privy-vaults, and sewers, are generally
+composed of discharges from the bowels and kidneys, various matters
+washed off from the bodies of animals and from culinary and household
+utensils, and dissolved soap, constituting a mixture which rapidly
+decomposes and affords a fine soil for the nourishment and propagation
+of microscopic organisms.
+
+Air contaminated in this way, popularly known as =sewer-gas=, contains
+sulphide of ammonium and sulphureted hydrogen (which cause the
+characteristic odor of rotten eggs), carbureted hydrogen, nitrogen, and
+carbonic acid (odorless), and certain undetermined organic matters.
+
+Professor Nichols analyzed the air of the Berkeley Street sewer in
+Boston, a type of a badly-constructed and badly-ventilated sewer. The
+sulphureted hydrogen, etc., were in too small quantity to be measured.
+The highest percentages found were, of oxygen, 20.90; of nitrogen,
+79.26; of carbonic acid, .4 (40 parts in 10,000). The lowest were,
+oxygen, 20.48; nitrogen, 78.89; and carbonic acid, .05 (5 parts in
+10,000).
+
+Letheby found that sewer-water (containing 128.8 grains of organic
+matter to the gallon) excluded from air yielded, for nine weeks, 1.2
+cubic inches of gas per hour. In one hundred volumes of this mixture
+there were 78.83 parts of marsh-gas (carbureted hydrogen), 15.90 parts
+of carbonic acid, 10.19 parts of nitrogen, and .08 of sulphureted
+hydrogen. Examination of sewage-mud in the Seine by Durand-Claye gave
+72.88 parts of marsh-gas, 13.30 of carbonic acid, 6.70 of sulphureted
+hydrogen, 2.54 of carbonic oxide, 4.58 of nitrogen, and some other
+gases. Such mixtures are sometimes found in long-closed cesspools and
+privy-vaults, but not in sewers proper.
+
+Of these gases, sulphureted hydrogen and carbonic acid are very
+poisonous, and when they are inhaled in concentrated form produce
+almost immediate unconsciousness, and often death. When less
+concentrated, sewer-air may cause nausea and vomiting, followed by a
+low fever which sometimes kills, and, if not, results in a tedious
+convalescence. As a rule, it is so largely diluted that it produces no
+immediate effects, excepting the discomfort due to offensive odor, and
+the mental anxiety resulting therefrom.
+
+The effects usually attributed to the continued breathing of diluted
+sewer-air are general _malaise_, loss of appetite, anæmia, impaired
+nutrition, and therefore diminished power of resistance to attacks of
+disease which are not directly attributable to sewer-air poisoning. It
+is doubtful whether these effects are due to the constant introduction
+of sewer-air in minute quantities into the blood, or to the inhalation
+of particles of organic matter floating in such a contaminated
+atmosphere.
+
+=The greatest danger, however, in the breathing of sewer-air is that of
+inhaling with it the living particles= (bacilli, etc.) =contained or
+developed in the excreta of diseased persons=.
+
+The diseases believed to be propagated in this way are =cholera=,
+=typhoid fever=, and =dysentery=. The discharges both from the mouth
+(stomach) and bowels are known to be poisonous.
+
+It believed by many that the poisons of typhoid fever and diphtheria
+may be developed _de novo_ by the decomposition of the mixtures found
+in cesspools and sewers.
+
+There also seems to be a connection, imperfectly understood, between
+bad drainage and malarial fevers, and perhaps cerebro-spinal meningitis.
+
+The origin of yellow fever is not yet ascertained.
+
+Surgical erysipelas, puerperal fever, and hospital gangrene, are
+only developed on and about wounded surfaces, and seem to be due to
+the organisms developed in the secretions of such surfaces, where
+ventilation and drainage are bad.
+
+
+=Air may be contaminated by the products of organic decomposition
+rising from the ground and drawn into the house through furnace-flues=,
+etc.
+
+=Ground-air= contains from 1.49 to 80 parts per 1,000 of carbonic
+acid, and frequently contains products of organic decomposition. A
+damp soil is also very unhealthy, as shown by Bowditch and others.
+“A persistently low ground-water, say fifteen feet down or more, is
+healthy; a persistently high ground-water, less than five feet from
+the surface, is unhealthy; and a fluctuating level, especially if the
+changes are sudden and violent, is very unhealthy” (De Chaumont). Such
+soils are especially productive of consumption.
+
+
+                             VENTILATION.
+
+The contamination of the atmosphere by the respiration and bodily
+emanations of human beings and other animals is unavoidable, but the
+noxious matters thus added to the air are being constantly changed in
+the following ways:
+
+=1. Oxidation.= The organic matters, which have been mentioned as
+especially injurious, are gradually decomposed by the oxygen of the
+air, and changed into harmless substances, which either remain as
+constituents of the atmosphere, or are washed into the earth by rains.
+
+=2. Vegetable growth.= Plants absorb carbonic acid (which is composed
+of carbon and oxygen) through their leaves, and give back oxygen
+to the air, retaining the carbon for their own nourishment. There
+is thus a constant interchange between animals and vegetables, the
+former exhaling carbonic acid and appropriating oxygen, and the latter
+appropriating carbonic acid and exhaling oxygen. The small percentage
+of carbonic acid always found in the air is, therefore, essential to
+vegetable life, while harmless to animals.
+
+It is necessary, for the proper purification of a contaminated
+atmosphere, that it should be largely diluted with fresh air. Hence
+arises the need of the constant change of air in dwellings.
+
+Air expands when heated and so becomes lighter. Local differences of
+temperature, created by natural and artificial means, therefore bring
+about currents in the atmosphere, the cooler and heavier column of air
+always descending, and the warmer and lighter always rising. This fact
+is taken advantage of in ventilation.
+
+It has been estimated that, to keep the air pure, three thousand cubic
+feet of fresh air per hour are required for a male adult, and that a
+sleeping-room should contain at least twelve hundred cubic feet of
+air-space for each occupant.
+
+When the temperature of the external air is such that the doors
+and windows can be constantly open, they afford the best means of
+ventilation for dwellings. An exposure to draughts, however, is
+dangerous to many persons, and it is desirable, therefore, in cooler
+weather, to devise means of admitting fresh air without creating a
+draught. At a temperature of 60°, a draught is perceived when the air
+moves at a higher rate of speed than three feet a second. Now it is
+obvious that a draught may be rendered harmless if the entering current
+of air is guided in such a direction as not to strike the occupants
+of a room. This is accomplished simply and cheaply by either of two
+devices: If the lower sash of a window is raised a few inches (say
+four), and the space between the bottom of the sash and the window-sill
+is filled by an accurately fitted board, there will be a space between
+the panes of the two sashes, through which air will enter, spouting
+upward toward the ceiling and not falling until its momentum is so much
+diminished that it will not be felt as a draught. The other plan is to
+make the upper portion of the upper sash movable, so that it can be
+tilted inward at such an angle as to direct the entering current upward
+(essentially the Sherringham valve, though this is made of iron, with
+side-cheeks to prevent a lateral outflow of air).
+
+There are various patent apparatuses for the admission of fresh air
+through windows without draught, but they are mostly modifications of
+the methods above mentioned.
+
+In weather when artificial heat is necessary for comfort, thorough
+ventilation is not difficult, provided expense is not considered. As
+the removal of the foul air, however, involves a considerable waste
+of heat and consumption of fuel, the means of procuring the best
+ventilation at the least cost becomes a problem of great intricacy,
+which has not yet been satisfactorily solved.
+
+=Fireplaces=, or open grates, are excellent ventilators. An ordinary
+fireplace renews the air of the room four or five times hourly,
+removing in that time from fifteen to twenty thousand cubic feet of
+air. But only about 12 or 14 per cent. of the heat given off by the
+fuel is utilized, the rest passing off by the chimney. The objections
+to the fireplace as a sole means of heating are, its wastefulness, and
+the fact that it warms only by radiation, so that the room is unequally
+warmed, and may be too cold in one place and insupportably hot in
+another.
+
+=Stoves= and =furnaces= can not be relied on for ventilation, the
+ventilating power of a close stove being only one tenth of that
+required for a single adult.
+
+Modern fireplaces are sometimes built with a metallic flue extending
+upward into the chimney. Between this flue and the masonry is an
+air-chamber opening to the external air and communicating with the
+room near the ceiling, so that fresh air from outside the house is
+continuously warmed, and discharged into the room at a temperature of
+80° or 90°. The Galton fireplace (Fig. 1) is of this kind, and utilizes
+35 per cent. of the fuel.
+
+The best combined heating and ventilating arrangement at present seems
+to be that which warms the fresh air by means of a soapstone furnace
+or steam-coils, and removes the foul air through a fireplace. In
+milder weather, gas may be burned in the chimney at a slight expense.
+According to Morin, seven cubic feet of gas burned in a flue eleven
+inches square and sixty-six feet high, will draw thirteen thousand
+three hundred cubic feet of air per hour from a room.
+
+[Illustration: Fig. 1.—Galton’s fireplace.]
+
+The =dampers= of stoves should never be in the pipes, for they dam
+back the gases which ought to enter the chimney, and force them into
+the room. The fire should be regulated by dampers which prevent the
+access of air, and not its escape after contamination.
+
+Ventilating =flues= in walls do very little good, unless special means
+are provided to heat them (e. g., gas lights or lamps).
+
+The common whirling ventilators in window-panes are of very little use.
+
+As a rule, fresh air should enter a room near the ceiling, and foul air
+be removed near the floor.
+
+In very cold climates, dangerous draughts are often produced by the
+cooling of the air in contact with the window-panes, so that it falls
+and sweeps along the floor. This danger may be prevented by double
+windows, which also save fuel. Double windows may be utilized in
+ventilation, by raising the lower outer sash a few inches, and lowering
+the upper inner one.
+
+
+                           _Smoky Chimneys._
+
+When a chimney smokes, the draught is downward. This may be, caused—1.
+By an obstruction in the flue or stove-pipe. 2. By a higher chimney in
+the same house, the air coming down the shorter chimney, and going up
+the other. The remedy is to equalize the heights, or close the doors
+between the two. 3. If, when the fire is started, the air outside is
+warmer than that in the chimney, the heavier column will of course
+fall. This effect will vanish in a few minutes, when the flue becomes
+heated. 4. The doors and windows of the room may be so tight as to
+prevent a sufficient supply of fresh air to burn the fuel. If so,
+they must be opened. 5. The chimney may be lower than the adjoining
+wall, and the wind from certain directions, striking the wall, may be
+directed down the flues. This may be remedied by extending the chimney
+above the wall, or by capping the flues with one of the various cowls
+that prevent a downward draught.
+
+
+
+
+                              CHAPTER II.
+
+                               DRAINAGE.
+
+
+=How to prevent the contamination of the air by the products of
+decomposition.=
+
+There is no evidence to show that the emanations from fresh
+house-slops, or the excreta of healthy animals, are injurious to
+health, but it has been proved that when these matters decompose they
+become dangerous. The bubbles of gas which rise to the surface of
+such decomposing matters, when they burst, throw up solid particles
+of organic matter in the air, which float about for some time before
+falling to the ground. It is, therefore, essential to health that
+all such matters shall be removed from the vicinity of human beings
+promptly, before decomposition sets in, or else so manipulated as to
+prevent decomposition, or promote rapid oxidation.
+
+The lower animals seem to recognize by instinct that their excreta
+are dangerous, and they deposit them (except when penned up by men)
+in places remote from their abodes, or else carefully cover them with
+fresh earth. Man alone retains his excreta in carefully prepared
+receptacles near his place of residence, until the accumulation is so
+large that he is forced to remove it.
+
+The ordinary =privy-vault= should never be allowed. Its only advantage
+is its cheapness, while it involves constant danger of contamination of
+the water of adjoining wells or cisterns. Many an epidemic of typhoid
+fever has been unmistakably traced to this source. If such a vault is
+a necessity, it should be made water-tight, be small and frequently
+emptied, the contents should be frequently disinfected, preferably by
+being covered with fresh earth, and it should be built in such a spot
+that the current of ground-water (which furnishes the well-water) shall
+be from the well toward the vault, and never in the opposite direction.
+Better still is a =movable tank=, in which the excreta are received
+and covered with fresh earth daily. This can be emptied over a garden
+or field without offense. In villages where sewerage is impossible,
+=pails= are sometimes used. They have tight covers, and are removed
+frequently (once or twice a week, clean ones being substituted at
+the time of removal by the proper authorities), the contents being
+converted into poudrette at some place remote from habitations.
+
+A better means of disposing of the excreta, where water-closets
+can not be had, is the =earth-closet=, of which there are several
+varieties. These are so constructed that they resemble a water-closet
+in appearance, but the excreta are caught in a receptacle beneath
+the seat, and covered with earth, when the handle beside the seat is
+raised. Dry earth is an excellent disinfectant,[1] and when excreta are
+thus mingled with it they are gradually oxidized and disappear, so that
+after a time the same earth may, with proper precautions, be used again.
+
+[1] Its disinfectant properties have been shown to be due to the
+presence of microscopic organisms, which decompose the excreta in the
+act of nourishing themselves. A little chloroform paralyzes them,
+and deprives the earth of its disinfecting properties, which return,
+however, when the chloroform is washed out, and the organisms recover
+their natural vigor.
+
+The earth for these closets must be dry, and sifted of coarse
+particles, and enough must be deposited upon the excreta to cover them
+and to absorb the urine.
+
+Its advantages, as compared with the water-closet, are, that it is
+cheaper, requires less repair, is not hurt by frost, is not injured
+when improper substances are thrown down it, and requires no water. Its
+disadvantages are, the trouble of collecting and drying the earth, the
+necessity of frequently removing the soil, the dust sometimes caused
+by its use, and the necessity of providing additional means for the
+disposal of slops.
+
+A perfect method of disposal of excreta and other house refuse would
+be one which would insure their prompt and rapid removal in such
+a way as to prevent the contamination of the air of any inhabited
+locality during such removal, or after their final deposition. The most
+convenient and economical means yet invented of accomplishing this
+object is =water-carriage=; i. e., the matters referred to are conveyed
+from the house, with the addition of sufficient water to insure a
+rapid flow, through a series of pipes and tunnels into a large body of
+running water, or over the surface of the earth, under conditions which
+insure their rapid conversion into harmless substances.
+
+The water-carriage system includes bowls or sinks for the deposit
+of refuse matters, connecting-pipes to remove such matters from the
+house, and public sewers for their further conveyance away from human
+abodes. The construction and care of public sewers belong to the local
+government; we have here only to do with house-drainage.
+
+The essentials of house-drainage are: 1. The primary receptacles
+(bowls, sinks, water-closets, etc.) should be of such material and so
+constructed as to be impervious to fluids, and easy to clean and keep
+clean. 2. The pipes should be of such material as to be as durable as
+possible, and so laid and connected as to form gas-tight conduits, and
+to insure the rapid passage of whatever enters them, so as to prevent
+the formation of deposits or incrustations. 3. The drainage system
+should be so planned and constructed that neither the atmosphere of the
+house nor the drinking-water can be polluted by anything escaping from
+it, and no noxious matters can enter it from any other house.
+
+The following plan of construction is that recommended by the Board of
+Health of New York city:
+
+1. All materials must be of good quality and free from defects; the
+work must be executed in a thorough and workmanlike manner.
+
+2. The arrangement of soil and waste pipes must be as direct as
+possible.
+
+3. The drain, soil, and waste pipes, and the traps, must, if
+practicable, be exposed to view for ready inspection at all times, and
+for convenience in repairing. When necessarily placed within partitions
+or in recesses of walls, soil and waste pipes must be covered with
+wood-work, so fastened with screws as to be readily removed. In no case
+shall they be absolutely inaccessible.
+
+4. It is recommended to place the soil and other vertical pipes in
+a special shaft, between or adjacent to the water-closet and the
+bath-room, and serving as a ventilating shaft for them. This shaft
+should be at least two and a half feet square. It should extend from
+the cellar through the roof, and should be covered by a louvered
+sky-light. It should be accessible at every story, and should have a
+very open but strong grating at each floor to stand upon.
+
+Shafts not less than three feet square in area are required in
+tenement-houses, to ventilate interior water-closets.
+
+5. Every house or building must be separately and independently
+connected with the street-sewer.
+
+6. Where the ground is made or filled in, the house-sewer—that is to
+say, the portion of the drain extending from the public sewer to the
+front wall—must be of cast-iron, with the joints properly calked with
+lead.
+
+7. Where the soil consists of a natural bed of loam, sand, or rock, the
+house-sewer may be of hard, salt-glazed, and cylindrical earthenware
+pipe, laid on a smooth bottom, free from all projections of rock,
+and with the soil well rammed to prevent any settling of the pipe.
+Each section must be wetted before applying the cement, and the
+space between each hub and the small end of the next section must
+be completely and uniformly filled with the best hydraulic cement.
+Care must be taken to prevent any cement being forced into the drain
+to become an obstruction. No tempered-up cement shall be used. A
+straight-edge must be used inside the pipe, and the different sections
+must be laid in perfect line on the bottom and sides.
+
+8. Where there is no sewer in the street, and it is necessary to
+construct a private sewer to connect with a sewer on an adjacent street
+or avenue, it must be laid under the roadway of the street on which
+the houses front, and not through the yards or under the houses.
+
+9. The house-drain must be of iron, with a fall of at least one quarter
+inch to the foot, if possible, and not more than one inch to the foot.
+
+10. Where water-closets or a school-sink discharge into it, the drain
+must be at least four inches in diameter.
+
+11. It must be hung on the cellar wall or ceiling, unless this is
+impracticable, in which case it must be laid in a trench cut at a
+uniform grade, walled upon the sides with brick laid in hydraulic
+cement, and provided with movable covers, and with a hydraulic concrete
+base of four inches in thickness, on which the pipe is to rest.
+
+12. It must be laid in a straight line, if possible. All changes in
+direction must be made with curved pipes, and all connections with
+Y-branch pipes and one-eighth bends.
+
+13. Any house-drain or house-sewer, put in and covered without due
+notice to the Health Department, must be uncovered for inspection at
+the direction of the inspector.
+
+14. A running or half S-trap must be placed on the house-drain at
+an accessible point near the front of the house. This trap must be
+furnished with a hand-hole for convenience in cleaning, the cover of
+which must be properly fitted and made gas and air tight with some
+proper cement.
+
+15. There must be an inlet for fresh air entering the drain just inside
+the trap, of at least four inches in diameter, leading to the outer
+air and opening at or near the street curb, or at a convenient place
+not less than ten feet from the nearest window. No cold-air box for a
+furnace shall be so placed that it can by any possibility draw air from
+this inlet-pipe. The inlet-pipe should never be carried up to the roof
+inside or outside the house.
+
+16. No brick, sheet-metal, earthenware, or chimney-flue shall be used
+as a sewer-ventilator, nor to ventilate any trap, drain, soil, or waste
+pipe.
+
+17. Every vertical soil-pipe and waste-pipe must be of iron, and, where
+it receives the discharge of fixtures on two or more floors, it must
+be extended at least two feet above the highest part of the roof or
+coping, of undiminished size, with a return bend or cowl. It must not
+open near a window, nor an air-shaft which ventilates livingrooms.
+
+18. Soil, waste, and vent pipes, in an extension, must be extended
+above the roof of the main building, when otherwise they would open
+within twenty feet of the windows of the main house or the adjoining
+house.
+
+19. Horizontal soil and waste pipes are prohibited.
+
+20. The minimum diameter of soil-pipe permitted is four inches. A
+vertical waste-pipe, into which a line of kitchen-sinks discharge, must
+be at least two inches in diameter, with one inch and a half branches.
+
+21. Where lead pipe is used to connect fixtures with vertical soil or
+waste pipes, or to connect traps with vertical vent-pipes, it must not
+be lighter than D-pipe.
+
+22. There shall be no traps on vertical soil-pipes or vertical
+waste-pipes.
+
+23. All iron pipes must be sound, free from holes, and of a uniform
+thickness of not less than one eighth of an inch for a diameter of two,
+three, or four inches, or five thirty-seconds of an inch for a diameter
+of five or six inches; and, in case the building is over sixty-five
+feet in height above the curb, the use of what is known as extra heavy
+pipe, and corresponding fittings, are required, which weigh as follows:
+
+   2 inches,  5½ pounds per lineal foot.
+   3   ”      9½      ”           ”
+   4   ”     13       ”           ”
+   5   ”     17       ”           ”
+   6   ”     20       ”           ”
+   7   ”     27       ”           ”
+   8   ”     33½      ”           ”
+  10   ”     45       ”           ”
+  12   ”     54       ”           ”
+
+24. Before they are connected they must be thoroughly coated inside
+and outside with coal-tar pitch, applied hot, or some other equivalent
+substance.
+
+25. When required by an inspector from the Board of Health, the
+plumbing must be tested with the peppermint or the water test, by the
+plumber in the presence of the inspector, and all defective joints made
+tight, and other openings made impermeable to gases. Defective pipe
+discovered must be removed and replaced by sound pipe.
+
+26. All joints in the iron drain-pipes, soil-pipes, and waste-pipes
+must be so calked with oakum and lead, or with cement made of iron
+filings and sal-ammoniac, as to make them impermeable to gas.
+
+27. All connections of lead with iron pipes must be made with a brass
+sleeve or ferrule, of the same size as the lead pipe, put in the hub
+of the branch of the iron pipe, and calked in with lead. The lead pipe
+must be attached to the ferrule by a wiped joint.
+
+28. All connections of lead pipe should be by wiped joints.
+
+29. Every water-closet, urinal, sink, basin, wash-tray, bath, and every
+tub or set of tubs, must be separately and effectively trapped, except
+where a sink and wash-tubs immediately adjoin each other, in which case
+the waste-pipe from the tubs may be connected with the inlet side of
+the sink-trap; in such a case the tub waste-pipe is not required to be
+separately trapped.
+
+30. Traps must be placed as near the fixtures as practicable, and in no
+case shall a trap be more than two feet from the fixture.
+
+31. All exit-pipes must be provided with strong metallic strainers.
+
+32. In no case shall the waste from a bath-tub or other fixture be
+connected with a water-closet trap.
+
+33. Traps must be protected from siphonage, and the waste-pipe leading
+from them ventilated, by a special air-pipe, in no case less than two
+inches in diameter for water-closet traps, and one inch and a half for
+other traps. Except in private dwellings, the vertical vent-pipes for
+traps of water-closets in buildings more than four stories in height
+must be at least three inches in diameter, with two-inch branches to
+each trap, and for traps of other fixtures not less than two inches in
+diameter, with branches one and a half inches in diameter, unless the
+trap is smaller, in which case the diameter of branch vent-pipe must
+be at least equal to the diameter of the trap. In all cases vertical
+vent-pipes must be of cast or wrought iron.
+
+34. These pipes must either extend two feet above the highest part
+of the roof or coping, the extension to be not less than four inches
+in diameter to avoid obstruction from frost, or they may be branched
+into a soil-pipe above the inlet from the highest fixture. They may be
+combined by branching together those which serve several traps. These
+air-pipes must always have a continuous slope, to avoid collecting
+water by condensation.
+
+35. Traps of fixtures near the fresh-air inlet may be ventilated by
+being connected with it.
+
+36. No trap vent-pipe shall be used as a waste or soil pipe.
+
+37. Overflow-pipes from fixtures must, in each case, be connected on
+the inlet side of the trap.
+
+38. Every safe under a wash-basin, bath, urinal, water-closet, or other
+fixture, must be drained by a special pipe not directly connected with
+any soil-pipe, waste-pipe, drain, or sewer, but discharging into an
+open sink, upon the cellar-floor, or outside the house.
+
+39. The waste-pipe from a refrigerator shall not be directly connected
+with the soil or waste pipe, or with the drain or sewer, or discharge
+into the soil; it should discharge into an open sink. Such waste-pipes
+should be so arranged as to admit of frequent flushing, and should be
+as short as possible, and disconnected from the refrigerator.
+
+40. The sediment-pipe from kitchen boilers must be connected on the
+inlet side of the sink-trap.
+
+41. All water-closets within the house must be supplied with water from
+special tanks or cisterns, the water of which is not used for any other
+purpose. The closets must never be supplied directly from the Croton
+supply-pipes. A group of closets may be supplied from one tank; but
+water-closets on different floors are not permitted to be flushed from
+one tank.
+
+42. The valves of cisterns must be so fitted and adjusted as to prevent
+wasting of water, especially where cisterns are supplied from a tank on
+the roof.
+
+43. The overflow-pipes from water-closet cisterns must discharge into
+an open sink, or where its discharge will attract attention and
+indicate that waste of water is occurring, but not into the bowl of
+the water-closet, not into the soil or waste pipe, nor into the drain
+or sewer. When the pressure of the Croton is not sufficient to supply
+these tanks, a pump must be provided.
+
+44. Tanks for drinking-water are objectionable; if indispensable,
+they must never be lined with lead, galvanized iron, or zinc. They
+should be constructed of iron, or wood lined with tinned and planished
+copper. The overflow should discharge upon the roof, or be trapped
+and discharge into an open sink, never into any soil or waste pipe or
+water-closet trap, nor into the drain or sewer.
+
+45. Rain-water leaders must never be used as soil, waste, or vent
+pipes; nor shall any soil, waste, or vent pipe be used as a leader.
+
+46. When within the house, the leader must be of cast-iron, with leaded
+joints; when outside of the house, and connected with the house-drain,
+it must be trapped beneath the ground or just inside of the wall, the
+trap being arranged in either case so as to prevent freezing. In every
+case where a leader opens near a window or a light-shaft, it must be
+properly trapped at its base.
+
+47. No steam exhaust or blow-off pipe from a steam-boiler will be
+allowed to connect with any soil or waste pipe, or directly with the
+house-drain. They should discharge into a tank or condenser, the
+waste from which, if to be discharged into the sewer through the
+house-drain, must be connected on the sewer side of the running trap.
+
+48. Subsoil drains must be provided whenever necessary.
+
+49. Yards and areas should always be properly graded, cemented,
+flagged, or well paved, and properly drained; when the drain is
+connected with the house-drain, it must be effectively trapped.
+Front-area drains must, where practicable, be connected with the
+house-drain inside of the running trap.
+
+50. Cellar and foundation walls must, where possible, be rendered
+impervious to dampness, and the use of asphaltum or coal-tar pitch, in
+addition to hydraulic cement, is recommended for that purpose.
+
+51. No privy-vault or school-sink will be allowed in any cellar or
+basement; nor shall the general privy accommodation of a tenement or
+lodging house be allowed to be in the cellar or basement.
+
+52. No privy-vault, or cesspool for sewage, will be permitted in any
+part of the city where water-closets or a school-sink can be connected
+with a public sewer in the street.
+
+53. School-sinks must be of cast-iron, not more than two feet in depth,
+connected at the upper end with the Croton supply, and at the lower end
+with a drain leading to the street-sewer, and provided with an outlet
+at the lowest point and on the bottom so as to admit of a complete
+discharge of the contents whenever the outlet is opened and the sink
+flushed with water.
+
+54. The sink must be set so that the flange will be at least two feet
+below the yard surface, to prevent freezing. It must be at least ten
+feet from any window, or as near that distance as practicable.
+
+55. The waste-pipe from a hydrant-sink in the yard must be properly
+trapped, especially where it discharges into a school-sink, a
+privy-vault, or cesspool, or the house-drain.
+
+56. Open light and air courts must be properly drained.
+
+57. When a privy-vault or cesspool must necessarily be used, and the
+water-supply of the premises is from a well, they must be at least
+fifty feet from the well; and the privy-vault must be absolutely tight.
+
+
+                        _Explanatory Remarks._
+
+2. =As direct as possible.= To insure an uninterrupted flow. When a
+pipe has to pass an obstruction (a beam or post) an =offset= is used
+(Fig. 2).
+
+3. The =soil-pipe= is that which conveys the contents of water-closets
+to the house-drain: the =waste-pipes= are intended to carry other
+refuse fluids only. The =house-drain= is the large pipe which receives
+the contents of the soil and waste pipes and conveys them outside the
+house.
+
+A =trap= is a bend (with or without an enlargement) of the pipe,
+intended to retain a sufficient amount of the fluids that enter it to
+occlude the pipe and prevent the backward flow of air. The effective
+=water-seal= is represented by the total depth of water in the trap,
+minus the inside diameter of the pipe, and should be at least one inch.
+
+[Illustration: Fig. 2.—Offset.]
+
+[Illustration: Fig. 3.—S-trap.]
+
+[Illustration: Fig. 4.—Half S-trap.]
+
+[Illustration: Fig. 5.—D-trap.]
+
+[Illustration: Fig. 6.—Bag-trap.]
+
+Traps are of various kinds, and many are patented. The accompanying
+figures represent the principal types.
+
+Fig. 3 is the S-trap. Fig. 4 is the half S-trap. There is also a
+three-quarter S-trap. Fig. 5 is a D-trap, formerly much used, but now
+mostly out of date, because it retains dirt. Fig. 6 is a =bag=-trap.
+It has no advantage over the S-trap, and uses more material. Fig. 7 is
+a =bottle=-trap, much used in Boston. This also retains dirt. There
+are varieties of it, the distinguishing feature of all being that the
+fluids enter them at the bottom and flow out at the top.
+
+[Illustration: Fig. 7.—Bottle-trap.]
+
+[Illustration: Fig. 8.—Bell-trap.]
+
+[Illustration: Fig. 9.—Running-trap.]
+
+[Illustration: Fig. 10.—Mason’s trap.]
+
+Fig. 8 is the =bell=-trap, so called from its shape. Much used for the
+drains of paved areas, yards, and cellars; liable to retain dirt, and
+needs frequent cleaning; not a good trap. Fig. 9 is a =running=-trap,
+used in house-drains and other pipes that are nearly horizontal. Fig.
+10 represents a =mason’s= trap. Is built of brick or stone and cement.
+Used in brick-drains and sewers, in receiving-basins at street corners,
+etc. Requires frequent cleaning, and should never be used inside a
+building. Fig. 11 represents the method of trapping a cesspool. The
+same plan is also used for =grease=-traps, the outlet-pipe dipping
+below the surface of the contents so that it is never obstructed by
+the grease, which floats on top.
+
+[Illustration: Fig. 11.—Trapped cesspool.]
+
+A few patent traps are shown as samples:
+
+[Illustration: Fig. 12.—Adee trap.]
+
+[Illustration: Fig. 13.—Bower trap.]
+
+Fig. 12 is the Adee trap, a modification of the D-trap. Fig. 13 is the
+Bower trap, claimed to be secured against siphonage or back pressure by
+a rubber ball which floats up against the entering-pipe. Modification
+of the bottle-trap. Fig. 14 is Bedell’s trap, with a metallic flap
+or valve, and an opening on the sewer side of the valve, to relieve
+pressure. Fig. 15 is Stewart’s trap, intelligible from the diagram.
+Traps are also made of iron or glass, with a mercury seal, which, it is
+claimed, are proof against siphoning, pressure, or evaporation.
+
+[Illustration: Fig. 14.—Bedell’s trap.]
+
+[Illustration: Fig. 15.—Stewart’s trap.]
+
+4. A =louvered sky-light= is one with slats at the sides inclining
+outward, so that air can escape but rain can not enter.
+
+6. =Calked with lead.= (See 26.)
+
+7. =Tempered-up cement.= Cement which has been used once, and has been
+broken up and ground, for using a second time.
+
+9. =House-drain=, of iron. (See “Bad Odors, 2, _a_.”)
+
+10. =Water-closets.= Four principal classes, with innumerable
+varieties, mostly patented.
+
+1. The =pan-closet= (Fig. 16). Its chief advantage is its cheapness
+and the ease with which it can be repaired. Its disadvantage is the
+odor that usually attends its use. When the handle (_a_) is raised,
+the contents of the pan (_b_) are thrown against the side of the iron
+container (_c_), and some filth adheres there and decomposes, filling
+the container with a noisome stench, which escapes into the room every
+time the closet is used. An abundant flush, an enameled container, and
+proper ventilation of the container, reduce this nuisance materially.
+Generally condemned by sanitarians.
+
+[Illustration: Fig. 16.—Pan-closet.]
+
+[Illustration: Fig. 17.—Hopper-closet.]
+
+2. =Hopper-closets= (Fig. 17). Rather unsightly, because the water and
+floating matter in the trap are visible, and matters often cling to
+the sides, but, with an abundant flush suddenly discharged, are very
+inoffensive.
+
+3. =Plunger-closets=, of which the Jennings closet (Fig. 18) may be
+taken as a type. The handle lifts a plug, which allows the contents of
+the bowl to run out, and, when the plug is dropped in place, the bowl
+is filled again from a ball-cock. These closets are liable to get out
+of order; the plungers or plugs lose their rubber flanges and leak, and
+the plunger-chamber is apt to retain filth.
+
+[Illustration: Fig. 18.—Jennings closet.]
+
+4. It is evident that if the hopper-closet could have its trap bent
+to one side out of sight, and its hopper enlarged toward the bottom,
+so that nothing would strike and cling to its sides, it would be an
+excellent one. Of such a type are the Tidal-Wave and National closets
+(Fig. 19), _a_ being the water-pipe, which discharges into a flushing
+rim, and _b_ a vent-pipe to relieve pressure between the two bodies of
+water during a discharge, and prevent siphoning.
+
+[Illustration: Fig. 19.—Tidal-wave closet.]
+
+[Illustration: Fig. 20.—Y-branch.]
+
+[Illustration: Fig. 21.—Quarter bend.]
+
+A water-closet, to be well flushed, should have a discharge of three
+gallons of water in five seconds, sent directly downward all around the
+rim.
+
+=School-sink= (also called trough-sink or privy-sink). An iron trough,
+having a sewer-connected opening with a movable iron plug in the bottom
+at one end, for the discharge of its contents, and a pipe at the other
+end, from which it is filled with water. It is practically an elongated
+water-closet. (See 53.)
+
+12. =Y-branch= (Fig. 20), so named from its shape. There are also half
+Y-branches.
+
+=Eighth bends.= There are also quarter bends (Fig. 21), sixth bends,
+and sixteenth bends. These are used in pipe-connections in order
+to discharge the contents of the branch pipes in the same general
+direction with the current in the main pipes, for, if the discharge
+enters at a right angle, a deposit is apt to form opposite the point of
+connection.
+
+14. =Trap in house-drain.= Intended to cut off all communication
+between the house and the street sewer. If a contagious disease occurs
+in one’s own house, he can be sure that the excreta are disinfected,
+and that disease-germs can not escape into the air, even if the pipes
+happen to be defective; but he can not be sure that such excreta are
+properly disinfected in other houses. The only safe way, therefore, is
+for each house to be cut off from all others by the means described.
+The objections to the trap on the house-drain are, that it forms
+a slight obstruction to the flow of drainage, and is liable to be
+obstructed by deposits, and that it favors “cushioning,” i. e., the
+forcing of smaller traps, when the air in the drain is compressed
+between this trap and a down-coming mass of water. (See “Bad Odors,”
+1, _d_.) The first of these objections is met by making the trap a half
+S one, so that the fluids fall down one limb with sufficient force to
+wash out the bottom of the trap thoroughly with each discharge, and
+the second by the fresh-air inlet, which relieves the pressure that
+otherwise might force the traps.
+
+15. The =fresh-air inlet= affords free entrance for air, and, as the
+main lines of pipe are open above the roof, the difference in length
+of the pipes will give rise to a constant current of fresh air through
+them, in one direction or the other. (See “Bad Odors,” 1 _c_.) This
+results in the oxidation of whatever filth may cling to the pipes, and
+dilutes offensive gases so that they are rendered harmless. It has also
+been shown that the various microscopic organisms, which are believed
+to be the specific cause of certain diseases, increase in virulence,
+when they propagate in the absence or with a deficient supply of
+oxygen, while the intensity of their action is diminished if they grow
+where oxygen is plentiful.
+
+16. =Ventilation in chimney-flues.= (See “Bad Odors,” 1, _c_.)
+
+17. =Vertical pipes of iron.= Iron resists corrosion and the assaults
+of rats better than lead, and lead pipes are sometimes occluded by
+pressure and settling. Branch wastes are generally of lead because it
+is easily cut and bent, so as to be used in difficult situations.
+
+=Return-bend= or =cowl=. To prevent senseless persons from throwing
+things down the pipe, and thus obstructing it.
+
+20. =Diameter of pipes.= The inside diameter is always meant.
+
+21. =D-pipe.= (See Appendix B.)
+
+22. =No traps on vertical pipes=,, at the foot of such pipes, because
+they would prevent the free circulation of air, and thus render the
+fresh-air inlet practically useless. Also to prevent “cushioning.”
+
+23. =Cast-iron= pipes are made in five-foot lengths, with an
+enlargement at one end, called the hub or bell, and a bead around the
+edge of the other end (the spigot-end). The spigot-end of one pipe
+fits loosely into the hub of another, sufficient room being left for
+calking. (See 26.)
+
+24. =Pipes= are =tarred= by being heated to 500° Fahr. and then dipped
+perpendicularly into a hot bath of coal-tar pitch mixed with a small
+proportion of heavy coal-oil. This coating prevents corrosion, or at
+least greatly retards it.
+
+25. =Wrought-iron pipes=, with screw joints, are used by the Durham
+House Drainage Company, the joints being gas-tight. They have the
+advantage of being very durable and impervious to gases, but the
+disadvantage of being too permanent. If it is desired to change the
+position of a fixture, or to connect a new one, it is easy to break
+a hole in a cast-iron pipe, or to remove a portion of it, but where
+wrought-iron pipe is used this is almost impossible. The Durham system
+also costs about twenty-five per cent more than the common one, and it
+is not strictly correct to say that its use renders a house absolutely
+secure against leakage of sewer-air, because it does not do away with
+lead branch-pipes, in which frequent leakages occur, and all irregular
+portions of pipe, with branches, etc., in this system are made of
+cast-iron with calked joints, as in the ordinary system.
+
+The =water-test= is applied by plugging the pipe carefully, and closing
+all openings below a certain point, and then filling it with water to
+that level. If there is any leakage, the water-level will gradually
+sink. If the pipes are tight, it will remain the same.
+
+=Peppermint-test.= (See hereafter.)
+
+26. Oakum is packed into the space between the spigot-end of one pipe
+and the hub of the other, and driven against the bead above mentioned.
+This packing is called a =gasket=. Melted lead is poured in on top of
+the oakum, and, when it has cooled, is driven in tight with a calking
+iron and mallet. When ordinary pipe is used, the calking will sometimes
+split the hub, and this furnishes an argument for the general use of
+extra-heavy pipe.
+
+=Iron-filings=, etc., making what is called a =rust-joint=.
+
+27. =Ferrules=, or =sleeves=, are used because lead pipes are too soft
+and yielding to withstand the calking. Lead can not be soldered to
+iron, and therefore brass or copper has to be used. If iron ferrules
+are used, the lead pipe must be turned up on the outside far enough so
+that its edge shall be covered by the melted lead used in calking, so
+as to prevent leakage of gas, as hereafter described. (See “Bad Odors,”
+1, _b_.)
+
+28. =Wiped-joints= are those always used for lead pipe, and are
+indicated by a raised ring of solder surrounding the pipe.
+
+29. A =trap=, with a good water-seal, is an effective barrier
+against the passage of sewer-air or particles of organic matter. The
+experiments of Carmichael, confirmed by Wernich and Pumpelly, have
+amply demonstrated that sewer-air passes through the water-seal in such
+minute quantities that it can not possibly harm any one, and that solid
+particles of matter can not pass at all.
+
+=Separate traps=, except, etc. (See “Bad Odors,” 1, _d_.)
+
+33. =Siphonage=. (See “Bad Odors,” 1, _d_ 37.)
+
+37. =Overflow-pipes= from fixtures. It is better to connect them with
+the trap below the water-level. (See “Bad Odors,” 1, _d_.)
+
+38. =Safes= are sheets of metal (generally lead) with turned-up edges,
+placed beneath basins, sinks, water-closets, etc., to protect the floor
+in case of leakage. The waste-pipes of safes are common sources of
+nuisance. (See “Bad Odors,” 1, _c_.)
+
+39. To prevent contamination of the contents of the refrigerator.
+
+41. When water-closets are flushed directly from the common supply-pipe
+of the house, as in the different kinds of valve-closets, the water in
+the pipes, under certain circumstances, will be contaminated: e. g.,
+if a person opens a faucet on one floor at the same moment that the
+valve is opened to flush a water-closet on a higher floor, water will
+be sucked back from the valve, and the air of the closet will follow
+it. Check-valves have been used to prevent this, but they should not be
+depended on.
+
+[Illustration: Fig. 22.]
+
+[Illustration: Fig. 23.]
+
+[Illustration: Fig. 24.]
+
+Various forms of =tanks= or =cisterns= for water-closets are here
+shown. Fig. 22 represents a tank, _b_, which discharges water as long
+as the handle (attached to the chain _a_) is raised. It gives a flush
+also of the entire contents of the service-box _c_, after the handle
+is lowered. Fig. 23 shows a waste-preventing tank, which is divided
+into two compartments, _b_ and _d_. It will be seen that this allows
+only the contents of _d_ to be discharged, with an after-flush from
+_c_. Fig. 24 shows a tank, in which the chain _a_ is attached to the
+seat, and is pulled down when the seat is depressed. It will be seen
+that no water can flow while the closet is in use, but, when the seat
+is released, the contents of _c_ are discharged with great force. In
+all these figures, _e_ is a ball-cock. This cock is controlled by a
+hollow copper ball, which floats on water, and is attached to the end
+of a lever. When the water falls, the ball falls with it, and opens the
+cock. When it is floated up to a certain point, it closes the cock and
+stops the flow.
+
+[Illustration: Fig. 25.—Drainage plan for dwellings.]
+
+45. =Leaders= should not be used as soil-pipes, because, during a rain,
+the ventilation of the pipes is interfered with by the downward flow
+of water, which will also empty unventilated traps by siphoning. The
+necessity of having leaders open flush with the roof also interferes
+with proper ventilation.
+
+47. If =steam= enters a soil-pipe, it heats the water in the traps,
+injures joints on account of the extreme changes of temperature
+induced, and hastens corrosion of the pipes.
+
+Fig. 25 shows a system of house-drainage for a city house planned in
+accordance with the above rules.
+
+[Illustration: Fig. 26.—Field’s flush-tank.]
+
+In =country houses=, where there are no sewers, the best method of
+disposing of the house-slops is =subsoil drainage=. The house system
+may be the same as that already explained for city houses. The fluids
+are conducted by a pipe with tight joints to a =flush-tank= (Fig. 26)
+near the house. This tank is so constructed that it empties itself, by
+a siphon action, whenever it gets full, discharging all its contents
+in a very short time, and thus washing out thoroughly the pipes into
+which it empties. “The outlet-pipe from this tank is continued by a
+cemented vitrified pipe to a point about twenty-five feet farther away.
+Here it connects with a system of open-jointed drain-tiles, consisting
+of one main, fifty feet long, and ten lateral drains, six feet apart,
+and each about twenty feet long. These drains underlie a part of the
+lawn, and are only about ten inches below the surface” (Waring). It
+will be understood that the purpose of this method of drainage is to
+have the organic matter contained in the house-refuse appropriated by
+vegetation, and it must therefore be distributed within reach of the
+grass-roots.
+
+If water-closets are used, the following system is recommended in “The
+Sanitary Engineer”: Collect all the sewage of the house in a small and
+perfectly tight tank or cesspool, in which the paper and fecal matter
+soon become macerated by fermentation and reduced to a pulp. This tank
+should overflow into the flush-tank, the overflow-pipe dipping at least
+a foot below the point of discharge, to avoid the scum. The siphon of
+the flush-tank should be accessible by a man-hole, so as to be readily
+cleaned. If thus arranged, and if no roots of trees are in the soil,
+the distribution-pipes will not clog for a year or more, sometimes not
+for ten years.
+
+Pipes should be laid at a depth of eight inches, with a slight and
+uniform descent of not over six or eight inches in one hundred feet.
+Branches from a four-inch main to the two-inch distribution-pipes
+should lead from the bottom of the former, instead of from the side, as
+in ordinary drain connections.
+
+There should be a grease-trap (see “Explanatory Remarks,” 3) attached
+to the kitchen waste-pipes, in order to prevent clogging of the tanks
+and pipes by the congelation of fat.
+
+
+                             _Bad Odors._
+
+=When bad odors in a house are traceable to the drainage, they will
+usually be found to be due to one or more of the following causes=:
+
+1. =To faulty construction.= (_a._) =Drains.=—These may be made of
+brick or stone and cement. Such materials are pervious to gases,
+even when sound, and are peculiarly liable to be channeled by rats,
+especially where an iron or lead pipe enters them. Such a drain should
+be replaced by an iron one.
+
+(_b._) =Joints.=—=Cement-joints= are pervious to gases. =Putty-joints=
+crack and so become pervious. A =lead= pipe is sometimes connected with
+an =iron= one by means of an iron ferrule, the lead pipe passing inside
+the ferrule and being turned over its lower edge, extending up on the
+outside, the ferrule then being calked into the hub. When paper is used
+for the gasket or packing, it rots away in time, and a passage is left
+through which gas can escape as follows: up between the hub and the
+turned-over lead pipe, over its edge, between it and the calking, down
+between the lead pipe and the ferrule, across the lower edge of the
+ferrule, and out between the inner surface of the ferrule and the outer
+surface of the lead pipe. (See Fig. 27.) Sometimes a connection of lead
+with iron is made by means of a =lead flange= fastened around the iron
+pipe with wire, and sometimes the lead pipe is simply stuck into a hole
+in the iron pipe and fastened with cement or putty. Such work should be
+replaced by properly made joints as described in the above regulations.
+(Or in “Bad Odors,” 2, _c_.)
+
+[Illustration:  Fig. 27.—Iron ferrule improperly calked.]
+
+(_c._) =Pipes.=—If the =leaders= are not trapped at the bottom,
+offensive gases from them may enter the nearest windows. A leader is
+never of the same length as the soil-pipe, and, if there is direct
+communication between them through the house-drain, there will always
+be a current of air through them in one direction or the other. If the
+external air is colder than that inside the pipes, then the heavier
+column of air will be over the shorter pipe, and the current will be
+down that one and up the other. If the external air is warmer than that
+in the pipes, the heavier column will be that which includes the longer
+pipe, and the current will be down that one and up the shorter. So, as
+a rule, the current in winter is down the short pipe and up the long
+one, while in summer it is reversed, and, as the short pipe often ends
+near windows, the nuisance is greatest when these windows are open. Of
+course, in such cases, the leader must be trapped.
+
+=Ventilating-pipes= sometimes end in chimney-flues. This is a bad
+plan, for, if the flue is in use, the open end of the pipe will become
+choked with soot and finally be rendered useless. If the flue is not
+used, there will often be a down draught in it, and the offensive gases
+may be conveyed through stove-pipes or fireplaces into the rooms of
+the house. Such gases may even penetrate the walls of the flue and so
+enter the house. If such a pipe is ever run into a flue, it should be
+extended at least two feet above the chimney-top.
+
+Ventilating-pipes are sometimes badly arranged, so that they actually
+neutralize a trap and render it useless. (See Fig. 28.) In this figure
+_a_ is the soil-pipe and _b_ the ventilating-pipe.
+
+[Illustration: Fig. 28.—Faulty arrangement of ventilating pipes.]
+
+=Safe-wastes= and the =overflow-pipes= of tanks and cisterns may be
+connected with the soil or waste pipe. When they are, they are usually
+trapped. It will often be found that the traps are empty and useless,
+so that offensive gases escape from the pipes. With tank-overflow pipes
+this is generally the case. Safe-waste traps are sometimes provided
+with small feed-pipes, intended to discharge water into them every
+time the fixtures are used. It will often be found, however, if the
+end of the feed-pipe is pulled up out of the waste, that no water runs
+through it, and it is useless, sometimes because it is too small and
+is choked with dust and sediment, and sometimes because it is wrongly
+attached to the source of supply. Safe-wastes, discharging into the
+kitchen or cellar, may convey to the rooms odors of cooking or of
+articles stored in the cellar (onions, turnips, etc.), or from the
+servants’ water-closet, which is often offensive. If urine or other
+offensive liquids from leakage flow through them, the upward currents
+of air will be impregnated with odors from the filth that has clung
+to the pipe long after the leak has been repaired. In any event these
+safe-wastes constitute a direct communication between different rooms
+of a house, which is not always desirable. It is better to do without
+them. They are rarely of any use. If required, however, they should
+either be trapped under the safe, and means taken to insure a constant
+water-seal, or they may be closed by a piece of paper pasted over the
+lower opening, which will prevent the entrance of any odors from cellar
+or kitchen, but will give way in case of leakage. The safe-wastes of
+water-closets often discharge into the trap of the water-closet. This
+is a bad plan, because, if there is an obstruction in the trap, the
+safe-waste is, of course, useless. If offensive odors are traced to
+safe-wastes, the openings had better be sealed. If overflow-pipes are
+the source, they must be disconnected from the soil or waste pipe and
+made to discharge elsewhere (e. g., into some sink or water-closet).
+
+[Illustration: Fig. 29.—Cushioning illustrated.]
+
+(_d._) =Traps.=—If two traps are so arranged that the air is compressed
+between them by an oncoming rush of water, the trap containing the
+shallowest water-seal will be forced, and a certain amount of air
+will escape through it from the interior of the pipe. This result is
+due to “cushioning,” as it is called, and is illustrated in Fig. 29.
+Such a fault is to be remedied by connecting the crown of one of the
+traps with a ventilating-pipe, so that any pressure of the kind is
+immediately relieved without disturbing the seal of the trap.
+
+[Illustration: Fig. 30.—Double-trapped waste-pipe (air-bound).]
+
+[Illustration: Fig. 31.—Two sinks with but one trap.]
+
+If there are two traps on the same line of pipe (Fig. 30), so that a
+part of the interior of the pipe is cut off from the external air in
+both directions, it becomes “air-bound,” and one of two results will
+follow, viz.: water discharged into the fixture above the higher trap
+will remain in the bowl and not run down, on account of the compression
+of air between the traps; or, if it does run out of the fixture, it
+will displace an equivalent bulk of foul air, which will bubble up
+through the upper trap and cause offensive odors. In such a case, the
+lower trap should be removed.
+
+If =two= or =more waste-pipes= (as in sets of tubs, in sinks, and
+often in urinals) are provided with but =one trap= for all (Fig. 31),
+there will be a constant current of air along the pipes, sometimes
+emerging from one opening and sometimes from another. This air will
+be contaminated by the filth that lines the pipes, and will often be
+quite offensive. In such cases, each waste-pipe should be independently
+trapped, or (as in the case of bath-tubs or urinals) the overflow-pipe
+should be connected with the trap of the waste-pipe below the
+water-seal, as in Fig. 25.
+
+When a body of water sufficiently large to nearly fill a pipe is
+discharged into it, it drags air along with it, and exhausts the air
+in all branch-pipes to a greater or less extent. When this exhaustion
+amounts to a diminution of the pressure in the pipe of about 1/350, the
+water in an ordinary trap (with a one-inch seal) will be forced out of
+it by the pressure of the external atmosphere, or in other words will
+be sucked out of the trap into the pipe, leaving no water-seal in the
+trap, and, therefore, allowing free exit for sewer-air. This effect is
+known as the “siphoning” of the trap, and is most likely to occur when
+the main pipe is not open at its upper extremity (is not ventilated),
+and when the branch wastes are of the same size with the main one. This
+fault is remedied by the ventilation of the traps, and of the main
+pipes, as described in the regulations above quoted (17 and 33).
+
+2. =To defects in the pipes.= (_a._) =Drains.=—Bad odors in cellars
+often come from broken earthenware or tile drains, cracked by settling,
+or from rat-holes in cemented drains. Earthenware or brick drains
+inside a house should be replaced by iron ones.
+
+(_b._) =Joints.=—=Cement= or =putty= joints are often cracked.
+=Water-closets= sometimes become loosened from the floor and leak
+fluids and gases. The covers of =hand-holes= of traps sometimes get
+loose and leak gas. Sometimes =trap-screws=, instead of being at the
+bottom of the trap, where they are covered by water, are at the top; if
+these are loose, gases may escape. All such defects should be repaired.
+
+(_c._) =Pipes.=—Both lead and iron pipes are corroded and in time
+perforated by sewer-air. Such corrosion is most likely to occur at
+points where gases come in contact with a dry part of the pipe, viz.,
+at the crowns or domes of traps, and in ventilating-pipes. For this
+reason, ventilating-pipes should never be made of thin iron (galvanized
+iron), and should always be protected by a tar-coating. The crowns
+of lead traps (especially of water-closets) are often bitten into
+by rats in search of water. In all cases when the crown of a trap
+is perforated, there is rarely any leakage of fluid to indicate it,
+but offensive gases escape. All corroded traps and pipes should be
+replaced by new ones, and not patched up. Holes in iron pipes may be
+closed by iron bands surrounding the pipe, and fastened with red-lead
+putty and screw-bolts (Fig. 32). A new joint may be made by means of a
+saddle-hub (Fig. 33) carefully secured in a similar manner. Lead pipes
+are sometimes protected against rats by being encircled by tin, or
+packed in pounded glass.
+
+[Illustration: Fig. 32.—Bands.]
+
+[Illustration: Fig. 33.—Saddle-hub.]
+
+3. =To carelessness.= (_a._) =Evaporation.=—If fixtures are not in
+constant use, the water soon evaporates from the traps and gives exit
+to sewer-air. This often happens in warm weather, and when a house is
+vacant for a time. To prevent evaporation, a little oil may be poured
+into the trap, to protect the surface of the water-seal, or it may be
+made the special duty of a servant to keep the traps full of water when
+the fixtures are not in use.
+
+(_b._) =Dirt.=—The inside of a pipe often becomes coated with slime,
+consisting largely of grease, especially in kitchens. This filthy
+lining rapidly decomposes, and that portion above the trap may give
+out bad odors. The pipes may be cleansed with a strong hot solution of
+soda.
+
+
+                   _Examination of House-Drainage._
+
+If the object of an examination is to determine whether the drainage is
+planned and constructed in accordance with the best methods of the day,
+each point referred to in the above regulations should be carefully
+investigated.
+
+If the object is to determine the source of offensive odors, or if
+there has been sickness in the house of such a character as to indicate
+possible defects in the plumbing, the several sources of bad odors just
+enumerated should each be carefully inquired into. A few additional
+suggestions as to the method of examination will not be out of place.
+
+It will be found much easier to determine the direction, number, and
+situation of the main lines of pipe, if the examination is begun at
+the roof and continued downward. If a beginning is made in the cellar,
+confusion results.
+
+“=Cushioning=” is determined by causing the discharge of a considerable
+mass of water (as from a bath-tub or water-closet) into the main
+pipe, at some distance above the suspected fixture. If there is a
+regurgitation in the fixture under observation, there is certainly
+an obstruction in the pipe at some point below the fixture. If the
+obstruction is caused by something lodged in the pipe, the back-flow in
+the fixture will be a steady one, because there will be some leakage
+through the obstruction, while if it is due to compressed air, which
+is elastic, the regurgitation will be by spurts, and the water in the
+trap may even be thrown up to a considerable height.
+
+“=Siphoning=” is also determined by filling the pipe with water in the
+manner just explained. If the trap of the fixture under observation is
+emptied by siphoning, a sucking or gurgling noise will be heard in it,
+and a flame held over the outlet of the fixture will be drawn downward
+by the inward current of air.
+
+=One trap to several pipes= (when it is suspected but not certainly
+known because the trap is out of sight) may be detected by the fact
+that there will always be a current of air in one direction or the
+other through such pipes, and more or less odor will escape. If the
+back of the hand is wet, it becomes very sensitive to such a current,
+and by holding alternately the palm and the back of the hand, or even
+of the forefinger (wet), over an opening, the existence and direction
+of such a current can be easily determined. If the odors are from such
+a source, it can then be made evident by covering all the outlets but
+one with wet paper, so as to prevent the air-currents, when the odors
+will temporarily disappear.
+
+If a trap is accessible, it is easy to determine whether its water-seal
+is preserved or not by tapping it from top to bottom with some metallic
+substance, when the difference in sound will indicate the exact level
+of the water inside.
+
+Those parts of the plumbing which are not accessible to inspection
+must be examined by introducing into the pipes some strong-smelling
+substance, which will indicate defects by its escape through them into
+the house. Oil of peppermint is often used for this purpose.
+
+
+                        _The Peppermint-Test._
+
+For testing the pipes of an ordinary dwelling, one ounce of the =oil=
+of peppermint is sufficient. For a large building more may be needed.
+The drug costs from twenty-five to seventy-five cents an ounce,
+according to its quality and the place where it is bought.
+
+It is best to introduce the oil into the pipes from outside the house,
+if possible, so that the odor which inevitably attends the process
+may be dissipated in the external air. The object being to ascertain
+the location of defects in the pipes inside the house, the examiner
+must feel certain, if he detects the odor of peppermint anywhere,
+that the vapor has come to him from inside the pipes, and not from
+the outside. If the ventilating-pipes are so constructed that the oil
+can not be poured in from the roof, then it must be poured into some
+basin or water-closet in the upper portion of the house. The peppermint
+should first be mingled with a pailful of hot water to promote rapid
+volatilization, and poured slowly down the pipe. After it is poured
+down, the openings at the upper extremities of the pipes should be
+closed, so that the pressure of the vapor inside the pipes may not be
+relieved in that direction. If the odor of peppermint, thus introduced
+with the precautions mentioned below, is perceived anywhere in the
+house, it is an indication that there is an opening in some pipe,
+through which sewer-air may escape. This opening may be a defect,
+or it may be due to siphoning of traps, or to faults of original
+construction. There will not usually be much difficulty in locating it
+with considerable exactness.
+
+
+                        _Special Precautions._
+
+The peppermint should be kept on the roof, or on a window-sill outside
+the house, until needed, for it is so volatile that the vapor escapes
+through the cork, and if the odor gets into the house in this way, it
+will vitiate the examination.
+
+The person who pours the peppermint should remain on the roof or in the
+room where he does it, with the doors closed, until the examination
+is complete, for the odor will cling to his clothing and follow him
+wherever he goes for an hour or more.
+
+
+                         _Additional Remarks._
+
+If bad odors have been noticed, and no defect can be found in the ways
+above mentioned, they may be due to decaying animal matter (dead rats,
+etc.), or (in the city) to defects in the plumbing of the adjoining
+house, offensive gases from which may penetrate the wall.
+
+The source of bad odors need not necessarily be in the immediate
+vicinity of the place where they are noticed, for the walls of
+buildings are full of channels and openings, through which offensive
+gases may be carried by currents of air, so as to emerge at a
+considerable distance from their origin. Thus, in winter, they are apt
+to be most noticeable near a fire.
+
+
+               SUMMARY OF THE BEST METHODS OF DRAINAGE.
+
+For =houses= where there are =public sewers=: water-carriage.
+
+For =country houses=, if =isolated from sewers=, and where expense is
+no objection: water-carriage with subsoil drainage.
+
+In =villages= and =small towns, without sewers=: subsoil drainage (for
+slops), and pails (for excreta), frequently removed by proper officers.
+
+For =farm-houses=: subsoil drainage for slops, and a movable tank, with
+dry earth disinfection, for excreta.
+
+For =sea-side houses, isolated=: if there is vegetation, subsoil
+drainage for slops, and earth-closets.
+
+For =sea-side villages=: subsoil drainage and the pail system.
+
+For =sea-side houses=, where there is =no vegetation=: for excreta,
+earth-closets or a movable iron tank, with dry-earth disinfection;
+for slops, a water-tight cesspool, with arrangements for emptying its
+contents into the sea when the tide is ebbing.
+
+
+=How to prevent contamination of the air from the ground.=
+
+Have the house separated from the soil on which it is built by a layer
+of asphalt between two layers of cement, extending over the whole
+cellar-floor, through the foundation-walls and up above the point where
+the ground touches the walls outside. Or have the house built without
+a cellar, and with perforated underpinning, so as to allow a free
+circulation of air underneath it. The subsoil should also be drained by
+tiles laid at least a foot lower than the cellar-bottom.
+
+The cold-air boxes of furnaces should draw their supply from the
+external air. It is advisable to have a thin layer of cotton held in
+place by wire gauze to filter the air as it enters them.
+
+
+
+
+                             CHAPTER III.
+
+                             DISINFECTION.
+
+
+=How to prevent contamination of the air by the respiration, bodily
+emanations, and excreta of diseased persons.=
+
+It is not possible with our present knowledge to prevent the
+multiplication of morbid germs in the human body, when they are once
+implanted there, nor to prevent their discharge; but we can destroy
+them after their exit from the body, and so protect other persons who
+are not yet affected.
+
+The following instructions for the management of contagious diseases
+were prepared for the National Board of Health by Professors Chandler,
+Henry Draper, Barker, Vander Poel, E. G. Janeway, and Ira Remsen.
+
+
+                   _Instructions for Disinfection._
+
+Disinfection is the destruction of the poisons of infectious and
+contagious diseases.
+
+Deodorizers, or substances which destroy smells, are not necessarily
+disinfectants, and disinfectants do not necessarily have an odor.
+
+Disinfection can not compensate for want of cleanliness nor of
+ventilation.
+
+
+                  I. _Disinfectants to be employed._
+
+1. Roll-sulphur (brimstone) for fumigation.
+
+2. Sulphate of iron (copperas) dissolved in water in the proportion of
+one and a half pounds to the gallon; for soil, sewers, etc.
+
+3. Sulphate of zinc and common salt, dissolved together in water in the
+proportion of four ounces sulphate and two ounces salt to the gallon;
+for clothing, bed-linen, etc.
+
+
+                    II. _How to use Disinfectants._
+
+1. In the sick-room. The most available agents are fresh air and
+cleanliness. The clothing, towels, bed-linen, etc., should on removal
+from the patient, and before they are taken from the room, be placed
+in a pail or tub of the zinc solution, boiling-hot if possible.
+
+All discharges should either be received in vessels containing copperas
+solution, or, when this is impracticable, should be immediately covered
+with copperas solution. All vessels used about the patient should be
+cleansed with the same solution.
+
+Unnecessary furniture, especially that which is stuffed, carpets and
+hangings, should, when possible, be removed from the room at the
+outset; otherwise they should remain for subsequent fumigation and
+treatment.
+
+2. Fumigation with sulphur is the only practicable method for
+disinfecting the house. For this purpose, the rooms to be disinfected
+must be vacated. Heavy clothing, blankets, bedding, and other articles
+which can not be treated with zinc solution, should be opened and
+exposed during fumigation, as directed below. Close the rooms as
+tightly as possible, place the sulphur in iron pans supported upon
+bricks placed in wash-tubs containing a little water, set it on fire
+by hot coals or with the aid of a spoonful of alcohol, and allow the
+room to remain closed for twenty-four hours. For a room about ten feet
+square, at least two pounds of sulphur should be used; for larger
+rooms, proportionally increased quantities.
+
+3. Premises. Cellars, yards, stables, gutters, privies, cesspools,
+water-closets, drains, sewers, etc., should be frequently and
+liberally treated with copperas solution. The copperas solution is
+easily prepared by hanging a basket containing about sixty pounds of
+copperas in a barrel of water.
+
+4. Body and bed clothing, etc. It is =best= to =burn= all articles
+which have been in contact with persons sick with contagious or
+infectious diseases. Articles too valuable to be destroyed should be
+treated as follows:
+
+(_a._) Cotton, linen, flannels, blankets, etc., should be treated
+with the boiling-hot zinc solution; introduce piece by piece, secure
+thorough wetting, and boil for at least half an hour.
+
+(_b._) Heavy woolen clothing, silks, furs, stuffed bed-covers, beds,
+and other articles which can not be treated with the zinc solution,
+should be hung in the room during fumigation, their surfaces thoroughly
+exposed and pockets turned inside out. Afterward they should be hung
+in the open air, beaten and shaken. Pillows, beds, stuffed mattresses,
+upholstered furniture, etc., should be cut open, the contents spread
+out and thoroughly fumigated. Carpets are best fumigated on the floor,
+but should afterward be removed to the open air and thoroughly beaten.
+
+5. Corpses especially of persons that have died of any infectious or
+malignant disease, should be thoroughly washed with a zinc solution of
+double strength; should then be wrapped in a sheet, wet with the zinc
+solution, and buried at once.
+
+Metallic, metal-lined, or air-tight coffins should be used when
+possible; certainly when the body is to be transported for any
+considerable distance.
+
+
+                              _Comments._
+
+SECTION I. 1. Copperas, also called green vitriol.
+
+2. About four tablespoonfuls of the zinc and two tablespoonfuls of the
+salt, making a solution of the chloride of zinc.
+
+SECTION II. 1. The windows should be kept open, if possible, but in
+such a way as to avoid draughts on the bed. A fire should be constantly
+burning in an open fireplace.
+
+The room should be on the top floor, and all cracks and openings
+communicating with other rooms should be closed tightly. The door which
+has to be used should have a wet sheet hanging entirely over it, the
+windows and fireplace being alone relied on for ventilation.
+
+2. The burning of sulphur produces sulphurous acid, which is an
+irrespirable gas. The person who lights the sulphur must, therefore,
+immediately leave the room, and after the lapse of the proper time,
+must hold his breath as he enters the room to open the windows and let
+out the gas. After fumigation, plastered walls should be whitewashed,
+the wood-work well scrubbed with carbolic soap, and painted portions
+repainted.
+
+3. Or put copperas in a pail of water, in such quantity that some may
+constantly remain undissolved at the bottom. This makes a saturated
+solution. To every privy or water-closet, allow one pint of the
+solution for every four persons when cholera is about. To keep privies
+from being offensive, pour one pint into each seat, night and morning.
+
+4. (_a._) Such articles should never be sent to a public laundry or
+mingled with the family washing.
+
+(_b._) The cutting open of stuffed articles may seem unnecessary, but
+it is not. The poison of contagious diseases clings to such stuffs
+(called =fomites=) with great tenacity for years, and must be destroyed
+before they are fit to be used again.
+
+5. It is also well to fill a large wad of cotton or fine shavings with
+coal-tar powder or chloride of lime and place it beneath the hips, to
+absorb fluids.
+
+Contagious diseases are often caught at the funerals of those who have
+died of them, and the sanitary code of New York city forbids a public
+funeral of any person who has died of small-pox, diphtheria, scarlet
+fever, yellow fever, typhus fever, or Asiatic cholera. It is better to
+limit the attendance at such funerals to as few as possible.
+
+
+             _Additional Precautions in Special Diseases._
+
+=Small-pox.=—Every one in the vicinity should be vaccinated with fresh
+virus. Every person should be vaccinated in infancy, again after
+puberty, and again within four days after exposure to small-pox.
+Special care should be paid to isolation. Inmates of the house should
+neither make nor receive visits while the patient is sick.
+
+=Diphtheria= and =Consumption=.—Special care should be taken to avoid
+inhaling the breath of the patient, as the diseases are communicated
+through the secretions of the nose, throat, and lungs. The matter
+coughed up should be received on rags and immediately burned.
+
+=Scarlet Fever= and =Measles=.—These are communicable during
+convalescence, as well as during the illness. The body of the patient
+should be anointed twice a day with sweet-oil, lard, or vaseline,
+containing ten grains of carbolic acid or thymol to the ounce. This
+should be continued until all bran-like scaling of the skin is at an
+end. Before again associating with unprotected persons, the patient
+should have several complete ablutions, including thorough washing of
+the hair with soap or borax; and none of the clothing worn for several
+days before the disease declared itself should be again used until
+thoroughly disinfected, and ventilated in the open air several days
+(New York State Board of Health circular).
+
+=Typhoid Fever=, =Asiatic Cholera=, and =Dysentery=.—Poison contained
+in discharges from the bowels. Particular attention should be paid to
+the disinfection of such discharges by the zinc or copperas solution.
+
+=Yellow Fever.=—Poison possibly contained in discharges from stomach
+and bowels, but requiring special conditions for development
+outside the body before it can affect other persons. Excreta should
+be immediately disinfected. Germs may be carried long distances in
+=fomites= (clothing, bedding, and other porous substances), and
+disinfection of such articles must be very thorough.
+
+=Typhus Fever.=—No visiting to be allowed.
+
+When there is small-pox, diphtheria, scarlet fever, measles, or typhus
+fever in a house, immediate attendants on the sick should not leave the
+house without a change of outside clothing.
+
+
+         _General Precautions for those entering a Sick-Room._
+
+Never enter a sick-room with an empty stomach, or when very tired.
+
+Never eat or drink anything that has been long exposed to the air of
+the sick-room.
+
+Breathe through your nose, and keep your mouth shut except when you are
+talking.
+
+
+
+
+                              CHAPTER IV.
+
+                                 FOOD.
+
+
+How to distinguish a good article of food from a bad one, when both
+are in their natural state, is within the province of the cook-book.
+In this place will be pointed out only the adulterations of food, and
+those methods of detecting them which can be used by householders who
+have no special knowledge of the instrumental and chemical means which
+are generally necessary.
+
+Adulterations are of two kinds: those which injure the consumer, and
+those which simply cheat him. The following details are chiefly taken
+from the New York State Board of Health report for 1881-’82, the name
+of the analyst being in each case appended.
+
+=Arrowroot.=—Often mixed with cheaper starches. Twenty-three samples
+examined: seventeen were arrowroot, one was arrowroot and tapioca, two
+arrowroot, tapioca, and potato, and three tapioca and potato. Harmless.
+(E. G. Love, Ph. D.)
+
+=Bakers’ chemicals.=—(Saleratus.) This was originally bicarbonate of
+potash, but the name is now applied to the bicarbonate of soda. Twenty
+samples: none adulterated.—(Baking-soda.) Twenty-three samples: twenty
+samples unadulterated. One contained 25 per cent of gypsum; one same
+quantity of gypsum and a little starch; one a large amount of sulphate
+of soda and 17 per cent of carbonate of lime.—(Cream of tartar.) This
+is the bitartrate of potash. Twenty-seven samples: sixteen adulterated
+and in some not a particle of cream of tartar found. Six adulterated
+with terra alba (gypsum) and starch, one with starch alone, two with
+starch, terra alba, and acid phosphate of lime. Six had tartaric acid
+and no cream of tartar. In eight the amount of terra alba was found to
+vary from 3.27 to 93 per cent. Five samples contained over 70 per cent
+of this injurious adulteration. (Love.)
+
+=Baking-powders.=—Contain bicarbonate of soda and some acid or acid
+salt, which combine when water is added and evolve carbonic-acid
+gas. There are four classes in use. One contains cream of tartar,
+one tartaric acid, one the acid phosphate of lime, and one potash or
+ammonia alum. Many powders contain a salt of ammonia. The pungent odor
+of this substance prevents its use in any but the smallest quantities,
+and it can not affect the wholesomeness of the powder. Flour or starch
+forms an ingredient of many powders to prevent a premature combination
+of its constituents and a consequent deterioration of the powder.
+Eighty-four samples: seventy-three had flour or starch; thirty-five
+contained ammonia. Eight adulterated with terra alba, phosphate of
+lime, or tartrate of lime. As a rule, these powders are harmless.
+(Love.)
+
+(Alum.) There does not seem sufficient evidence as to the injurious
+effects of alum upon the human system to warrant legislation against
+it. (Love.)
+
+=Beer.=—Most adulterations are harmless. Corn, rice, wheat, glucose,
+starch, potatoes, etc., are used in making beer, and in many countries
+are allowed by special laws (as in England and Germany). The use of
+substitutes for hops within the last few years is hardly possible to
+believe, since hops have been so cheap, in fact, almost the cheapest
+bitter, and are, moreover, as every brewer knows, the best material to
+preserve his beer. (F. E. Engelhardt, Ph. D.)
+
+=Brandy.=—Cognac brandy is naturally colorless, but public taste
+demands a brown color, which is imparted by a mixture of caramel
+(burned sugar). A very large proportion of the brandy in the world is
+made of corn-spirit colored with burned sugar and flavored with oil of
+cognac (an essential oil derived from the lees of wine; twenty-five
+hundred pounds of lees make one pound of oil.) Here is one recipe: “To
+every ten gallons of pure spirits add two quarts New England rum or
+one quart Jamaica rum, and from thirty to forty drops of oil of cognac
+cut in one half pint of alcohol; color with burned sugar.” Twenty-five
+samples examined: sixteen contained fusel-oil, six had traces of it,
+and three none. (Engelhardt). The only injurious ingredient (besides
+alcohol) in the artificial brandies seems to be the fusel-oil contained
+in the corn-spirit or whisky used as a base. Rub suspected brandy on
+the palm of the hand until it has evaporated. Fusel-oil may then still
+be detected by the smell. Good brandy will leave no odor.
+
+=Bread.=—Ten samples: no adulteration. (Love.) In 1873, Elwyn Waller,
+for the New York City Board of Health, examined fifty-one samples, of
+which forty-one were unadulterated, and ten contained traces of copper
+or alum.
+
+=Butter.=—May be mixed with oleomargarine, and the adulteration is hard
+to detect. Oleomargarine is more crumbly than butter in cold weather.
+Often colored with annotto, and, as this sometimes contains a little
+sulphate of copper, a trace of copper may occasionally be found in
+butter. As a rule, adulterations of butter are harmless.
+
+=Candy.=—“Taffy” and gum-drops are almost all glucose. Coloring-matters
+usually harmless, but of ten samples of yellow candy, seven contained
+chromate of lead. (W. H. Pitt,) Candy often contains terra alba, flour,
+and gum-arabic. The only injurious ingredients usually found are terra
+alba (recognized by its grittiness and insolubility) and the chromate
+of lead. On account of the latter it is best to avoid yellow, green,
+and orange candies.
+
+=Canned fruits= and =vegetables=.—Eighteen samples, including peaches,
+plums, grapes, strawberries, cherries, blackberries, olives, mushrooms,
+corn, beans, succotash, tomatoes, pumpkin, and peas. No adulteration
+found. Attention was given to the possibility of the chemical reaction
+of the fruit acids upon the inner surface of the cans, whereby salts
+of tin and lead might be produced, rendering the contents in some
+degree poisonous. There was no evidence of their presence. Some of the
+articles were canned over a year before. (S. A. Lattimore, Ph. D.) =Per
+contra=, other analysts have found from .1 to 2.3 grains of tin to the
+can. There is no evidence, however, that this amount of tin in solution
+is injurious, and the recent investigations of Hall seem to show that
+the fruit acids do not act appreciably on the tin or the lead of
+the solder, so long as the air is excluded. Cans once opened should
+therefore be emptied, and not left partly full.
+
+=Canned meats.=—No adulterations and no tin or lead found. The heads of
+all cans should be slightly concave. This shows that the contents were
+hot when the can was sealed. If the heads are convex, the contents are
+decomposing.
+
+=Cereals.=—Ninety-four samples, including wheat and Graham flour,
+farina, oatmeal, rye, barley, corn-meal, rice, buckwheat, sago, and
+tapioca. Two adulterated. Adulterations consisted in mixture of other
+cereals, and were harmless. (Love.)
+
+=Cheese.=—Skim-milk cheese often contains lard, put in to replace
+the butter which has been removed. This adulteration improves the
+quality of the cheese and often can not be detected by experts. One
+sample of cheese, which had caused sickness in those who ate it,
+was examined, and, although it also made the analyst ill, no known
+poisonous substance could be detected in it. (G. C. Caldwell, Ph. D.)
+All yellow cheese is colored with annotto, which can therefore hardly
+be considered an adulteration. The rind is sometimes washed with a
+mercurial or arsenical solution, to protect it from insects, and should
+therefore never be eaten.
+
+=Cocoa= and =chocolate=.—Six samples. None adulterated. (Lattimore.)
+
+=Coffee.=—Thirty-five samples of unroasted, three of roasted unground,
+twenty-one of ground, three of coffee extract. Of the thirty-five
+unroasted, in five a few grains were found which had been slightly
+colored or faced, apparently with Prussian blue; the three roasted
+unground were pure; of the twenty-one ground, nineteen contained
+chiccory, beans, wheat, rye, etc. One sample consisted entirely of
+roasted hominy. Three samples of coffee extract consisted chiefly of
+caramel and licorice, and contained no coffee. (Lattimore.) Pure coffee
+swims in water, and colors it slowly. Chiccory sinks and colors water
+rapidly. Peas sink and color water slowly. Rye sinks more rapidly
+than coffee, and colors water more quickly. Ground coffee is hard and
+crumbles between the teeth; chiccory is soft and does not crumble.
+
+=Gin.=—No injurious adulterations detected. Twenty-five samples.
+(Engelhardt.)
+
+=Honey.=—Three samples: two pure. One, labeled “white-clover honey,”
+contained 50 per cent of artificial glucose. The presence of added
+glucose is indicated by the turbidity produced by oxalic acid in a
+solution of the honey in distilled water. This turbidity is due to
+the presence of gypsum in artificial glucose—a substance which is not
+contained in pure honey. (Pitt.)
+
+=Horse-radish.=—Often harmlessly adulterated with grated turnip.
+
+=Isinglass.=—Two samples. Both were common gelatine. (Chester.)
+
+=Jellies.=—Fruit-jellies are often simple apple-jelly, flavored with
+artificial essences and colored with aniline. Safest not to use them
+unless their source is known to be trustworthy.
+
+=Lard.=—Twenty-eight samples. Fifteen pure; the rest contained water.
+Good lard should melt to a clear fat without sputtering.
+
+=Meat.=—Sound fresh meat is pale red when first cut, the surface
+after exposure turning to a deep red. The meat of animals that have
+died a natural death is of a deep purple color, not having been bled.
+The greatest danger in meat, however, is that due to the presence
+of trichinæ, which are killed by a temperature of 160° Fahr. All
+forms of pork should therefore be cooked thoroughly before eating.
+(Chester.) Poisoning (vomiting, cramps, and diarrhœa) produced by meat
+is generally caused by some kind of preserved meat (sausages, pickled
+meats, etc.), and is probably due to the presence of fungi.
+
+=Milk.=—Frauds consist generally in adding water or removing fat
+(skimming). As the milk of healthy cows varies in composition within
+certain limits, it is necessary to have a standard of purity, which
+has been fixed upon in New York as follows: Nearly 1,000 cows have
+been examined, with reference to the specific gravity of their milk,
+in New York, New Jersey, and Connecticut. The maximum specific gravity
+was 1.039 in milk of an Alderney cow. The minimum for normal milk
+from a healthy cow was 1.029. The specific gravity is determined by
+an instrument called a lactometer, on which 0 stands for 1,000, the
+specific gravity of water, and 100 for 1,029, that of the poorest
+milk from a healthy cow. The composition of such milk, adopted by the
+English Society of Public Analysts and the New York City Board of
+Health, as a result of fifty analyses, is as follows:
+
+  Fat                                     2.5
+  Solids, not fat (sugar, salt, etc.)     9.0
+  Water                                  88.5
+                                        ——-
+                                        100.0
+
+=Method of using the Lactometer.=—Put the milk in a vessel so deep that
+the lactometer, when introduced and allowed to float, shall not touch
+the bottom. Notice the reading of the scale at the surface of the milk.
+If it is less than 100, it gives the percentage of milk in the sample.
+For example, if the reading be 80, the sample contains 80 per cent of
+milk and 20 per cent of water.
+
+=Sources of Error.=—Milk very rich in cream may possibly, though not
+probably, register less than 100, but its very appearance will show
+that it has not been thinned by water or by skimming.
+
+Skimmed milk, especially if a little salt has been added, may register
+high above 100, but its thinness and blueness will show that it has
+been doctored.
+
+Condensed milk was carefully analyzed, and found to be unobjectionable.
+(C. E. Munsell, Ph. D.)
+
+=Olive-Oil.=—Often adulterated with poppy, cotton-seed, ground or
+peanut, sesame, rape-seed, colza or beechnut oil, all harmless.
+Sixteen samples; nine adulterated. (Caldwell.)
+
+=Pickles.=—Nine samples. None contained copper or any other metal. The
+only sample that possessed a suspiciously green appearance was found to
+contain alum. (Lattimore.)
+
+=Rum.=—Twenty-five samples. No objectionable additions found.
+(Engelhardt.)
+
+=Sirups.=—Three samples of maple-sirup. Two were pure, and one,
+manufactured in Chicago and sold in cans, contained 35 per cent of
+artificial glucose. In 1870 Dr. Chandler found .02 per cent of tin in
+each of two samples of sugar-house sirups. This represents .8 grain
+of tin to the gallon. A common adulterant of sirups is glucose, which
+diminishes their sweetening power, but is not considered injurious.
+
+=Spices.=—One hundred and eighty samples, comprising mustard, ginger,
+allspice, cinnamon, cassia, cloves, white, black, and red pepper, mace,
+and nutmeg. One hundred and twelve were adulterated from 40 to 81.8 per
+cent. All the adulterations were harmless (wheat and buckwheat bran,
+hulls of different seeds, middlings of corn-meal, stale ship’s bread,
+peas, beans, etc.). No poisonous substance was found. (Lattimore.)
+
+=Sugar.=—One hundred and sixteen samples, principally collected in New
+York city. Care was taken to secure the samples from different sections
+of the city and from all classes of stores. Of these, thirtyfour were
+microscopically clean, fifty-four slightly contaminated with dust,
+twenty-two contained considerable dirt, and six were very dirty. But in
+no case was there an intentional addition of insoluble mineral matters.
+Of forty-nine white sugars, all were pure; of sixty-seven brown sugars,
+four were adulterated with glucose. (A. L. Colby, Ph. B.)
+
+There have been many exaggerated statements put forth regarding the
+adulteration of sugar. In 1870 Dr. Chandler reported to the New York
+City Board of Health that sixty samples of sugar bought at small
+groceries were found pure and unadulterated without exception. In 1872,
+Elwyn Waller, for the same board, examined one hundred and nine samples
+of powdered sugar, but found no adulteration.
+
+Powdered sugar is quite generally believed to be adulterated with
+gypsum or flour. As both of these adulterants are insoluble in water,
+it is easy for any one to convince himself of the purity of sugar by
+dissolving it in water.
+
+=Teas.=—Forty-three samples of green tea, and eighteen of black. Many
+were cheap and of very inferior quality, some mere tea rubbish, yet no
+leaf, or fragment of a leaf, which was examined, could be considered
+anything but tea. No adulterations were found, and even the admixture
+of exhausted leaves could not be positively asserted. (Lattimore.)
+Suspected leaves should be wet and spread out, and then compared with
+leaves known to be genuine. It is said that exhausted leaves of
+green tea are often colored or “faced” with plumbago, Prussian blue,
+soapstone, etc., so artfully that only an expert can detect the fraud.
+Black tea is generally pure.
+
+=Vinegar.=—Four samples, all poor, but not adulterated, unless with
+water. (Lattimore.)
+
+=Whisky.=—Twenty-five samples. Fusel-oil decided in twenty, and traces
+in the rest. No injurious adulteration found. “It is evident that the
+addition of water and coloring-matter is practiced more than any other
+adulteration.” (Engelhardt.)
+
+=Wine.=—“A good wine should be transparent, and should have a bouquet.
+When pouring it into a glass, it should sparkle. A sour taste is
+always a sign of poor wine. Dizziness and headache are not produced
+by drinking pure wine. Cloudy, discolored, highly colored wines are
+suspicious.” There are various substances used in the manufacture of
+wine which should be classed as adulterations, e.g., calcined plaster
+is added to the grape-juice during fermentation (so-called plastering);
+in this way is formed an insoluble tartrate of lime, and a soluble
+sulphate of potash, the latter having a bitter taste and acting as
+a purgative even in small doses. The French Government forbids the
+sale of wine containing over 0.2 per cent of sulphate of potash.
+This process also leads to the formation of acid sulphates and free
+sulphuric acid in wines. Plastering of wines is practiced in Spain,
+Portugal, and the south of France.
+
+Wines are often fortified by the addition of brandy, cologne spirit,
+or French spirit, to arrest fermentation. Ports and sherries are almost
+invariably so.
+
+Red wines are often colored with logwood, Brazil-wood, fuchsine,
+cochineal, black hollyhock and red poppy flowers, alkana-root, red
+beets, cherries, whortleberries, elderberries, pokeberries, etc. It is
+very difficult to detect these, and fuchsin is the only one that is
+poisonous. Carpené gives the following very simple method to decide
+whether a red wine is naturally or artificially colored: Take a piece
+of good, white burned lime, break it into two pieces, smooth the
+surfaces by a knife or file, and place a few drops in succession on the
+same spot of the smooth surface, and observe after a few minutes the
+color produced. Natural red wines give a yellowish-brown spot; colored
+with fuchsine, or Brazil-wood, a rose-colored spot; colored with
+logwood, a dark-violet spot; colored with cochineal, a reddish-violet
+spot; colored with black hollyhock, a yellowish-brown spot; colored
+with pokeberries, a yellowish somewhat red spot. (Engelhardt.)
+
+Another test is to concentrate the wine, and dip in a piece of pure
+white woolen-yarn. The natural red coloring-matter of wine does not dye
+without a mordant, while fuchsine and cochineal dye it red or pink.
+
+
+
+
+                              CHAPTER V.
+
+                                WATER.
+
+
+In cities and towns which have a common water-supply, the water
+sometimes contains impurities dissolved from the pipes through which it
+runs, or dirt and vegetable _débris_ stirred up from the bottom of the
+sources of supply, or brought down into them by heavy storms or melting
+snows.
+
+Service-pipes are usually made of lead, and, after moderate use, become
+coated on their internal surface with insoluble compounds (sulphate of
+lead), which prevent contamination of the water by them. When the water
+is not very hard, however, a slight amount of lead may be dissolved by
+it. It is said that Cochituate water (Boston) always contains traces
+of lead, but that no well-authenticated case of poisoning from this
+source has ever been reported. Croton water (New York), which has
+stood overnight in the pipes, is said to contain one tenth of a grain
+of lead per gallon—sufficient to produce poisoning in some instances.
+One case of this sort has been known. If drinking-water is drawn from
+tanks, they should never be lined with lead, but should be made of
+iron, or of wood lined with tinned and planished copper. (See “Plumbing
+Regulations,” 44.)
+
+Water passing through galvanized-iron pipes always contains zinc
+salts—not, however, in injurious amount. Such pipes soon rust.
+
+Dirt and other suspended matters should be removed by means of a
+=filter=. A good household filter must be made of a material which
+can not communicate any injurious or offensive quality to the water
+that passes through it; it must remove all suspended particles, so as
+to render the water bright and clear; it must be easy to clean, or so
+arranged that the filtering material can be readily renewed. The action
+of a filter is either mechanical or chemical; in the latter case, the
+organic matters contained in the water are oxidized in the filter.
+There are innumerable patent filters in the market, to be attached to
+the faucet, but these can only act as strainers. There is no material
+known which can be introduced into the small space of a tap-filter and
+accomplish any real =purification= of the water which passes through
+at the ordinary rate of flow. (Nichols.) The only points to be looked
+to, therefore, in purchasing a tap-filter, are its efficiency as a
+strainer, and the facility of cleansing or renewing the filtering
+material. Where the pressure is not too great, a closely woven
+cotton-flannel bag, fastened to the tap, makes as good a filter as
+any. For large filters (in cisterns, etc.), those which contain animal
+charcoal are the most efficient.
+
+In places where the drinking-water is drawn from wells, it is sometimes
+polluted by leakage from cesspools, privy-vaults, stables, and refuse
+matters lying on the surface of the ground in their vicinity. It has
+been demonstrated beyond a doubt that epidemics of typhoid fever have
+often originated and spread in this way. Even when no specific disease
+is caused, water polluted from such sources often causes diarrhœal
+disorders and various forms of indigestion in those who drink it.
+
+The determination of such pollution is a matter of great delicacy and
+difficulty, and can only be trusted to an expert. Waters polluted by
+organic matters often contain an excess of gaseous constituents, and
+are clear, sparkling, and palatable, presenting to the uninstructed eye
+no indication of impurity. There are certain tests, however, which can
+be used by any person of intelligence, when, if positive results are
+obtained, an expert should be called in to determine the source and
+character of the contamination.
+
+The pollution of water by decomposing animal matters is always to
+be suspected, if there are evidences of the presence of chlorine
+or nitrogen in the water, as these are invariable constituents of
+animal excreta. These substances are found in combination—the former
+in chloride of sodium, and the latter in the so-called nitrites and
+nitrates.[2] Their presence is determined as follows:
+
+[2] The albuminoid ammonia test is too technical for insertion here.
+
+=Chlorine.=—_Tests_: Nitrate of silver (twenty-five cents a drachm),
+twenty-four grains to one ounce of distilled water, and dilute nitric
+acid (ten cents an ounce). Pour a few drops of each into the suspected
+water. If chlorine is present, there will be a cloudy-white precipitate
+of chloride of silver, which will gradually turn darker. One grain
+of chlorine to a gallon of water gives a haze; four grains a marked
+turbidity, and ten grains a considerable precipitate. In case chlorine
+is found, and any particular source is suspected, a pailful of salt
+(chloride of sodium) and water may be thrown into the place from which
+the leakage is supposed to come, and the water again examined, after a
+few hours, to see whether the amount of chlorine has increased.
+
+=Nitrates.=—_Tests_: Pure sulphuric acid and a saturated solution of
+sulphate of iron (copperas). Add an equal bulk of the acid to any
+quantity of the water in a test-tube. The mixture will become very
+hot. Wait until it is cool, and then pour in the iron solution gently,
+so that it will float above the mixed acid and water. If nitrates are
+present, there will be an olive-colored layer where the fluids meet.
+
+=Nitrites.=—_Test-mixture_: Iodide of potassium (fifty cents per
+ounce), one part; starch, twenty parts; water, five hundred parts.
+Make the starch-solution first, and filter when cold; then add the
+iodide of potash. Add to the suspected water this mixture, and then a
+little dilute sulphuric acid. If nitrites are present, there will be an
+immediate blue color.
+
+=Organic Matters in general.=—_Test_: Eight grains of chemically pure
+permanganate of potash in one ounce of distilled water. In half a pint
+of the suspected water in a tumbler, put one drop of the solution. If
+the red color disappears in one half hour, add more. For every drop
+that loses color in the half-pint there will be found one and a half to
+two grains of putrid organic matter in a gallon of the water. If the
+action is rapid, the matter is probably animal; if slow, vegetable.
+
+To =purify= such water, if it must be used, drop in the solution until
+a slight red tinge remains. The organic matter is then all oxidized
+and rendered harmless. It is better, however to boil such water before
+using it for drinking.
+
+
+             _Precautions with regard to Drinking-Water._
+
+Do not drink water that has been standing long in lead pipes, or lead
+cisterns or tanks.
+
+Filter it before drinking.
+
+See that the current of ground-water in the well from which you get
+your drinking-water is from the well toward any possible source of
+contamination (privy-vault, cesspool, etc.), and not _vice versa_.
+
+If the use of a suspected water is unavoidable, boil it first. It can
+be rendered palatable by an infusion of tea or coffee.
+
+
+
+
+                              APPENDIX A.
+
+ ALPHABETICAL LIST OF THE COMMON DISINFECTANTS, WITH A BRIEF
+ DESCRIPTION OF EACH, AND THE AVERAGE PRICE AT RETAIL.
+
+
+=Carbolic Acid.=—A product of the distillation of coal-tar. When
+pure and free from water, a transparent crystalline solid. Dissolves
+in twenty parts of cold water. Coagulates albuminous matters. A
+one-per-cent solution of it in water arrests putrefaction. For
+disinfection use at least a one-per-cent solution. The chief
+objection to its use is its odor. This may be modified to some extent
+by mixing the pure acid with camphor, forming a liquid, which may
+then be diluted. This acid is often used in combination with other
+disinfectants. A preparation much used by the New York City Board
+of Health for the disinfection of clothing contains eight ounces of
+sulphate of zinc and three ounces of carbolic acid to three gallons of
+water. Another for privies, water-closets, etc., is composed of ten
+pounds of copperas, one pint of carbolic acid, and five gallons of
+water. The strong acid injures iron pipe. Do not use in combination
+with the permanganate of potash or the chloride of zinc. “=Dead Oil=”
+(heavy oil of coal-tar) contains from 5 to 15 per cent of carbolic acid
+mingled with impurities. It is used for the disinfection of drains,
+streets, stables, etc. =Thymol= also occurs in coal-tar, but is usually
+obtained from oil of thyme. Its action is similar to that of carbolic
+acid. =Carbolic Powders= are made by mixing five parts of the pure
+acid, or ten parts of the crude, with one hundred parts of sawdust,
+clay, or lime. Squibb’s Carbolic Acid (No. 1), containing 77.90 per
+cent of pure acid, costs $1 a pint; (No. 2), with 37.46 per cent of
+pure acid, 75 cents a pint. Different samples examined (Waller),
+containing from .20 to .78 per cent, cost from 50 cents to $1 a pint.
+Crude acid, containing 50 per cent of acid, with many tarry impurities,
+costs less than $1 a gallon. Thymol, $1 per ounce.
+
+=Charcoal.=—Absorbs putrid gases. See =Lime=.
+
+=Chloride of Lime.= See =Chlorine=.
+
+=Chloride of Zinc.= See =Zinc=.
+
+=Chlorine.=—A pale, yellowish-green gas, of a suffocating quality,
+possessing great bleaching and disinfecting powers. When dry, it does
+not bleach. When moist, it combines with the hydrogen of water or of
+organic substances, and sets free the oxygen, which constitutes its
+disinfecting power. It decomposes sulphureted hydrogen, ammonia, and
+in general compounds arising from the putrid fermentation of organic
+matter. It is obtained as follows: Pour one pound of sulphuric acid,
+previously diluted with four times its volume of water, on three
+pounds of chloride of lime. Mix in a large earthen dish to allow for
+frothing up. Or mix two parts, by weight, of the black oxide (dioxide)
+of manganese with three parts, by weight, of strong hydrochloric acid.
+The gas is evolved very rapidly, so that it is difficult to make the
+mixture complete before the fumes drive away the person manipulating
+it. The colors of hangings, etc., are apt to be bleached out by it,
+and metals are corroded. (See also =Sulphurous Acid=.) =Chloride of
+Lime.=—Made by saturating slaked lime with chlorine-gas. It contains
+on an average about 30 per cent of available chlorine, to be set free
+by an acid. Very useful for disinfection of cellars, damp yards, and
+areas. One half pound in a gallon of water may be used for washing
+floors of sick-rooms, etc. Heat destroys its disinfecting properties.
+=Chloride of Aluminum.=—Action similar to but weaker than the iron and
+zinc salts, Sulphuric acid, black oxide of manganese, and hydrochloric
+acid, each 5 cents an ounce. Chloride of lime, 15 cents a pound.
+
+=Copperas.= (Green vitriol, sulphate of iron.)—Comes in pale-green
+crystals. It is an efficient disinfectant for privies, water-closets,
+stables, etc. Stains white goods. Acts by destroying sulphureted
+hydrogen and ammonia. Also oxidizes organic compounds and coagulates
+albuminous matters. A good mixture is four pounds of copperas and
+three ounces of carbolic acid to a gallon of water. Ten cents a pound.
+One hundred pounds for $3 or less.
+
+=Corrosive Sublimate.= (Mercuric chloride.)—The most powerful
+disinfectant known. Coagulates albuminous substances. A solution of
+one part in 2,000 of water kills microscopic organisms. Two drachms of
+this substance in a gallon of water (1 to 500) makes a solution sure
+to destroy any disease-germ. It is a deadly poison, and can only be
+purchased under legal restrictions. Fifteen cents an ounce.
+
+=Dead Oil.= See =Carbolic Acid=.
+
+=Green Vitriol.= See =Copperas=.
+
+=Gypsum.= See =Lime=.
+
+=Heat.=—Boiling is a good disinfectant. Boil for at least an hour. If
+dry air is used, the temperature must be from 250° to 300° for five or
+six hours. Cotton and silk will stand a temperature of 295° for three
+hours without harm. Woolen suffers more.
+
+=Iron, Sulphate of.= See =Copperas=.
+
+=Lime.=—Twenty parts of quicklime, mixed with two parts of dry, fresh
+charcoal, form the =calx-powder=, as sold in the shops. It is useful
+to absorb putrid gases, when sprinkled in cellars, etc. =Sulphate of
+lime=, or =gypsum= (plaster of Paris), mingled with coal-tar or impure
+carbolic acid, is an effective deodorant for stables and manure-heaps.
+It absorbs and retains ammonia, and therefore preserves to the manure
+its most valuable constituent. =Chloride of lime.= See =Chlorine=.
+Quicklime, 5 cents a pound. Gypsum, 10 cents a pound.
+
+=Nitrate of Lead.=—Theoretically a good disinfectant, but practically
+of little use. Five cents an ounce.
+
+=Nitrous Acid.=—Evolved in the form of brownish-red fumes, when nitric
+acid is poured on copper turnings. Very dangerous to inhale, and little
+used as a disinfectant.
+
+=Ozone.=—Is a form of oxygen, supposed to be three volumes condensed
+into two. Is a powerful oxidizer. Corrodes cork, paper, and other
+organic substances. Oxidizes very rapidly compounds of ammonia,
+phosphorus, and sulphur, which are offensive, instantly removing the
+odor. Simple vegetables, like mould, are completely destroyed by it.
+Obtained by gradually mixing three parts of sulphuric acid with two
+parts of permanganate of potash. This mixture will continue to give off
+ozone for several months. Or, put a piece of phosphorus on a plate, and
+pour in water sufficient to cover two thirds of it. These methods are
+used in the patented ozone generators. Phosphorus, 40 cents an ounce;
+sulphuric acid, 5 cents an ounce.
+
+=Permanganate of Potash.=—Dark purple crystals, almost black. A
+solution is of a beautiful purple color, but stains brown almost
+everything it touches. Can not be used with carbolic acid or the
+coal-tar disinfectants. Is a powerful oxidizer, and is used to
+disinfect excreta, and to purify drinking-water. Fifty cents an ounce.
+
+=Sulphate of Iron.= See =Copperas=.
+
+=Sulphate of Lime.= See =Lime=.
+
+=Sulphate of Zinc.= See =Zinc=.
+
+=Sulphurous Acid.= An irrespirable gas, produced by burning sulphur.
+Powerful disinfectant. Coagulates albuminous matters and probably
+destroys germs. Destroys sulphureted hydrogen and ammonia. Dry articles
+are not hurt by it, but wet clothes are bleached. Can not be used with
+chlorine, as they neutralize each other. Chlorine is as effective, but
+is so destructive that it can only be used in empty rooms. It requires
+about a tablespoonful of alcohol to light a pound of sulphur. Sulphur
+(roll-brimstone), 10 cents a pound.
+
+=Thymol.= See =Carbolic Acid=.
+
+=Zinc Salts.=—The sulphate and the chloride of zinc are excellent
+disinfectants. They are colorless, and can therefore be used on
+clothing. They form, with albuminous matters, extremely insoluble
+compounds, and also absorb gases from putrefying material. They are the
+best disinfectants of their class. The sulphate is cheaper, but the
+chloride more efficient. Sulphate of zinc, 10 cents an ounce; chloride
+of zinc, 20 cents an ounce.
+
+It is better and cheaper to buy and mix one’s own disinfectants.
+The many proprietary articles are no more efficient, and are very
+expensive. The composition of some of those most in use is here given.
+(Analyses by Waller, of the New York City Health Department.)
+
+The first column gives parts in 100, and the second, ounces in a gallon
+in the case of liquids, and ounces in a pound in case of powders.
+
+Bromo-chloralum (Tilden & Co.), 50 cents a pint.
+
+  Chloride of aluminum                                  8.152     12.71
+  Water, bromide of aluminum, lime salts, etc.         91.848    143.25
+                                                        ———-      ———
+                                                      100.000    155.96
+
+Burnett’s Fluid is a solution of chloride of zinc (25 grains to the
+drachm).
+
+Carbolate of lime, in three-quarter pound boxes, at 25 cents.
+
+  Lime                                                 64.245     10.28
+  Magnesia                                              0.602      0.09
+  Sand, oxide of iron, etc.                             0.670      0.11
+  Carbolic acid                                         0.472      0.07
+  Carbonic acid and organic impurities                 34.021      5.45
+                                                         ———-      ——-
+                                                      100.000     16.00
+
+Chloralum (English Chloralum Co.), 50 cents a pint.
+
+  Chloride of aluminum                                 13.213     20.14
+  Sulphate of lime                                      0.197      0.30
+  Water, chloride of calcium, etc.                     86.590    131.99
+                                                         ———-     ———
+                                                      100.000    152.43
+
+Chloride of lime, 20 cents a pound.
+
+  Available chlorine                                   31.38       5.02
+  Lime salts, water, etc.                              68.62      10.98
+                                                        ———        ——-
+                                                      100.00      16.00
+
+Condy’s Fluid is a solution of permanganate of potash (9.26 grains to
+a fluid ounce, about 2-1/2 drachms to the pint).
+
+Darby’s Prophylactic Fluid, 50 cents a half-pint.
+
+  Permanganate of potash                                0.055      0.08
+  Sulphate of potash                                    1.750      2.50
+  Chloride of potassium                                 1.270      1.81
+  Carbonate of potash                                   6.570      9.40
+  Water                                                90.355    129.24
+                                                        ———-       ———
+                                                      100.000    143.03
+
+Egyptian Disinfectant, 25 cents a pound.
+
+  Clay                                                 87.810     14.05
+  Lime                                                  0.354      0.06
+  Carbolic acid                                         0.320      0.05
+  Other constituents of dead oil                        5.685      0.91
+  Organic matter and water                              5.831      0.93
+                                                        ———-       ——-
+                                                      100.000     16.00
+
+Excelsior Disinfectant, 15 cents a pound.
+
+  Protosulphate of iron (copperas)                     31.464      5.03
+  Chloride of sodium (salt)                            19.251      3.08
+  Flowers of sulphur                                    7.800      1.25
+  Water of crystallization, cassia-oil, etc.           41.485      6.64
+                                                        ———-       ——-
+                                                      100.000     16.00
+
+The Germicide is a patented apparatus for discharging chloride of zinc
+into the bowl of the water-closet, and impregnating the air at the same
+time with the vapor of thymol.
+
+Girondin Disinfectant, 75 cents a quart.
+
+  Sulphate of zinc                                     19.692     32.64
+  Sulphate of copper                                    1.202      1.99
+  Sulphate of lime                                      0.480      0.79
+  Water, traces of calcium chloride, etc.              78.626    130.34
+                                                        ———-       ———
+                                                      100.000    165.76
+
+Labarraque’s Solution, 50 cents a pint.
+
+  Available chlorine                                    1.423      1.96
+  Water and soda salts                                 98.577    135.54
+                                                        ———-      ———
+                                                      100.000    137.50
+
+
+Metropolitan Disinfectant, 30 cents a quart.
+
+  Protosulphate of iron (copperas)                      11.413    17.10
+  Carbolic acid (about)                                  3.330     4.99
+  Water, dead oil, and impurities                       85.257   127.74
+                                                         ———-      ———
+                                                       100.000   149.83
+
+
+Phenix Disinfectant, 35 cents a pound.
+
+  Silicate of alumina (clay)                            56.876     9.10
+  Sesquichloride of iron                                 1.192     0.19
+  Sesquioxide of iron                                    7.102     1.14
+  Lime                                                   2.470     0.39
+  Carbolic acid                                          0.400     0.06
+  Carbonic acid and organic impurities                  31.960     5.12
+                                                          ———-     ———
+                                                       100.000    16.00
+
+
+Phenol Sodique, 50 cents a half pint.
+
+  Carbolic acid                                          1.177    1.61
+  Soda salts, water, and impurities                     98.823  134.29
+                                                         ———-     ———
+                                                        100.000 135.90
+
+
+Platt’s Chlorides, 50 cents a quart.
+
+  Solution chloride of zinc     (saturated)     40 parts.
+     ”        ”     ”  lead          ”          20   ”
+     ”        ”     ”  calcium       ”          15   ”
+     ”        ”     ”  aluminum      ”          15   ”
+     ”        ”     ”  magnesium     ”           5   ”
+     ”        ”     ”  potassium     ”           5   ”
+                                               —-
+                                               100   ”
+
+
+
+
+                              APPENDIX B.
+
+
+List of the prices of plumber’s materials and labor, from which a rough
+estimate may be formed of the probable cost of proposed plumbing. The
+prices given are wholesale ones, and it must be remembered that every
+plumber is also a retail merchant, who obtains his materials at a
+discount, and charges them to his customer at an average advance of 10
+or 15 per cent on the prices here given.
+
+All measurements are of inside diameters.
+
+ =Bands.=—Ordinary thickness, 2 by 2 inches, 75 cents; 6 by 6 inches,
+ $1.90. Intermediate sizes at corresponding prices.
+
+ =Bends= and =Offsets=.—Two inches in diameter, 40 cents; extra heavy,
+ 50 cents. Six inches in diameter, $1.20; extra heavy, $1.75.
+
+ =Cisterns= and =Service-boxes= (for water-closets), $10 to $20;
+ (waste-preventing), $13 to $26.
+
+ =Offsets.= See =Bends=.
+
+ =Pipe.=—Tile or earthenware (vitrified), in lengths of 2-1/2 feet
+ each, 2-inch, 13 cents a foot; 3-inch, 16 cents a foot; 4-inch, 20
+ cents a foot; and 5 cents more per foot for each additional inch of
+ diameter.
+
+ Iron, in lengths of 5 feet each: Ordinary, about 10 cents a foot for
+ every inch of diameter. Extra heavy, about twice as much. Double-hub
+ pipe, about 6 cents a foot more. The tar-coating costs about 3 cents a
+ foot for 2-inch pipe, 4 cents for 3-inch pipe, etc.
+
+ Lead, about 9 cents a pound. Manufactured pipe (traps, etc.), 10 cents
+ a pound. Qualities are marked according to thickness—i. e., weight
+ for each size, AAA (best), AA, A, B, C, D, and E. 3/8-inch pipe, AAA
+ weighs 1 pound 12 ounces per foot; B weighs 1 pound per foot; C weighs
+ 14 ounces per foot; D weighs 7 ounces per foot. 5/8-inch pipe, AAA
+ weighs 3 pounds 8 ounces per foot; AA weighs 2 pounds 12 ounces per
+ foot; B weighs 2 pounds per foot. 3/4-inch pipe, AAA weighs 4 pounds
+ 14 ounces per foot; B weighs 2 pounds 3 ounces per foot. 1-inch pipe,
+ AAA weighs 6 pounds per foot; AA weighs 4 pounds 8 ounces per foot;
+ A weighs 4 pounds per foot; B weighs 3 pounds 4 ounces per foot; D
+ weighs 2 pounds 4 ounces per foot. 2-inch pipe, AAA weighs 10 pounds
+ 11 ounces per foot; AA weighs 8 pounds 14 ounces per foot; A weighs
+ 7 pounds per foot; B weighs 6 pounds per foot; D weighs 4 pounds per
+ foot. 3-inch pipe, 3/8 thick, weighs 19 pounds 9 ounces per foot.
+ 4-inch pipe, 3/8 thick, weighs 25 pounds 6 ounces per foot, and so on.
+
+ For supply-pipes, AA pipe is generally used.
+
+ =Privy-Sinks.=—About $5 for every foot in length.
+
+ =Saddle-Hubs.=—2 by 2 inches, 30 cents; extra heavy, 40 cents. 6 by 6
+ inches, $1.10; extra heavy, $1.40.
+
+ =School-Sinks.= See =Privy-Sinks=.
+
+ =Traps.=—Adee traps about 5 cents apiece less than ordinary S-traps,
+ and Bower traps about twice as much.
+
+ Earthenware, 2-inch, $1 each; 6-inch, $3.25 each.
+
+ Iron (S-traps), 2-inch, 80 cents; extra heavy, $1.25; 6-inch, $3.75;
+ extra heavy, $5. Running traps, with or without hand-holes, about the
+ same.
+
+ Lead, made of 6-pound lead (lead weighing 6 pounds to the square
+ foot), 1-1/4-inch, 65 cents; 1-1/2-inch, 80 cents; 2-inch, $1.10;
+ 4-1/2-inch, $3.25, etc.
+
+ =Urinals.=—(Earthenware), $5 to $6 each.
+
+ =Wash-Basins.=—(Iron, enameled or marbled), $1.50 to $4.50.
+
+ =Water-Closets.=—Demarest’s (plunger), $15 to $40. Earthenware hopper,
+ $10 to $12. Earthenware hopper, with trap, waste-preventing cistern,
+ chain and bracket, wood-seat, etc., $30. Hopper-valve closet, with
+ self-raising, round seat, $9.
+
+ =Pan-Closets.=—$4.50 to $22.
+
+ A journeyman and helper are charged for at the rate of from $5 to $6
+ per day.
+
+
+
+
+                                INDEX.
+
+
+  Acid, carbolic, 72, 91.
+    carbonic, 7-9, 13, 15.
+    carbonic, test for, 9.
+    hydrochloric, 93.
+    nitric, 88.
+    nitrous, 95.
+    sulphuric, 89, 93, 95.
+    sulphurous, 70, 96.
+
+  Adulterations of food, 73.
+
+  Air, contaminated by combustion, 9.
+    contaminated by excreta, 12, 21.
+    contaminated by respiration, 8, 11.
+    contaminated by the sick, 11.
+    dangers of impure, 11-14.
+
+  Air-bound pipes, 57.
+
+  Air in ground, 15.
+
+  Alum, 75.
+
+  Aluminum, chloride of, 93.
+
+  Annotto, 77, 78.
+
+  Areas, drainage of, 34.
+
+  Arrowroot, 74.
+
+  Asphalt in walls, 34, 66.
+
+
+  Bacilli, 11, 14.
+
+  Bacteria, 11.
+
+  Bad odors, sources of, 52.
+
+  Bakers’ chemicals, 74.
+
+  Baking-powders, 75.
+
+  Ball-cock, 48.
+
+  Bands, 60, 100.
+
+  Basins, 32, 102.
+
+  Bath-tubs, 30.
+
+  Bedclothing, disinfection of, 69.
+
+  Beer, 75.
+
+  Bends, 42, 100.
+
+  Blow-offs, 33.
+
+  Board of Health, plumbing rules of, 25.
+
+  Boilers, sediment-pipe of, 32.
+
+  Boiling, disinfection by, 94.
+
+  Brandy, 76.
+
+  Bread, 76.
+
+  Brimstone, 67, 96.
+
+  Bromo-chloralum, 97.
+
+  Burnett’s Fluid, 97.
+
+  Butter, 76.
+
+
+  Caldwell,, Ph. D., 78, 82.
+
+  Calking of joints, 45.
+
+  Calx-powder, 94.
+
+  Candy, 77.
+
+  Canned fruits and vegetables, 77.
+
+  Canned meats, 78.
+
+  Caramel, 76.
+
+  Carbolate of lime, 97.
+
+  Carbolic acid, 72, 91.
+    powders, 92.
+
+  Carbonic acid, 7-9, 13, 15.
+
+  Carbureted hydrogen, 12.
+
+
+  Carmichael, 46.
+
+  Carpené, 85.
+
+  Cast-iron pipes, 44, 101.
+
+  Cellars, 34, 66.
+
+  Cemented joints, 52.
+
+  Cement, tempered-up, 26, 39.
+
+  Cereals, 78.
+
+  Cesspools, 12, 34, 35.
+
+  Chandler,, Professor, 67, 82, 83.
+
+  Charcoal, 94.
+
+  Cheese, 78.
+
+  Check-valves, 47.
+
+  Chester,, Ph. D., 79, 80.
+
+  Chiccory, 79.
+
+  Chicken-pox, 12.
+
+  Chimneys as pipe-vents, 44.
+
+  Chimneys, smoky, 20.
+
+  Chloralum, 97.
+
+  Chloride of aluminum, 93.
+    of lime, 71, 93, 97.
+    mercuric, 94.
+    of sodium, 89.
+    of zinc, 70, 96.
+
+  Chlorine, method of obtaining, 92.
+    properties of, 96.
+    test for, 88.
+
+  Chocolate, 78.
+
+  Cholera, precautions _vs._, 72.
+    propagation of, 14.
+
+  Chromate of lead in candy, 77.
+
+  Cisterns for water-closets, 32, 47.
+
+  City houses, drainage of, 65.
+
+  Closet, earth, 23.
+
+  Closets, water, 39, 102.
+
+  Clothing, disinfection of, 69.
+
+  Cocoa, 78.
+
+  Coffee, 78.
+    extract of, 79.
+
+  Coffins, air-tight, 70.
+
+  Cognac, 76.
+
+  Colby,, Ph. B., 83.
+
+  Combustion, 9.
+
+  Condensers, 33.
+
+  Condy’s fluid, 97.
+
+  Confectionery, 77.
+
+  Connections, pipe, 30, 52.
+
+  Construction, faulty, 52.
+
+  Consumption, precautions _vs._, 72.
+    propagation of, 12, 72.
+
+  Contagious diseases, propagation of, 11.
+
+  Copperas, 70, 93.
+    solution of, 67, 70.
+
+  Copper, sulphate of, 77.
+
+  Corpses, disinfection of, 69, 71.
+
+  Corrosive sublimate, 94.
+
+  Country houses, drainage of, 50, 65.
+
+  Cream of tartar, 74.
+
+  Cushioning, 42, 44, 56.
+    how determined, 61.
+
+
+  Damp soil, danger of, 15.
+
+  Dampers, position of, 19.
+
+  Darby’s Prophylactic Fluid, 98.
+
+  Dead bodies, disinfection of, 69, 71.
+
+  Dead oil, 92.
+
+  Deodorizers, 67.
+
+  Diphtheria, precautions _vs._, 72.
+    propagation of, 12, 72.
+
+  Discharges, disinfection of, 68.
+
+  Diseases, contagious, 11.
+
+  Disinfectant, Egyptian, 98.
+    Excelsior, 98.
+    Girondin, 98.
+    Metropolitan, 99.
+    Phenix, 99.
+
+  Disinfectants, 91.
+    how to use, 67.
+
+  Disinfection, 66.
+    National Board of Health rules for, 67.
+    of bedclothing, 69.
+
+  Disinfection of clothing, 69, 91.
+    of corpses, 69, 71.
+    of furniture, 69.
+    of premises, 68, 92, 94.
+    of privies, 71, 91.
+    of water-closets, 71, 91.
+    of woolen stuffs, etc., 69.
+
+  Double windows, 20.
+
+  Drain, fall of, 27.
+    house, 35.
+    house, trap in, 42.
+    location of, 27.
+    pipes, 59.
+    size of, 27.
+
+  Drainage, 21.
+    diagram of, 49.
+    essentials of, 24.
+    examination of, 61.
+    of city houses, 65.
+    of country houses, 50, 65.
+    of farm-houses, 65.
+    of sea-side houses, 65.
+    New York City Board of Health, 25.
+    subsoil, 50.
+
+  Drains, defective, 52, 59.
+
+  Draughts, how produced, 17, 20.
+    how to avoid, 20.
+    when perceived, 17.
+
+  Drinking-water, tanks for, 33, 86.
+    tests of, 89.
+
+  Durand-Claye, 13.
+
+  Durham house-drainage system, 44.
+
+  Dysentery, precautions _vs._, 72.
+    propagation of, 14.
+
+
+  Earth as a disinfectant, 23.
+    closet, 23.
+
+  Earthenware pipes, 26, 59, 100.
+
+  Egyptian Disinfectant, 98.
+
+  Engelhardt,, Ph. D., 76, 79, 82, 84, 85.
+
+  Erysipelas, propagation of, 14.
+
+  Evaporation from traps, 60.
+
+  Excelsior Disinfectant, 98.
+
+  Excreta, contamination of air by, 14, 21.
+    dangers from, 14, 21.
+    removal of, 24.
+
+  Exhaust-steam in soil-pipes, 33, 50.
+
+
+  Farm-houses, drainage of, 65.
+
+  Faulty construction of drains, 52.
+
+  Ferrules, 30, 45, 52.
+
+  Fever, malarial, 14.
+    puerperal, 14.
+    scarlet, 11, 72.
+    typhoid, 14, 72.
+    typhus, 11, 73.
+    yellow, 14, 72.
+
+  Field’s flush-tank, 50.
+
+  Filters, 87.
+
+  Fireplace, Galton’s, 18, 19.
+
+  Fireplaces, 18.
+
+  Flanges, lead, 53.
+
+  Flues for ventilation, 20.
+
+  Flush-tank, 50.
+
+  Fomites, 71, 73.
+
+  Food, 73.
+
+  Fresh-air inlet, 28, 43.
+
+  Fruits, canned, 77.
+
+  Fumigation, methods of, 68, 69.
+    precautions during, 70.
+    treatment of rooms after, 70.
+
+  Funerals, 71.
+
+  Furniture, disinfection of, 69.
+    of sick-room, 68.
+
+  Fusel-oil, 76, 84.
+
+
+  Galton’s fireplace, 18, 19.
+
+  Gas, sewer, composition of, 12.
+
+  Gasket, 45.
+
+  General debility, 11, 13.
+
+  German measles, 12.
+
+  Germicide, 98.
+
+  Gin, 79.
+
+  Girondin Disinfectant, 98.
+
+  Glucose, 75, 79, 82.
+
+  Grains, cereal, 78.
+
+  Green vitriol, 70, 93.
+
+  Ground air, danger of, 15.
+    air, exclusion of, 66.
+    water, high and low, 15.
+
+  Gum-drops, 77.
+
+  Gypsum, 74, 79, 94.
+
+
+  Hand-holes, 59.
+
+  Heat, disinfection by, 94.
+
+  Honey, 79.
+
+  Hops, 75.
+
+  Horizontal pipes, 28.
+
+  Horse-radish, 79.
+
+  Hospital gangrene, 14.
+
+  House-drain, 35.
+    drain, trap in, 27, 42.
+    drainage, Durham system of, 44.
+    drainage, essentials of, 24.
+    sewer, material of, 26.
+
+  Hydrant-sinks, 35.
+
+  Hydrochloric acid, 93.
+
+
+  Impurity of air, measure of, 9.
+
+  Inlet, fresh-air, 28, 43.
+
+  Iodide of potassium, 89.
+
+  Iron, sulphate of, 93.
+
+  Iron pipes, weight of, 29.
+
+  Isinglass, 79.
+
+
+  Jellies, 79.
+
+  Joints, calking of, 45, 52.
+    cement, 52, 59.
+    imperfect, 59.
+    lead, 45, 52.
+    putty, 52, 59.
+
+  Joints, rust, 30, 45.
+    wiped, 46.
+
+
+  Labarraque’s Solution, 99.
+
+  Labor, plumber’s, 102.
+
+  Lactometer, method of using, 81.
+
+  Lard, 80.
+
+  Lattimore,, Ph. D., 77-79, 82-84.
+
+  Lead, chromate of, 77.
+    dissolving of, in water, 86.
+    flanges, 53.
+    nitrate of, 95.
+
+  Leaders, bad odors from, 53.
+    as soil-pipes, 33, 49.
+    trapping of, 33, 53.
+
+  Lead pipes, weight of, 101.
+
+  Letheby, 13.
+
+  Lime, 94.
+    chloride of, 93.
+    sulphate of, 94.
+
+  Louvered sky-light, 39.
+
+  Love,, Ph. D., 74-76, 78.
+
+
+  Malarial fevers, 14.
+
+  Manganese, oxide of, 93.
+
+  Marsh-gas, 13.
+
+  Measles, precautions _vs._, 72.
+    propagation of, 11.
+
+  Meat, 80.
+
+  Meats, canned, 78.
+    preserved, poisoning by, 80.
+
+  Mercuric chloride, 94.
+
+  Mercury seal for traps, 39.
+
+  Metropolitan Disinfectant, 99.
+
+  Microscopic organisms, 11, 43.
+
+  Milk, composition of, 81.
+
+  Mines, air of, 7.
+
+  Morin, estimate by, 19.
+
+  Movable tanks for excreta, 22.
+
+  Mumps, 12.
+
+  Munsell,, Ph. D., 81.
+
+
+  National Board of Health, rules, etc., 67.
+
+  Nichols, Professor, 8, 12, 87.
+
+  Nitrate of lead, 95.
+    of silver, 88.
+
+  Nitrates, tests for, 89.
+
+  Nitric acid, 88.
+
+  Nitrites, test for, 89.
+
+  Nitrogen, 7.
+    in sewers, 12, 13.
+
+  Nitrous acid, 95.
+
+  New York City Board of Health, rules, etc., 25.
+
+  New York State Board of Health, rules, etc., 74.
+
+
+  Oakum, 45.
+
+  Odors, offensive, 52.
+
+  Offsets, 35, 100.
+
+  Oil, dead, 92.
+    fusel, 76, 84.
+    of cognac, 76.
+    of peppermint, 63.
+    olive, 81.
+
+  Oleomargarine, 76.
+
+  One trap, etc., how determined, 58, 62.
+
+  Organic matter of respired air, 9.
+    matters, test for, 89.
+
+  Organisms, microscopic, 11, 43.
+
+  Overflow-pipes, 32, 33, 46, 54, 58.
+
+  Oxidation, 15, 43.
+
+  Oxide of manganese, 93.
+
+  Oxygen, 7, 8, 13.
+
+  Ozone, 95.
+
+
+  Pails for excreta, 22.
+
+  Paris, plaster-of-, 94.
+
+  Peppermint test, 63.
+
+  Permanganate of potash, 95.
+
+  Pettenkofer’s test for carbonic acid, 9.
+
+  Phenix Disinfectant, 99.
+
+  Phenol Sodique, 99.
+
+  Phosphorus, 95.
+
+  Pickles, 82.
+
+  Pipe connections, 30, 52.
+
+  Pipes, air, 31.
+    air-bound, 57.
+    cast-iron, 27, 28, 44, 101.
+    corrosion of, 50, 59.
+    drain, 27, 59.
+    earthenware, 26, 100.
+    galvanized iron, 59, 86.
+    hub-end of, 44.
+    iron, weight of, 29.
+    lead, weight of, 101.
+    obstruction of, 61.
+    overflow, 32, 33, 46, 54, 58.
+    rat-holes in, 59.
+    service, 86.
+    spigot-end of, 44.
+    tarring of, 44, 101.
+    traps on vertical, 29, 44.
+    ventilating, size of, 31.
+    waste, 28.
+    wrought-iron, 44.
+
+  Pitt,,, 77, 79.
+
+  Plants, action of air on, 15.
+
+  Plaster-of-Paris, 94.
+
+  Platt’s chlorides, 99.
+
+  Plumber’s labor, 102.
+    materials, 101, 102.
+
+  Pork, 80.
+
+  Potash, permanganate of, 95.
+
+  Potassium, iodide of, 89.
+
+  Powders, calx, 94.
+    carbolic, 92.
+
+  Premises, disinfection of, 68, 92, 94.
+
+  Privies, disinfection of, 71.
+
+  Privy-sinks, 42, 102.
+
+  Privy-vaults, construction of, 22, 34, 35.
+
+    contents of, 12.
+    dangers of, 22.
+
+  Pumpelly, 46.
+
+  Purification of water, 87, 90.
+
+  Putty-joints, 52, 54.
+
+
+  Rat-holes in pipes, 59.
+
+  Refrigerator wastes, 32.
+
+  Respiration, organic matter of, 9.
+
+  Return bend, 43.
+
+  Rum, 82.
+
+
+  Saddle-hubs, 60, 102.
+
+  Safes, 32, 46.
+    draining of, 32, 54.
+
+  Safe-wastes, 32, 54.
+
+  Saleratus, 74.
+
+  Salt, 67, 70, 89.
+
+  “Sanitary Engineer,” 51.
+
+  Scarlet fever, precautions _vs._, 72.
+    propagation of, 11.
+
+  School-sinks, 34, 42, 102.
+
+  Seal of trap, 36.
+
+  Sea-side houses, drainage of, 65.
+
+  Seine, mud of, 13.
+
+  Service-pipes, 86.
+
+  Sewer-air, effects attributed to, 13.
+
+  Sewer-gas, composition of, 12.
+
+  Sewer, house, material of, 26.
+
+  Sewer-water, 13.
+
+  Sewers, contents of, 12.
+    private, 26.
+
+  Sherringham valve, 17.
+
+  Sick-room, care of, 67, 70.
+    precautions on entering, 73.
+
+  Sinks, 30.
+
+  Siphonage, 58.
+    how determined, 62.
+    prevention of, 31, 58.
+
+  Sirups, 82.
+
+  Sky-light, louvered, 39.
+
+  Sleeves, 30, 45.
+
+  Slops, dangers from, 21.
+
+  Small-pox, precautions _vs._, 71.
+    propagation of, 11.
+
+  Smoky chimneys, 20.
+
+  Smith, Angus, 8.
+
+  Soil, damp, danger of, 15.
+
+  Soil-pipe, 35.
+    material and size of, 28.
+
+  Spices, 82.
+
+  Stables, disinfection of, 94.
+
+  Starch, 75, 89.
+
+  Squibb’s carbolic acid, 92.
+
+  Steam in soil-pipes, 33, 50.
+
+  Steam-coils, heating by, 19.
+
+  Subsoil drainage, 50.
+
+  Sugar, 82.
+
+  Sulphate of copper, 77.
+    of iron, 89, 93.
+    of lime, 94.
+    of zinc, 67, 96.
+
+  Sulphide of ammonium, 12.
+
+  Sulphur, 67, 96.
+    use of, in disinfection, 68.
+
+  Sulphureted hydrogen, 12, 13.
+
+  Sulphuric acid, 89, 95.
+
+  Sulphurous acid, 70, 96.
+
+  Syrups (see Sirups).
+
+
+  Tanks for drinking-water, 33, 86.
+    lining of, 33.
+    movable, for excreta, 22.
+
+  Tarring of pipes, 44, 101.
+
+  Teas, 83.
+
+  Terra alba, 74, 75, 77.
+
+  Test, Carpené’s, for wine, 85.
+    for carbonic acid, 9.
+    for chlorine, 88.
+    for nitrates, 89.
+    for nitrites, 89.
+
+  Test for organic matters in water, 89.
+    peppermint, 63.
+    water, 45.
+
+  Thymol, 72, 92, 98.
+
+  Tin in canned fruits, 77.
+    in sirups, 82.
+
+  Traps, 35, 102.
+    cleaning of, 60.
+    efficiency of, 46.
+    empty, how to determine, 62.
+    in house-drains, 27, 42.
+    on vertical pipes, 29, 44.
+    position of, 30.
+    unsealing of, by cushioning, 56.
+    unsealing of, by evaporation, 60.
+    unsealing of, by siphoning, 58.
+    various kinds of, 36, 102.
+    ventilation of, 31.
+
+  Trap-screws, 59.
+
+  Trichinæ, 80.
+
+  Typhoid fever caused by water, 88.
+    precautions _vs._, 72.
+    propagation of, 14.
+
+  Typhus fever, precautions _vs._, 73.
+    propagation of, 11.
+
+
+  Urinals, 30, 102.
+
+
+  Valve-closets, dangers of, 47.
+
+  Valves, check, 47.
+
+  Vegetables, canned, 77.
+
+  Ventilating shaft, 25.
+
+  Ventilation, 15.
+    different methods of, 17-19.
+    flues for, 20.
+
+  Ventilation of pipes, 31, 54, 58.
+
+  Ventilators, whirling, 20.
+
+  Vent-pipes, 54.
+
+  Vertical pipes, traps on, 29, 44.
+
+  Vinegar, 84.
+
+
+  Waller, Elwyn, Ph. D., 83, 97.
+
+  Walls, damp-proof courses in, 66.
+
+  Wash-trays and tubs, 30.
+
+  Waste-pipes, 35.
+    material of, 28.
+    trapping of, 30.
+
+  Water, 86.
+    drinking, tanks for, 33, 86.
+    drinking, tests of, 89.
+    impure, disorders due to, 88.
+    in lead pipes, 86.
+    iron pipes for, 86.
+    of sewers, 13.
+    pollution of, 87.
+    precautions regarding, 90.
+    purification of, 90.
+    typhoid fever caused by, 88.
+
+  Water-carriage, 24.
+
+  Water-closets, 39, 102.
+    cisterns for, 32, 47, 100.
+    disinfection of, 71, 91.
+    valve, dangers of, 47.
+
+  Water-seal, 36, 46.
+
+  Water test, the, 45.
+
+  Weight of iron pipe, 29.
+    of lead pipe, 101.
+
+  Wernich, 46.
+
+  Whirling ventilators, 20.
+
+  Whisky, 76, 84.
+
+  Whooping-cough, propagation of, 12.
+
+  Windows, double, 20.
+
+  Wine, how to tell good, 84.
+    tests of, 85.
+
+  Wiped joints, 46.
+
+  Woolen stuffs, disinfection of, 69.
+
+  Wrought-iron pipes, 44.
+
+
+  Y-branches, 42.
+
+  Yards, drainage of, 34.
+
+  Yellow fever, 14, 72.
+
+
+  Zinc, chloride of, 70, 96.
+    sulphate of, 67, 96.
+
+
+                               THE END.
+
+
+
+
+                           WORKS ON HYGIENE.
+
+
+ =Health Primers.= Edited by J. LANGDON DOWN,, F. P., HENRY POWER,, C.
+ S., J. MORTIMER-GRANVILLE, M. D., JOHN TWEEDY, C. S. In square 16mo.
+ volumes. Cloth, 40 cents each.
+
+  I. EXERCISE AND TRAINING.
+  II. ALCOHOL: Its Use and Abuse.
+  III. PREMATURE DEATH: Its Promotion or Prevention.
+  IV. THE HOUSE AND ITS SURROUNDINGS.
+  V. PERSONAL APPEARANCE IN HEALTH AND DISEASE.
+  VI. BATHS AND BATHING.
+  VII. THE SKIN AND ITS TROUBLES.
+  VIII. THE HEART AND ITS FUNCTIONS.
+  IX. THE NERVOUS SYSTEM.
+
+ =Hygiene for Girls.= By IRENÆUS P. DAVIS, 16mo. Cloth, $1.25.
+
+ =Dangers to Health=: A Pictorial Guide to Domestic Sanitary Defects.
+ By T. PRIDGIN TEALE,, Surgeon to the General Infirmary at Leeds. With
+ 70 Lithographic Plates. 8vo. Cloth, $3.00.
+
+ =Health and Education.= By Rev. C. KINGSLEY. 12mo. Cloth, $1.75.
+
+ =Physical Education=; or, The Health Laws of Nature. By FELIX L.
+ OSWALD, 12mo. Cloth, $1.00.
+
+
+                     THE POPULAR SCIENCE MONTHLY.
+
+                _CONDUCTED BY E. L. AND W. J. YOUMANS._
+
+
+THE POPULAR SCIENCE MONTHLY was established a dozen years ago to
+bring before the general public the results of scientific thought on
+many large and important questions which could find no expression in
+the current periodicals. Scientific inquiry was penetrating many new
+fields, extending important knowledge, and profoundly affecting opinion
+upon numberless questions of speculative and practical interest. It
+was the policy of this magazine at the outset, and has been constantly
+adhered to since, to obtain the ablest statements from the most
+distinguished scientific men of all countries in their bearing upon the
+higher problems of investigation. Leaving the dry and technical details
+of science, which are of chief concern to specialists, to the journals
+devoted to them, THE POPULAR SCIENCE MONTHLY has dealt with those more
+general and practical subjects which are of the greatest interest and
+importance to the people at large.
+
+Science is the great agency of improvement in this age, private and
+public, individual, social, professional, and industrial. In its
+irresistible progress it touches everywhere, and affects everybody. It
+gives law to the material interests of the community, and modifies its
+ideas, opinions, and beliefs, so that all have an interest in being
+informed of its advancement. Those, therefore, who desire to know what
+is going on in the world of thought in these stirring times, when new
+knowledge is rapidly extending, and old errors are giving way, will
+find that they can keep informed only by subscribing for THE POPULAR
+SCIENCE MONTHLY.
+
+
+TERMS: $5.00 per annum, or 50 cents a number; cloth covers for the
+volumes, 50 cents each.
+
+The volumes begin with May and November of each year, and subscriptions
+may begin at any time.
+
+A club of five will be supplied for $20.00 per annum.
+
+
+          New York: D. APPLETON & CO., 1, 3, & 5 Bond Street.
+
+*** END OF THE PROJECT GUTENBERG EBOOK HAND-BOOK OF SANITARY
+INFORMATION FOR HOUSEHOLDERS ***
+
+Updated editions will replace the previous one--the old editions will
+be renamed.
+
+Creating the works from print editions not protected by U.S. copyright
+law means that no one owns a United States copyright in these works,
+so the Foundation (and you!) can copy and distribute it in the
+United States without permission and without paying copyright
+royalties. Special rules, set forth in the General Terms of Use part
+of this license, apply to copying and distributing Project
+Gutenberg-tm electronic works to protect the PROJECT GUTENBERG-tm
+concept and trademark. Project Gutenberg is a registered trademark,
+and may not be used if you charge for an eBook, except by following
+the terms of the trademark license, including paying royalties for use
+of the Project Gutenberg trademark. If you do not charge anything for
+copies of this eBook, complying with the trademark license is very
+easy. You may use this eBook for nearly any purpose such as creation
+of derivative works, reports, performances and research. Project
+Gutenberg eBooks may be modified and printed and given away--you may
+do practically ANYTHING in the United States with eBooks not protected
+by U.S. copyright law. Redistribution is subject to the trademark
+license, especially commercial redistribution.
+
+START: FULL LICENSE
+
+THE FULL PROJECT GUTENBERG LICENSE
+PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK
+
+To protect the Project Gutenberg-tm mission of promoting the free
+distribution of electronic works, by using or distributing this work
+(or any other work associated in any way with the phrase "Project
+Gutenberg"), you agree to comply with all the terms of the Full
+Project Gutenberg-tm License available with this file or online at
+www.gutenberg.org/license.
+
+Section 1. General Terms of Use and Redistributing Project
+Gutenberg-tm electronic works
+
+1.A. By reading or using any part of this Project Gutenberg-tm
+electronic work, you indicate that you have read, understand, agree to
+and accept all the terms of this license and intellectual property
+(trademark/copyright) agreement. If you do not agree to abide by all
+the terms of this agreement, you must cease using and return or
+destroy all copies of Project Gutenberg-tm electronic works in your
+possession. If you paid a fee for obtaining a copy of or access to a
+Project Gutenberg-tm electronic work and you do not agree to be bound
+by the terms of this agreement, you may obtain a refund from the
+person or entity to whom you paid the fee as set forth in paragraph
+1.E.8.
+
+1.B. "Project Gutenberg" is a registered trademark. It may only be
+used on or associated in any way with an electronic work by people who
+agree to be bound by the terms of this agreement. There are a few
+things that you can do with most Project Gutenberg-tm electronic works
+even without complying with the full terms of this agreement. See
+paragraph 1.C below. There are a lot of things you can do with Project
+Gutenberg-tm electronic works if you follow the terms of this
+agreement and help preserve free future access to Project Gutenberg-tm
+electronic works. See paragraph 1.E below.
+
+1.C. The Project Gutenberg Literary Archive Foundation ("the
+Foundation" or PGLAF), owns a compilation copyright in the collection
+of Project Gutenberg-tm electronic works. Nearly all the individual
+works in the collection are in the public domain in the United
+States. If an individual work is unprotected by copyright law in the
+United States and you are located in the United States, we do not
+claim a right to prevent you from copying, distributing, performing,
+displaying or creating derivative works based on the work as long as
+all references to Project Gutenberg are removed. Of course, we hope
+that you will support the Project Gutenberg-tm mission of promoting
+free access to electronic works by freely sharing Project Gutenberg-tm
+works in compliance with the terms of this agreement for keeping the
+Project Gutenberg-tm name associated with the work. You can easily
+comply with the terms of this agreement by keeping this work in the
+same format with its attached full Project Gutenberg-tm License when
+you share it without charge with others.
+
+1.D. The copyright laws of the place where you are located also govern
+what you can do with this work. Copyright laws in most countries are
+in a constant state of change. If you are outside the United States,
+check the laws of your country in addition to the terms of this
+agreement before downloading, copying, displaying, performing,
+distributing or creating derivative works based on this work or any
+other Project Gutenberg-tm work. The Foundation makes no
+representations concerning the copyright status of any work in any
+country other than the United States.
+
+1.E. Unless you have removed all references to Project Gutenberg:
+
+1.E.1. The following sentence, with active links to, or other
+immediate access to, the full Project Gutenberg-tm License must appear
+prominently whenever any copy of a Project Gutenberg-tm work (any work
+on which the phrase "Project Gutenberg" appears, or with which the
+phrase "Project Gutenberg" is associated) is accessed, displayed,
+performed, viewed, copied or distributed:
+
+  This eBook is for the use of anyone anywhere in the United States and
+  most other parts of the world at no cost and with almost no
+  restrictions whatsoever. You may copy it, give it away or re-use it
+  under the terms of the Project Gutenberg License included with this
+  eBook or online at www.gutenberg.org. If you are not located in the
+  United States, you will have to check the laws of the country where
+  you are located before using this eBook.
+
+1.E.2. If an individual Project Gutenberg-tm electronic work is
+derived from texts not protected by U.S. copyright law (does not
+contain a notice indicating that it is posted with permission of the
+copyright holder), the work can be copied and distributed to anyone in
+the United States without paying any fees or charges. If you are
+redistributing or providing access to a work with the phrase "Project
+Gutenberg" associated with or appearing on the work, you must comply
+either with the requirements of paragraphs 1.E.1 through 1.E.7 or
+obtain permission for the use of the work and the Project Gutenberg-tm
+trademark as set forth in paragraphs 1.E.8 or 1.E.9.
+
+1.E.3. If an individual Project Gutenberg-tm electronic work is posted
+with the permission of the copyright holder, your use and distribution
+must comply with both paragraphs 1.E.1 through 1.E.7 and any
+additional terms imposed by the copyright holder. Additional terms
+will be linked to the Project Gutenberg-tm License for all works
+posted with the permission of the copyright holder found at the
+beginning of this work.
+
+1.E.4. Do not unlink or detach or remove the full Project Gutenberg-tm
+License terms from this work, or any files containing a part of this
+work or any other work associated with Project Gutenberg-tm.
+
+1.E.5. Do not copy, display, perform, distribute or redistribute this
+electronic work, or any part of this electronic work, without
+prominently displaying the sentence set forth in paragraph 1.E.1 with
+active links or immediate access to the full terms of the Project
+Gutenberg-tm License.
+
+1.E.6. You may convert to and distribute this work in any binary,
+compressed, marked up, nonproprietary or proprietary form, including
+any word processing or hypertext form. However, if you provide access
+to or distribute copies of a Project Gutenberg-tm work in a format
+other than "Plain Vanilla ASCII" or other format used in the official
+version posted on the official Project Gutenberg-tm website
+(www.gutenberg.org), you must, at no additional cost, fee or expense
+to the user, provide a copy, a means of exporting a copy, or a means
+of obtaining a copy upon request, of the work in its original "Plain
+Vanilla ASCII" or other form. Any alternate format must include the
+full Project Gutenberg-tm License as specified in paragraph 1.E.1.
+
+1.E.7. Do not charge a fee for access to, viewing, displaying,
+performing, copying or distributing any Project Gutenberg-tm works
+unless you comply with paragraph 1.E.8 or 1.E.9.
+
+1.E.8. You may charge a reasonable fee for copies of or providing
+access to or distributing Project Gutenberg-tm electronic works
+provided that:
+
+* You pay a royalty fee of 20% of the gross profits you derive from
+  the use of Project Gutenberg-tm works calculated using the method
+  you already use to calculate your applicable taxes. The fee is owed
+  to the owner of the Project Gutenberg-tm trademark, but he has
+  agreed to donate royalties under this paragraph to the Project
+  Gutenberg Literary Archive Foundation. Royalty payments must be paid
+  within 60 days following each date on which you prepare (or are
+  legally required to prepare) your periodic tax returns. Royalty
+  payments should be clearly marked as such and sent to the Project
+  Gutenberg Literary Archive Foundation at the address specified in
+  Section 4, "Information about donations to the Project Gutenberg
+  Literary Archive Foundation."
+
+* You provide a full refund of any money paid by a user who notifies
+  you in writing (or by e-mail) within 30 days of receipt that s/he
+  does not agree to the terms of the full Project Gutenberg-tm
+  License. You must require such a user to return or destroy all
+  copies of the works possessed in a physical medium and discontinue
+  all use of and all access to other copies of Project Gutenberg-tm
+  works.
+
+* You provide, in accordance with paragraph 1.F.3, a full refund of
+  any money paid for a work or a replacement copy, if a defect in the
+  electronic work is discovered and reported to you within 90 days of
+  receipt of the work.
+
+* You comply with all other terms of this agreement for free
+  distribution of Project Gutenberg-tm works.
+
+1.E.9. If you wish to charge a fee or distribute a Project
+Gutenberg-tm electronic work or group of works on different terms than
+are set forth in this agreement, you must obtain permission in writing
+from the Project Gutenberg Literary Archive Foundation, the manager of
+the Project Gutenberg-tm trademark. Contact the Foundation as set
+forth in Section 3 below.
+
+1.F.
+
+1.F.1. Project Gutenberg volunteers and employees expend considerable
+effort to identify, do copyright research on, transcribe and proofread
+works not protected by U.S. copyright law in creating the Project
+Gutenberg-tm collection. Despite these efforts, Project Gutenberg-tm
+electronic works, and the medium on which they may be stored, may
+contain "Defects," such as, but not limited to, incomplete, inaccurate
+or corrupt data, transcription errors, a copyright or other
+intellectual property infringement, a defective or damaged disk or
+other medium, a computer virus, or computer codes that damage or
+cannot be read by your equipment.
+
+1.F.2. LIMITED WARRANTY, DISCLAIMER OF DAMAGES - Except for the "Right
+of Replacement or Refund" described in paragraph 1.F.3, the Project
+Gutenberg Literary Archive Foundation, the owner of the Project
+Gutenberg-tm trademark, and any other party distributing a Project
+Gutenberg-tm electronic work under this agreement, disclaim all
+liability to you for damages, costs and expenses, including legal
+fees. YOU AGREE THAT YOU HAVE NO REMEDIES FOR NEGLIGENCE, STRICT
+LIABILITY, BREACH OF WARRANTY OR BREACH OF CONTRACT EXCEPT THOSE
+PROVIDED IN PARAGRAPH 1.F.3. YOU AGREE THAT THE FOUNDATION, THE
+TRADEMARK OWNER, AND ANY DISTRIBUTOR UNDER THIS AGREEMENT WILL NOT BE
+LIABLE TO YOU FOR ACTUAL, DIRECT, INDIRECT, CONSEQUENTIAL, PUNITIVE OR
+INCIDENTAL DAMAGES EVEN IF YOU GIVE NOTICE OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+1.F.3. LIMITED RIGHT OF REPLACEMENT OR REFUND - If you discover a
+defect in this electronic work within 90 days of receiving it, you can
+receive a refund of the money (if any) you paid for it by sending a
+written explanation to the person you received the work from. If you
+received the work on a physical medium, you must return the medium
+with your written explanation. The person or entity that provided you
+with the defective work may elect to provide a replacement copy in
+lieu of a refund. If you received the work electronically, the person
+or entity providing it to you may choose to give you a second
+opportunity to receive the work electronically in lieu of a refund. If
+the second copy is also defective, you may demand a refund in writing
+without further opportunities to fix the problem.
+
+1.F.4. Except for the limited right of replacement or refund set forth
+in paragraph 1.F.3, this work is provided to you 'AS-IS', WITH NO
+OTHER WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PURPOSE.
+
+1.F.5. Some states do not allow disclaimers of certain implied
+warranties or the exclusion or limitation of certain types of
+damages. If any disclaimer or limitation set forth in this agreement
+violates the law of the state applicable to this agreement, the
+agreement shall be interpreted to make the maximum disclaimer or
+limitation permitted by the applicable state law. The invalidity or
+unenforceability of any provision of this agreement shall not void the
+remaining provisions.
+
+1.F.6. INDEMNITY - You agree to indemnify and hold the Foundation, the
+trademark owner, any agent or employee of the Foundation, anyone
+providing copies of Project Gutenberg-tm electronic works in
+accordance with this agreement, and any volunteers associated with the
+production, promotion and distribution of Project Gutenberg-tm
+electronic works, harmless from all liability, costs and expenses,
+including legal fees, that arise directly or indirectly from any of
+the following which you do or cause to occur: (a) distribution of this
+or any Project Gutenberg-tm work, (b) alteration, modification, or
+additions or deletions to any Project Gutenberg-tm work, and (c) any
+Defect you cause.
+
+Section 2. Information about the Mission of Project Gutenberg-tm
+
+Project Gutenberg-tm is synonymous with the free distribution of
+electronic works in formats readable by the widest variety of
+computers including obsolete, old, middle-aged and new computers. It
+exists because of the efforts of hundreds of volunteers and donations
+from people in all walks of life.
+
+Volunteers and financial support to provide volunteers with the
+assistance they need are critical to reaching Project Gutenberg-tm's
+goals and ensuring that the Project Gutenberg-tm collection will
+remain freely available for generations to come. In 2001, the Project
+Gutenberg Literary Archive Foundation was created to provide a secure
+and permanent future for Project Gutenberg-tm and future
+generations. To learn more about the Project Gutenberg Literary
+Archive Foundation and how your efforts and donations can help, see
+Sections 3 and 4 and the Foundation information page at
+www.gutenberg.org
+
+Section 3. Information about the Project Gutenberg Literary
+Archive Foundation
+
+The Project Gutenberg Literary Archive Foundation is a non-profit
+501(c)(3) educational corporation organized under the laws of the
+state of Mississippi and granted tax exempt status by the Internal
+Revenue Service. The Foundation's EIN or federal tax identification
+number is 64-6221541. Contributions to the Project Gutenberg Literary
+Archive Foundation are tax deductible to the full extent permitted by
+U.S. federal laws and your state's laws.
+
+The Foundation's business office is located at 809 North 1500 West,
+Salt Lake City, UT 84116, (801) 596-1887. Email contact links and up
+to date contact information can be found at the Foundation's website
+and official page at www.gutenberg.org/contact
+
+Section 4. Information about Donations to the Project Gutenberg
+Literary Archive Foundation
+
+Project Gutenberg-tm depends upon and cannot survive without
+widespread public support and donations to carry out its mission of
+increasing the number of public domain and licensed works that can be
+freely distributed in machine-readable form accessible by the widest
+array of equipment including outdated equipment. Many small donations
+($1 to $5,000) are particularly important to maintaining tax exempt
+status with the IRS.
+
+The Foundation is committed to complying with the laws regulating
+charities and charitable donations in all 50 states of the United
+States. Compliance requirements are not uniform and it takes a
+considerable effort, much paperwork and many fees to meet and keep up
+with these requirements. We do not solicit donations in locations
+where we have not received written confirmation of compliance. To SEND
+DONATIONS or determine the status of compliance for any particular
+state visit www.gutenberg.org/donate
+
+While we cannot and do not solicit contributions from states where we
+have not met the solicitation requirements, we know of no prohibition
+against accepting unsolicited donations from donors in such states who
+approach us with offers to donate.
+
+International donations are gratefully accepted, but we cannot make
+any statements concerning tax treatment of donations received from
+outside the United States. U.S. laws alone swamp our small staff.
+
+Please check the Project Gutenberg web pages for current donation
+methods and addresses. Donations are accepted in a number of other
+ways including checks, online payments and credit card donations. To
+donate, please visit: www.gutenberg.org/donate
+
+Section 5. General Information About Project Gutenberg-tm electronic works
+
+Professor Michael S. Hart was the originator of the Project
+Gutenberg-tm concept of a library of electronic works that could be
+freely shared with anyone. For forty years, he produced and
+distributed Project Gutenberg-tm eBooks with only a loose network of
+volunteer support.
+
+Project Gutenberg-tm eBooks are often created from several printed
+editions, all of which are confirmed as not protected by copyright in
+the U.S. unless a copyright notice is included. Thus, we do not
+necessarily keep eBooks in compliance with any particular paper
+edition.
+
+Most people start at our website which has the main PG search
+facility: www.gutenberg.org
+
+This website includes information about Project Gutenberg-tm,
+including how to make donations to the Project Gutenberg Literary
+Archive Foundation, how to help produce our new eBooks, and how to
+subscribe to our email newsletter to hear about new eBooks.
