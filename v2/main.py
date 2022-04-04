@@ -41,7 +41,7 @@ if __name__=="__main__":
     db_name='words'
     db_user='root'
     db_password='root'
-    buffer_size=1000
+    buffer_size=1_000
 
     start_exec_time = time.perf_counter()
     words_saver = None
@@ -59,7 +59,7 @@ if __name__=="__main__":
         pipeline = ThreadedPipeline(LOGGER, 
                             max_transformation_pipelines=5,
                             use_threads_as_transformation_pipelines=True,
-                            trans_in_queue_max_size=1_000,
+                            trans_in_queue_max_size=config['buffer_size'],
                             extractor=FilesListExtractor(LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                             transformers=[
                                     #NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='X'),
@@ -92,7 +92,7 @@ if __name__=="__main__":
                                                                    input_key_path=['_', 'line'], 
                                                                    output_key='_', 
                                                                    copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]),
-                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename)
+                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename),
                                     ],
                             loaders=[
                                     # ConditionalLoader(  LOGGER, 
@@ -110,7 +110,7 @@ if __name__=="__main__":
                                     ConditionalLoader( LOGGER, 
                                                        config['save_to_db'],
                                                        MySQL_DBLoader( LOGGER, 
-                                                                       input_key_path=['_'], 
+                                                                       input_key_path=None, 
                                                                        values_path=[('word', ['_', 'word'], True), 
                                                                                      ('file', ['file_path'], True),
                                                                                      ('words_count', ['words_count'], True)],

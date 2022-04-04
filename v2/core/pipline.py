@@ -238,7 +238,7 @@ class ThreadedPipeline(AbstractPipeline):
                         if self.pipeline_closed.value==0:
                             t.join()
                     transformators_joined = True
-                    self.logger.log_msg("Transformation threads joined", level=INFO)
+                    self.logger.log_msg("Transformation threads joined. Waiting for loaders to finish their words...", level=INFO)
 
                 if not loaders_joined and self.loaders_alive.value==0:
                     for t in load_threads:
