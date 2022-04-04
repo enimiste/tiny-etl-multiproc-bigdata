@@ -10,7 +10,7 @@ from core.commons import dict_deep_get
 class AbstractLoader(WithLogging):
     def __init__(self, logger: Logger, 
                 input_key_path: list[str],
-                values_path: list[tuple[str, list[str]]]) -> None:
+                values_path: list[tuple[str, list[str]], bool]) -> None:
         super().__init__(logger)
         self.input_key_path = input_key_path
         self.values_path = values_path
@@ -27,7 +27,7 @@ class AbstractLoader(WithLogging):
 class NoopLoader(AbstractLoader):
     def __init__(self, logger, 
                 input_key_path: list[str],
-                values_path: list[tuple[str, list[str]]] = [],
+                values_path: list[tuple[str, list[str], bool]] = [],
                 log: bool = False) -> None:
         super().__init__(logger, input_key_path, values_path)
         self.log = log
@@ -73,7 +73,7 @@ class MySQL_DBLoader(AbstractLoader):
     def __init__(self, 
                 logger: Logger, 
                 input_key_path: list[str],
-                values_path: list[tuple[str, list[str]]],
+                values_path: list[tuple[str, list[str], bool]],
                 sql_query: str,
                 buffer_size: int, 
                 host: str, 
@@ -93,8 +93,11 @@ class MySQL_DBLoader(AbstractLoader):
 
     def _row_from_data(self, item: dict)->list:
         row = []
-        for (title, key_path) in self.values_path:
-            row.append(dict_deep_get(item, key_path))
+        for (title, key_path, required) in self.values_path:
+            val = dict_deep_get(item, key_path)
+            if required is not None and required is True and val is None:
+                return None
+            row.append(val)
         return row
 
     def _connect(self):
@@ -124,7 +127,9 @@ class MySQL_DBLoader(AbstractLoader):
         for item in items:
             x = dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item
             if x is not None:
-                data.append(self._row_from_data(x))
+                d = self._row_from_data(x)
+                if d is not None:
+                    data.append(d)
 
         if len(data)>0:
             self.buffer = self.buffer + data
@@ -140,10 +145,12 @@ class MySQL_DBLoader(AbstractLoader):
             data_len=len(self.buffer)
             inserted_data = 0
             super().log_msg("{0} rows available to be inserted".format(data_len))
+
             cursor = connection.cursor()
             connection.start_transaction()
             cursor.executemany(self.sql_query, self.buffer)   
             connection.commit()
+
             inserted_data+=cursor.rowcount
             super().log_msg("{} Record inserted successfully".format(cursor.rowcount))
             super().log_msg("{} Total record inserted successfully".format(data_len))
@@ -152,7 +159,7 @@ class MySQL_DBLoader(AbstractLoader):
 
         except mysql.connector.Error as error:
             super().log_msg("Failed to insert records {}".format(error), exception=error, level=ERROR)
-            if not connection is None and connection.in_transaction():
+            if not connection is None and connection.in_transaction:
                 try:
                     connection.rollback()
                 except Exception as ex:
@@ -173,7 +180,7 @@ class CSV_FileLoader(AbstractLoader):
     def __init__(self, 
                 logger: Logger, 
                 input_key_path: list[str],
-                values_path: list[tuple[str, list[str]]],
+                values_path: list[tuple[str, list[str], bool]],
                 out_dir: str,
                 col_sep: str=";",
                 out_file_ext="txt",
@@ -192,8 +199,11 @@ class CSV_FileLoader(AbstractLoader):
 
     def _row_from_item(self, item: dict) -> list[str]:
         row = []
-        for (title, key_path) in self.values_path:
-            row.append(str(dict_deep_get(item, key_path)))
+        for (title, key_path, required) in self.values_path:
+            val = dict_deep_get(item, key_path)
+            if required is not None and required is True and val is None:
+                return None
+            row.append(str(val))
         return row
 
     def load(self, job_uuid: str, items: list[dict]):
@@ -216,7 +226,9 @@ class CSV_FileLoader(AbstractLoader):
         for item in items:
             x = dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item
             if x is not None:
-                rows.append(self.col_sep.join(self._row_from_item(x)))
+                row = self._row_from_item(x)
+                if row is not None:
+                    rows.append(self.col_sep.join(row))
 
         if len(rows) >0: 
             self.buffer = self.buffer + rows

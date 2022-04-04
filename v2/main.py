@@ -33,16 +33,15 @@ LOGGER = logging.getLogger("my-logger")
                           
 if __name__=="__main__":
 
-    in_dir='../bdall_test_data'
-    #in_dir='../bdall_test_data/corpusB/base1'
+    #in_dir='../bdall_test_data'
+    in_dir='../bdall_test_data/one_book'
     out_dir = 'out_dir'
-    save_to_db=False
+    save_to_db=True
     db_host='localhost'
-    db_name='arabic_lang'
+    db_name='words'
     db_user='root'
     db_password='root'
     buffer_size=1000
-    show_summary=False
 
     start_exec_time = time.perf_counter()
     words_saver = None
@@ -96,40 +95,34 @@ if __name__=="__main__":
                                     ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename)
                                     ],
                             loaders=[
-                                    ConditionalLoader(  LOGGER, 
-                                                        not config['save_to_db'],
-                                                        # False,
-                                                        CSV_FileLoader( LOGGER,
-                                                                        input_key_path=None,
-                                                                        values_path=[('word', ['_', 'word']), 
-                                                                                        ('file', ['file_path']),
-                                                                                        ('words_count', ['words_count'])],
-                                                                        out_dir=os.path.abspath(out_dir),
-                                                                        out_file_ext='txt',
-                                                                        buffer_size=config['buffer_size'])),
                                     # ConditionalLoader(  LOGGER, 
                                     #                     not config['save_to_db'],
+                                    #                     # False,
                                     #                     CSV_FileLoader( LOGGER,
                                     #                                     input_key_path=None,
-                                    #                                     values_path=[('word', ['_', 'word']), 
-                                    #                                                     ('file', ['file_path']),
-                                    #                                                     ('words_count', ['words_count'])],
+                                    #                                     values_path=[('word', ['_', 'word'], True), 
+                                    #                                                     ('file', ['file_path'], True),
+                                    #                                                     ('words_count', ['words_count'], True)],
                                     #                                     out_dir=os.path.abspath(out_dir),
-                                    #                                     out_file_ext='csv')),
-                                    # ConditionalLoader( LOGGER, 
-                                    #                    config['save_to_db'],
-                                    #                    MySQL_DBLoader( LOGGER, 
-                                    #                                    input_key_path=['_'], 
-                                    #                                    values_path=[('word', ['_', 'word']), 
-                                    #                                                  ('file', ['file_path']),
-                                    #                                                  ('words_count', ['words_count'])],
-                                    #                                    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
-                                    #                                                    VALUES(%s,%s,0)""",
-                                    #                                    buffer_size=config['buffer_size'],
-                                    #                                    host=config['db_host'],
-                                    #                                    database=config['db_name'],
-                                    #                                    user=config['db_user'],
-                                    #                                    password=config['db_password']))
+                                    #                                     out_file_ext='txt',
+                                    #                                     buffer_size=config['buffer_size'])),
+                                    
+                                    ConditionalLoader( LOGGER, 
+                                                       config['save_to_db'],
+                                                       MySQL_DBLoader( LOGGER, 
+                                                                       input_key_path=['_'], 
+                                                                       values_path=[('word', ['_', 'word'], True), 
+                                                                                     ('file', ['file_path'], True),
+                                                                                     ('words_count', ['words_count'], True)],
+                                                                    #    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
+                                                                    #                    VALUES(%s,%s,0)""",
+                                                                       sql_query= """INSERT INTO words (word, file_path, file_words_count)
+                                                                                       VALUES(%s,%s,%s)""",
+                                                                       buffer_size=config['buffer_size'],
+                                                                       host=config['db_host'],
+                                                                       database=config['db_name'],
+                                                                       user=config['db_user'],
+                                                                       password=config['db_password']))
                                                             ])
         pipeline.start()
         pipeline.join()
