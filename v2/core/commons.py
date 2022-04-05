@@ -69,18 +69,18 @@ def flatMapApply(item:Any, mappers: list[Callable[[Any], Generator[Any, None, No
                             yield a
 
 def get_thread_process_id(th):
-    if type(th) is threading.Thread:
+    if isinstance(th, threading.Thread):
         return th.ident
-    elif type(th) is multiprocessing.Process:
+    elif isinstance(th, multiprocessing.Process):
         return th.pid
-    raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
+    raise RuntimeError('Invalid thread/process object {}'.format(type(th)))
 
 def get_thread_process_is_joined(th) -> bool:
-    if type(th) is threading.Thread:
+    if isinstance(th, threading.Thread):
         return not th.is_alive()
-    elif type(th) is multiprocessing.Process:
+    elif isinstance(th, multiprocessing.Process):
         return th.exitcode is not None
-    raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
+    raise RuntimeError('Invalid thread/process object {}'.format(type(th)))
 
 def kill_threads_processes(threads: list[Any], ignore_exception:bool=True):
     for th in threads:
@@ -88,29 +88,29 @@ def kill_threads_processes(threads: list[Any], ignore_exception:bool=True):
 
 def kill_thread_process(th, ignore_exception:bool=True):
     try:
-        if type(th) is threading.Thread:
+        if isinstance(th, threading.Thread):
             th._stop()
             return
-        elif type(th) is multiprocessing.Process:
+        elif isinstance(th, multiprocessing.Process):
             th.kill()
             return
     except Exception as ex:
         if not ignore_exception:
             raise ex
-    raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
+    raise RuntimeError('Invalid thread/process object {}'.format(type(th)))
 
 def terminate_thread_process(th, ignore_exception:bool=True):
     try:
-        if type(th) is threading.Thread:
+        if isinstance(th, threading.Thread):
             th._stop()
             return
-        elif type(th) is multiprocessing.Process:
+        elif isinstance(th, multiprocessing.Process):
             th.terminate()
             return
     except Exception as ex:
         if not ignore_exception:
             raise ex
-    raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
+    raise RuntimeError('Invalid thread/process object {}'.format(type(th)))
 
 def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[], bool] = None, join_timeout: int = 0.01, ignore_exception:bool=True) -> bool:
     nbr_threads = len(threads)
@@ -151,3 +151,8 @@ def basename_backwards(path: str, backwards_level: int=2) -> str:
         paths.reverse()
         return os.path.join(paths[0], *paths[1:])
     
+def make_thread_process(use_thread: bool, target, args) -> threading.Thread | multiprocessing.Process:
+    if use_thread:
+        return threading.Thread(target=target, args=args)
+    else:
+        return multiprocessing.Process(target=target, args=args)

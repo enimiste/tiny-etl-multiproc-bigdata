@@ -51,9 +51,12 @@ if __name__=="__main__":
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'parallel_loader_count': 20,
-        'max_transformation_pipelines': 100,
-        'use_threads_as_transformation_pipelines':False,
+        'parallel_loader_count': 10,
+        'max_transformation_pipelines': 28,
+        'use_threads_as_transformation_pipelines': True,
+        'use_threads_as_loaders_executors': True,
+        'use_threads_as_extractors_executors': True,
+        'use_threads_as_load_balancer_loaders_executors': True,
         'load_balancer_buffer_size': 1000
     }
 
@@ -78,8 +81,10 @@ if __name__=="__main__":
     LOGGER.log(INFO, "Script started : {}".format(config['in_dir']))
     try:
         pipeline = ThreadedPipeline(LOGGER, 
+                            use_threads_as_extractors_executors=config['use_threads_as_extractors_executors'],
                             max_transformation_pipelines=config['max_transformation_pipelines'],
                             use_threads_as_transformation_pipelines=config['use_threads_as_transformation_pipelines'],
+                            use_threads_as_loaders_executors=config['use_threads_as_loaders_executors'],
                             trans_in_queue_max_size=config['buffer_size'],
                             extractor=FilesListExtractor(LOGGER, intput_dir=config['in_dir'], pattern=".txt", output_key='_'),
                             transformers=[
@@ -138,6 +143,7 @@ if __name__=="__main__":
                                                         LoadBalanceLoader(LOGGER, 
                                                                         queue_no_block_timeout_sec = 0.09,
                                                                         buffer_size=config['load_balancer_buffer_size'],
+                                                                        use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
                                                                         loaders= [(
                                                                                     config['buffer_size']*10, 
                                                                                     MySQL_DBLoader( LOGGER, **mysql_db_loader_config)) 
@@ -148,11 +154,10 @@ if __name__=="__main__":
                                                                         #                         input_key_path=None,
                                                                         #                         values_path=[('word', ['_', 'word'], None), 
                                                                         #                                     ('file', ['file_path'], None),
-                                                                        #                                     ('words_count', ['words_count'], None)],
-                                                                        #                         log=True,
-                                                                        #                         log_level=INFO)) 
-                                                                        #                         for i in range(0, max(1, config['parallel_loader_count']))]
-                                                                        ))
+                                                                        #                                     ('words_count', ['words_count'], None)])) 
+                                                                        #                         for _ in range(0, max(1, config['parallel_loader_count']))]
+                                                                        )
+                                                    )
                                     ])
         pipeline.start()
         pipeline.join()

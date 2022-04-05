@@ -1,9 +1,8 @@
 from abc import abstractmethod
-from asyncio import queues
 import io
 from logging import INFO, WARN, ERROR, Logger, DEBUG
+import multiprocessing
 from multiprocessing.sharedctypes import Value
-from multiprocessing import Queue
 import queue
 import threading
 import uuid
@@ -12,6 +11,8 @@ from core.commons import WithLogging
 from core.commons import dict_deep_get
 from core.commons import rotary_iter
 from core.commons import block_join_threads_or_processes
+from core.commons import LoggerWrapper
+from core.commons import make_thread_process
  
 class AbstractLoader(WithLogging):
     def __init__(self, logger: Logger, 
@@ -113,7 +114,8 @@ class LoadBalanceLoader(AbstractLoader):
                     loaders: list[tuple[int, AbstractLoader]],
                     buffer_size: int = 1000,
                     queue_no_block_timeout_sec: int = 0.09,
-                    queue_block_timeout_sec: int = 0.1) -> None:
+                    queue_block_timeout_sec: int = 0.1,
+                    use_threads_as_loaders_executors: bool = True) -> None:
         super().__init__(logger, None, None)
         self.loaders = loaders
         self.started = False
@@ -124,22 +126,50 @@ class LoadBalanceLoader(AbstractLoader):
         self.rotary_iter_queues = []
         self.queue_no_block_timeout_sec=max(0.01, queue_no_block_timeout_sec)
         self.queue_block_timeout_sec = max(0.1, queue_block_timeout_sec)
-        self.load_balancer_closed = Value('i', 0)
+        self.use_threads_as_loaders_executors = use_threads_as_loaders_executors
+        self.load_balancer_closed= Value('i', 0)
         self.loaders_threads = []
 
         if len(loaders)<=1:
             raise RuntimeError('At least two loaders should be passed to the load balancer')
 
+    @staticmethod
+    def load_items(idx: int,
+                    job_uuid: str, 
+                    in_queue: multiprocessing.Queue, 
+                    loader: AbstractLoader, 
+                    queue_block_timeout_sec: int,
+                    load_balancer_closed: Value,
+                    logger: WithLogging) -> None:
+        finished = False
+        while True:
+            try:
+                (last_call, items) = in_queue.get(timeout=queue_block_timeout_sec)
+                loader.load(job_uuid, items, last_call=finished or last_call)
+            except queue.Empty:
+                if finished:
+                    break
+            finally:
+                finished=load_balancer_closed.value==1
+        if logger is not None:
+            logger.log_msg("Loader N° {} in the Loadbalancer <{}> stopped".format(idx, loader.__class__.__name__), level=INFO)
+
     def start_loadbalancer(self, job_uuid: str):
-        self.queues = [Queue(maxsize=max(100, q_size)) for (q_size, _) in self.loaders]
+        self.queues = [multiprocessing.Queue(maxsize=max(100, q_size)) for (q_size, _) in self.loaders]
         self.rotary_iter_queues = rotary_iter(self.queues)
         for (idx, queue_) in enumerate(self.queues):
-                self.loaders_threads.append(threading.Thread(target=LoadBalanceLoader.load_items, args=(job_uuid, 
-                                                                                        queue_, 
-                                                                                        self.loaders[idx][1], 
-                                                                                        self.queue_block_timeout_sec,
-                                                                                        self.load_balancer_closed, 
-                                                                                        self)))
+                params = {
+                    'target':LoadBalanceLoader.load_items, 
+                    'args': (idx,
+                            job_uuid, 
+                            queue_, 
+                            self.loaders[idx][1], 
+                            self.queue_block_timeout_sec,
+                            self.load_balancer_closed, 
+                            LoggerWrapper(self.logger))
+                }
+                self.loaders_threads.append(make_thread_process(self.use_threads_as_loaders_executors, params["target"], params["args"]))
+
         for t in self.loaders_threads:
             t.start()
         super().log_msg('{} threads started for loadbalancing'.format(len(self.loaders_threads)), level=INFO)
@@ -173,25 +203,6 @@ class LoadBalanceLoader(AbstractLoader):
             ack_counter.value -= self.ack_dec
         self.clear_buffer_and_ack()
         
-    @staticmethod
-    def load_items(job_uuid: str, 
-                    in_queue: Queue, 
-                    loader: AbstractLoader, 
-                    queue_block_timeout_sec: int,
-                    load_balancer_closed: Value,
-                    logger: WithLogging) -> None:
-        finished = False
-        while True:
-            try:
-                (last_call, items) = in_queue.get(timeout=queue_block_timeout_sec)
-                loader.load(job_uuid, items, last_call=finished or last_call)
-            except queue.Empty:
-                if finished:
-                    break
-            finally:
-                finished=load_balancer_closed.value==1
-
-        logger.log_msg("loader in the Loadbalancer <{}> stopped".format(str(loader.__class__.__name__)), level=INFO)
 
     def close(self) -> None:
         super().log_msg("Closing the Loadbalancer <{}> ...".format(str(self.__class__.__name__)), level=INFO)

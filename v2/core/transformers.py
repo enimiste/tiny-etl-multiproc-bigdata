@@ -2,7 +2,6 @@ from abc import abstractmethod
 import codecs
 from logging import Logger, ERROR, DEBUG, INFO
 import os
-import re
 from typing import Any, Callable, Generator, Tuple
 from core.commons import WithLogging
 from core.commons import dict_deep_get, dict_deep_set
@@ -42,8 +41,8 @@ class AbstractTransformer(WithLogging):
         if input_value is None:
             raise RuntimeError("Item doesn't contains the input_key_path={}".format('.'.join(self.input_key_path)))
 
-        if type(input_value) is not self._input_value_type:
-            raise RuntimeError("Input value expected type : {}, is different from the given one : {}".format(str(self._input_value_type), str(type(input_value))))
+        if not isinstance(input_value, self._input_value_type):
+            raise RuntimeError("Input value expected type : {}, is different from the given one : {}".format(elf._input_value_type, type(input_value)))
         
         context['__input_item__'] = item
         for res in self._map_item(input_value, context):
@@ -191,8 +190,8 @@ class ReduceItemTransformer(AbstractTransformer):
         if input_value is None:
             raise RuntimeError("Item doesn't contains the input_key_path={}".format('.'.join(self.input_key_path)))
 
-        if type(input_value) is not self._input_value_type:
-            raise RuntimeError("Input value expected type : {}, is different from the given one : {}".format(str(self._input_value_type), str(type(input_value))))
+        if not isinstance(input_value, self._input_value_type):
+            raise RuntimeError("Input value expected type : {}, is different from the given one : {}".format(self._input_value_type, type(input_value)))
         
         init_val = self.initial_value
         for res in flatMapApply({'_': input_value}, list(map(lambda mapper: mapper.transform, self.transformers)), context=context):
