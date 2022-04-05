@@ -4,9 +4,12 @@ from concurrent.futures import thread
 from logging import Logger, INFO, WARN, ERROR
 from multiprocessing import Process, Queue
 from multiprocessing.sharedctypes import Value
+from ntpath import join
 import queue
 import signal
 from threading import Thread, Timer
+import threading
+from typing import Any, Callable
 
 import uuid
 
@@ -15,6 +18,7 @@ from core.extractors import AbstractExtractor
 from core.loaders import AbstractLoader
 from transformers import AbstractTransformer
 from core.commons import flatMapApply
+from core.commons import block_join_threads_or_processes, kill_threads_processes
 
 class AbstractPipeline(Process, ABC):
     def __init__(self, logger: Logger) -> None:
@@ -148,13 +152,13 @@ class ThreadedPipeline(AbstractPipeline):
                 loader.loadWithAck(job_uuid, [item], ack_counter, last_call=finished)
             except queue.Empty:
                 if finished is True and ack_counter.value==0:
-                    logger.log_msg("Closing loader <{}>".format(str(loader.__class__.__name__)), level=INFO)
+                    logger.log_msg("Closing loader <{}> ({})".format(str(loader.__class__.__name__), loader.uuid), level=INFO)
                     loader.close()
                     break
                 if transformation_pipeline_alive.value==0: # no more transformers to push data to loaders
                     finished=pipeline_started.value==1
         loaders_alive.value -= 1
-        logger.log_msg("A loader <{}> finished his work".format(str(loader.__class__.__name__)), level=INFO)
+        logger.log_msg("A loader <{}> finished his work ({})".format(str(loader.__class__.__name__), loader.uuid), level=INFO)
     
     def _run(self) -> None:
         extract_threads = []
@@ -216,6 +220,8 @@ class ThreadedPipeline(AbstractPipeline):
                                                                                         self.queue_block_timeout_sec,
                                                                                         self.logger)))
             self.logger.log_msg("{} loading processes created".format(len(self.loaders)), level=INFO)
+            for l in self.loaders:
+                self.logger.log_msg("Loader uuid : {}".format(l.uuid), level=INFO)
 
             threads = load_threads +  trans_threads + extract_threads
             self.logger.log_msg("Starting {} threads of the pipeline {}.".format(len(threads), self.job_uuid), level=INFO)
@@ -229,25 +235,16 @@ class ThreadedPipeline(AbstractPipeline):
             loaders_joined=False
             while self.pipeline_closed.value==0:
                 if not extractor_joined and self.extractor_finished.value==1:
-                    for t in extract_threads:
-                        if self.pipeline_closed.value==0:
-                            t.join()
-                    extractor_joined=True
+                    extractor_joined = block_join_threads_or_processes(extract_threads, lambda: self.pipeline_closed.value==1)
                     self.logger.log_msg("Extract threads joined", level=INFO)
 
-                if not transformators_joined and  self.transformation_pipeline_alive.value==0:
-                    for t in trans_threads:
-                        if self.pipeline_closed.value==0:
-                            t.join()
-                    transformators_joined = True
+                if not transformators_joined and self.transformation_pipeline_alive.value==0:
+                    transformators_joined = block_join_threads_or_processes(trans_threads, lambda: self.pipeline_closed.value==1)
                     self.logger.log_msg("Transformation threads joined. Waiting for loaders to finish their words...", level=INFO)
 
                 if not loaders_joined and self.loaders_alive.value==0:
-                    for t in load_threads:
-                        if self.pipeline_closed.value==0:
-                            t.join()
-                    loaders_joined = True
-                    self.logger.log_msg("Load threads joined", level=INFO)
+                    loaders_joined = block_join_threads_or_processes(load_threads, lambda: self.pipeline_closed.value==1)
+                    self.logger.log_msg("Loaders threads joined", level=INFO)
 
                 if extractor_joined and transformators_joined and loaders_joined:
                     self.close()
@@ -258,14 +255,7 @@ class ThreadedPipeline(AbstractPipeline):
 
             threads = extract_threads + trans_threads + load_threads
             self.logger.log_msg("Threads killing ...", level=INFO)
-            for t in threads:
-                try:
-                    if type(t) is Thread:
-                        t._stop()
-                    else:
-                        t.kill()
-                except Exception:
-                    pass
+            kill_threads_processes(threads)
             self.logger.log_msg("Threads killed", level=INFO)
         
         finally:

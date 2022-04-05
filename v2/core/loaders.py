@@ -6,6 +6,7 @@ from multiprocessing.sharedctypes import Value
 from multiprocessing import Queue
 import queue
 import threading
+import uuid
 
 from core.commons import WithLogging
 from core.commons import dict_deep_get
@@ -18,6 +19,7 @@ class AbstractLoader(WithLogging):
         super().__init__(logger)
         self.input_key_path = input_key_path
         self.values_path = values_path
+        self.uuid = str(uuid.uuid1())
         
     def loadWithAck(self, job_uuid: str, items: list[dict], ack_counter: Value, last_call: bool) -> None:
         try:
@@ -83,6 +85,7 @@ class ConditionalLoader(AbstractLoader):
             return self.wrapped_loader.loadWithAck(job_uuid, items, ack_counter, last_call)
         elif self.else_log:
             super().log_msg("Item loaded : {}".format(str(items)))
+        ack_counter.value -= 1
 
     def load(self, job_uuid: str, items: list[dict], last_call: bool) -> None:
         if self.check_condition():
@@ -131,10 +134,10 @@ class LoadBalanceLoader(AbstractLoader):
         self.started=True
 
     def loadWithAck(self, job_uuid: str, items: list[dict], ack_counter: Value, last_call: bool) -> None:
-        self.load(job_uuid, items, last_call)
+        self.load(job_uuid, items, last_call, ack_counter)
         ack_counter.value -= 1
 
-    def load(self, job_uuid: str, items: list[dict], last_call: bool) -> None:
+    def load(self, job_uuid: str, items: list[dict], last_call: bool, ack_counter: Value=None) -> None:
         if not self.started:
             self.start_loadbalancer(job_uuid)
 
@@ -142,9 +145,9 @@ class LoadBalanceLoader(AbstractLoader):
             self.buffer = self.buffer + items
 
         if last_call or len(self.buffer) > self.buffer_size:
-            self.balance()
+            self.balance(ack_counter)
 
-    def balance(self):
+    def balance(self, ack_counter: Value):
         for queue_ in self.queues:
             try:
                 queue_.put([] + self.buffer, timeout=self.queue_no_block_timeout_sec)
@@ -179,13 +182,13 @@ class LoadBalanceLoader(AbstractLoader):
         try:
             if len(self.buffer) > self.buffer_size:
                 self.balance()
-        except Exception as ex:
+        except Exception:
             pass
         self.banlancer_closed.value=1
         for (_, loader) in self.loaders:
             try:
                 loader.close()
-            except Exception as ex:
+            except Exception :
                 pass
 
 

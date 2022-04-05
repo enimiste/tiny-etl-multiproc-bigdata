@@ -20,7 +20,7 @@ from core.transformers import AddStaticValuesTransformer
 from core.loaders import LoadBalanceLoader
 from core.loaders import NoopLoader
 
-LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
+LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
 console_handler.setFormatter(logging.Formatter(LOGGING_FORMAT))
 console_handler.setLevel(logging.INFO)
@@ -43,7 +43,7 @@ if __name__=="__main__":
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'parallel_loader_count': 2
+        'parallel_loader_count': 10
     }
 
     start_exec_time = time.perf_counter()
@@ -74,27 +74,27 @@ if __name__=="__main__":
                             transformers=[
                                     #NoopTransformer(LOGGER, log=True, log_level=INFO, log_prefix='X'),
                                     ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['_'], callback=os.path.abspath),
-                                    AddStaticValuesTransformer(LOGGER,
-                                                                static_values=[(['words_count'], 0)],
-                                                                copy_values_key_paths=[('file_path', ['_'])],
-                                                                remove_key_paths = [['_']]),
-                                    # ReduceItemTransformer(  LOGGER,
-                                    #                     input_key_path=['_'], 
-                                    #                     input_value_type=(str),
-                                    #                     output_key='words_count', 
-                                    #                     copy_values_key_paths=[('file_path', ['_'])],
-                                    #                     transformers=[
-                                    #                                     FileTextReaderTransformer(LOGGER, 
-                                    #                                                             pattern=".txt", 
-                                    #                                                             input_key_path=None, 
-                                    #                                                             output_key=None),
-                                    #                                     TextWordTokenizerTransformer(   LOGGER, 
-                                    #                                                                 pattern="\\s+", 
-                                    #                                                                 input_key_path=['_', 'content'], 
-                                    #                                                                 output_key=None)
-                                    #                                 ],
-                                    #                     initial_value=0,
-                                    #                     reducer=ReduceItemTransformer.count),
+                                    # AddStaticValuesTransformer(LOGGER,
+                                    #                             static_values=[(['words_count'], 0)],
+                                    #                             copy_values_key_paths=[('file_path', ['_'])],
+                                    #                             remove_key_paths = [['_']]),
+                                    ReduceItemTransformer(  LOGGER,
+                                                        input_key_path=['_'], 
+                                                        input_value_type=(str),
+                                                        output_key='words_count', 
+                                                        copy_values_key_paths=[('file_path', ['_'])],
+                                                        transformers=[
+                                                                        FileTextReaderTransformer(LOGGER, 
+                                                                                                pattern=".txt", 
+                                                                                                input_key_path=None, 
+                                                                                                output_key=None),
+                                                                        TextWordTokenizerTransformer(   LOGGER, 
+                                                                                                    pattern="\\s+", 
+                                                                                                    input_key_path=['_', 'content'], 
+                                                                                                    output_key=None)
+                                                                    ],
+                                                        initial_value=0,
+                                                        reducer=ReduceItemTransformer.count),
                                     FileToTextLinesTransformer(LOGGER, pattern=".txt", input_key_path=['file_path'], output_key='_',
                                                             copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]), 
                                     TextWordTokenizerTransformer(LOGGER, 
@@ -116,16 +116,20 @@ if __name__=="__main__":
                                     #                                                     out_dir=os.path.abspath(out_dir),
                                     #                                                     out_file_ext='txt',
                                     #                                                     buffer_size=config['buffer_size'])),
-                                    
-                                    ConditionalLoader( LOGGER, 
-                                                       config['save_to_db'],
-                                                    #  False,
-                                                       LoadBalanceLoader(LOGGER, 
+                                    # ConditionalLoader(  LOGGER, 
+                                    #                     config['save_to_db'],
+                                    #                     #  False,
+                                    #                     MySQL_DBLoader( LOGGER, **mysql_db_loader_config)
+                                    ),
+                                    ConditionalLoader(  LOGGER, 
+                                                        config['save_to_db'],
+                                                        # False,
+                                                        LoadBalanceLoader(LOGGER, 
                                                                         queue_no_block_timeout_sec = 0.09,
                                                                         loaders= [(
                                                                                     config['buffer_size']*10, 
                                                                                     MySQL_DBLoader( LOGGER, **mysql_db_loader_config)) 
-                                                                                    for i in range(0, max(1, config['parallel_loader_count']))]
+                                                                                    for _ in range(0, max(1, config['parallel_loader_count']))]
                                                                         # loaders= [(
                                                                         #             config['buffer_size']*10, 
                                                                         #             NoopLoader( LOGGER, 

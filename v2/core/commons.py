@@ -2,6 +2,7 @@ from abc import ABC
 from functools import reduce
 import logging
 from logging import ERROR, Logger
+import multiprocessing
 import threading
 import traceback
 from typing import Any, Callable, Generator
@@ -65,3 +66,56 @@ def flatMapApply(item:Any, mappers: list[Callable[[Any], Generator[Any, None, No
                     for a in  flatMapApply(x, mappers[1:], **kwargs):
                         if a is not None:
                             yield a
+
+def get_thread_process_id(th):
+    if type(th) is threading.Thread:
+        return th.ident
+    elif type(th) is multiprocessing.Process:
+        return th.pid
+    raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
+
+def get_thread_process_is_joined(th) -> bool:
+    if type(th) is threading.Thread:
+        return not t.is_alive()
+    elif type(th) is multiprocessing.Process:
+        return th.exitcode is not None
+    raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
+
+def kill_threads_processes(threads: list[Any], ignore_exception:bool=True):
+    for th in threads:
+        kill_thread_process(th, ignore_exception)
+        
+def kill_thread_process(th, ignore_exception:bool=True):
+    try:
+        if type(th) is threading.Thread:
+            th._stop()
+            return
+        elif type(th) is multiprocessing.Process:
+            th.kill()
+            return
+    except Exception as ex:
+        if not ignore_exception:
+            raise ex
+    raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
+
+def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[], bool], join_timeout: int = 0.01, ignore_exception:bool=True) -> bool:
+    nbr_threads = len(threads)
+    joined_ids = set()
+    while len(joined_ids) < nbr_threads:
+        for t in threads:
+            try:
+                t_id = get_thread_process_id(t)
+                if t_id not in joined_ids:
+                    if interrupt_on():
+                        joined_ids.add(t_id) # should be before terminate()
+                        kill_thread_process(t)
+                    else:
+                        t.join(timeout=join_timeout)
+                        is_joined = get_thread_process_is_joined(t)
+                        if is_joined:
+                            joined_ids.add(t_id)
+                            t.terminate()
+            except Exception as ex:
+                if not ignore_exception:
+                    raise ex
+    return True
