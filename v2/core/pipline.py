@@ -271,7 +271,8 @@ class ThreadedPipeline(AbstractPipeline):
             self.logger.log_msg("Threads killing ...", level=INFO)
             kill_threads_processes(threads)
             self.logger.log_msg("Threads killed", level=INFO)
-        
+        except Exception as ex:
+            self.logger.log_msg("Error", exception=ex, level=ERROR)
         finally:
             self.logger.log_msg("Loaders closing ...", level=INFO)
             for loader in self.loaders:

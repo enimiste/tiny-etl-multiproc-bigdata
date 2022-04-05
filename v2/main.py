@@ -174,7 +174,9 @@ if __name__=="__main__":
 """
 SELECT COUNT(*) FROM words; 
 2_140_380 rows in 110 sec/28 files (12.9Mo)
-676_360_080 rows in 9.65 hour/8848 files (4Go)
+28_160_000 rows in 39 min/491 files
+
+~ 676_360_080 rows in 9.65 hour/8848 files (4Go)
 
 SELECT DISTINCT(file_path) FROM words;
 
