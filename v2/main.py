@@ -53,7 +53,7 @@ if __name__=="__main__":
         'db_user': 'root', 
         'db_password': 'root',
         'parallel_loader_count': 20,
-        'max_transformation_pipelines': 56,
+        'max_transformation_pipelines': 200,
         'use_threads_as_transformation_pipelines': False,
         'use_threads_as_loaders_executors': False,
         'use_threads_as_extractors_executors': False,
@@ -169,4 +169,15 @@ if __name__=="__main__":
     finally:
         end_exec_time=time.perf_counter()
         LOGGER.info('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))))
+
+
+"""
+SELECT COUNT(*) FROM words; 
+2_140_380 rows in 110 sec/28 files (12.9Mo)
+676_360_080 rows in 9.65 hour/8848 files (4Go)
+
+SELECT DISTINCT(file_path) FROM words;
+
+SELECT * FROM words LIMIT 100;
+"""
     
