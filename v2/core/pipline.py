@@ -253,11 +253,19 @@ class ThreadedPipeline(AbstractPipeline):
                     self.logger.log_msg("Extract threads joined", level=INFO)
 
                 if not transformators_joined and self.transformation_pipeline_alive.value==0:
-                    transformators_joined = block_join_threads_or_processes(trans_threads, lambda: self.pipeline_closed.value==1)
+                    transformators_joined = block_join_threads_or_processes(trans_threads, lambda: self.pipeline_closed.value==1,
+                                                                            logger=self.logger, 
+                                                                            log_level=INFO, 
+                                                                            log_when_joined=True, 
+                                                                            log_msg="Transformation joined")
                     self.logger.log_msg("Transformation threads joined. Waiting for loaders to finish their words...", level=INFO)
 
                 if not loaders_joined and self.loaders_alive.value==0:
-                    loaders_joined = block_join_threads_or_processes(load_threads, lambda: self.pipeline_closed.value==1)
+                    loaders_joined = block_join_threads_or_processes(load_threads, lambda: self.pipeline_closed.value==1,
+                                                                            logger=self.logger, 
+                                                                            log_level=INFO, 
+                                                                            log_when_joined=True, 
+                                                                            log_msg="Loader joined")
                     self.logger.log_msg("Loaders threads joined", level=INFO)
 
                 if extractor_joined and transformators_joined and loaders_joined:

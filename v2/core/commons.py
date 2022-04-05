@@ -1,7 +1,7 @@
 from abc import ABC
 from functools import reduce
 import logging
-from logging import ERROR, Logger
+from logging import ERROR, Logger, DEBUG
 import multiprocessing
 import os
 import threading
@@ -112,7 +112,14 @@ def terminate_thread_process(th, ignore_exception:bool=True):
             raise ex
     raise RuntimeError('Invalid thread/process object {}'.format(type(th)))
 
-def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[], bool] = None, join_timeout: int = 0.01, ignore_exception:bool=True) -> bool:
+def block_join_threads_or_processes(threads: list[Any], 
+                                    interrupt_on: Callable[[], bool] = None, 
+                                    join_timeout: int = 0.01, 
+                                    ignore_exception:bool=True,
+                                    logger: Logger = None,
+                                    log_when_joined: bool=False,
+                                    log_msg: str=None,
+                                    log_level=DEBUG) -> bool:
     nbr_threads = len(threads)
     joined_ids = set()
     while len(joined_ids) < nbr_threads:
@@ -122,12 +129,16 @@ def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[
                 if t_id not in joined_ids:
                     if interrupt_on is not None and interrupt_on():
                         joined_ids.add(t_id) # should be before terminate()
+                        if log_when_joined and logger is not None:
+                            logger.log(log_level, log_msg)
                         kill_thread_process(t)
                     else:
                         t.join(timeout=join_timeout)
                         is_joined = get_thread_process_is_joined(t)
                         if is_joined:
                             joined_ids.add(t_id)
+                            if log_when_joined and logger is not None:
+                                logger.log(log_level, log_msg)
                             terminate_thread_process(t)
             except Exception as ex:
                 if not ignore_exception:

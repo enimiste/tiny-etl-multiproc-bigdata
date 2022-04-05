@@ -171,7 +171,7 @@ if __name__=="__main__":
         for pipeline in pipelines:
             pipeline.start()
         LOGGER.log(INFO, 'Pipelines started'.format(len(pipelines)))
-        block_join_threads_or_processes(pipelines)
+        block_join_threads_or_processes(pipelines, logger=LOGGER, log_level=INFO, log_when_joined=True, log_msg="Pipeline joined")
         LOGGER.log(INFO, 'Pipelines joined'.format(len(pipelines)))
     except Exception as ex:
         LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(ex))))
@@ -182,7 +182,7 @@ if __name__=="__main__":
 
 """
 SELECT COUNT(*) FROM words; 
-2_140_380 rows in 110 sec/28 files (12.9Mo)
+2_140_380 rows in 2 min/28 files (12.9Mo)
 28_160_000 rows in 39 min/491 files
 
 ~ 676_360_080 rows in 9.65 hour/8848 files (4Go)
