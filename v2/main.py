@@ -37,6 +37,9 @@ LOGGER = logging.getLogger("my-logger")
 def basename_backwards_x3(path: str) -> str:
     return basename_backwards(path, 3)
 
+def basename_backwards_x2(path: str) -> str:
+    return basename_backwards(path, 2)
+
 if __name__=="__main__":
     config = {
         'in_dir': '../bdall_test_data/one_book',
