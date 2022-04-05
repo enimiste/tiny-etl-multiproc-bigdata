@@ -41,6 +41,9 @@ class AbstractLoader(WithLogging):
     def has_buffered_data(self) -> bool:
         return False
 
+    def kill_threads_processes(self):
+        pass
+
 class NoopLoader(AbstractLoader):
     def __init__(self, logger, 
                 input_key_path: list[str],
@@ -107,6 +110,10 @@ class ConditionalLoader(AbstractLoader):
             return self.wrapped_loader.has_buffered_data()
         else:
             return super().has_buffered_data()
+
+    def kill_threads_processes(self):
+        if self.check_condition():
+            return self.wrapped_loader.kill_threads_processes()
 
 class LoadBalanceLoader(AbstractLoader):
     def __init__(self, 
@@ -242,6 +249,11 @@ class LoadBalanceLoader(AbstractLoader):
 
     def has_buffered_data(self) -> bool:
         return len(self.buffer)>0
+
+    def kill_threads_processes(self):
+        if len(self.loaders_threads) > 0:
+            block_join_threads_or_processes(self.loaders_threads, ignore_exception=False)
+            self.loaders_threads.clear()
 
 
 class MySQL_DBLoader(AbstractLoader):

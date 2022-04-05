@@ -273,6 +273,12 @@ class ThreadedPipeline(AbstractPipeline):
             self.logger.log_msg("Threads killed", level=INFO)
         
         finally:
+            self.logger.log_msg("Loaders closing ...", level=INFO)
+            for loader in self.loaders:
+                try:
+                    loader.kill_threads_processes()
+                except Exception:
+                    pass
             queues = in_queues + out_queues
             self.logger.log_msg("Queues closing ...", level=INFO)
             timer = Timer(interval=1, function=lambda : thread.interrupt_main())#in seconds

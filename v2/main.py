@@ -1,3 +1,4 @@
+import json
 import traceback
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 import logging
@@ -42,8 +43,8 @@ def basename_backwards_x2(path: str) -> str:
 
 if __name__=="__main__":
     config = {
-        #'in_dir': '../bdall_test_data/one_book',
-        'in_dir': '../bdall_test_data/__generated/books_0',
+        'in_dir': '../bdall_test_data',
+        # 'in_dir': '../bdall_test_data/__generated/books_0',
         'out_dir': 'out_dir',
         'save_to_db': True, 
         'buffer_size': 10_000, 
@@ -51,11 +52,11 @@ if __name__=="__main__":
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'parallel_loader_count': 10,
-        'max_transformation_pipelines': 28,
-        'use_threads_as_transformation_pipelines': True,
-        'use_threads_as_loaders_executors': True,
-        'use_threads_as_extractors_executors': True,
+        'parallel_loader_count': 20,
+        'max_transformation_pipelines': 56,
+        'use_threads_as_transformation_pipelines': False,
+        'use_threads_as_loaders_executors': False,
+        'use_threads_as_extractors_executors': False,
         'use_threads_as_load_balancer_loaders_executors': True,
         'load_balancer_buffer_size': 1000
     }
@@ -79,6 +80,8 @@ if __name__=="__main__":
             'password': config['db_password']}
             
     LOGGER.log(INFO, "Script started : {}".format(config['in_dir']))
+    LOGGER.log(INFO, 'Config : '.format(json.dumps(config, indent=4)))
+    LOGGER.log(INFO, 'MySQL Loader Config : '.format(json.dumps(mysql_db_loader_config, indent=4)))
     try:
         pipeline = ThreadedPipeline(LOGGER, 
                             use_threads_as_extractors_executors=config['use_threads_as_extractors_executors'],
