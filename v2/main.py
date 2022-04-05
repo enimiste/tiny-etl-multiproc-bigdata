@@ -34,16 +34,16 @@ LOGGER = logging.getLogger("my-logger")
                           
 if __name__=="__main__":
     config = {
-        'in_dir': '../bdall_test_data/one_book',
-        # 'in_dir': '../bdall_test_data',
+        # 'in_dir': '../bdall_test_data/one_book',
+        'in_dir': '../bdall_test_data',
         'out_dir': 'out_dir',
         'save_to_db': True, 
-        'buffer_size': 2_00, 
+        'buffer_size': 2_000, 
         'db_host': 'localhost', 
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'parallel_loader_count': 3
+        'parallel_loader_count': 10
     }
 
     start_exec_time = time.perf_counter()
