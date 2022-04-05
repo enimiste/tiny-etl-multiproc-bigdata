@@ -223,7 +223,7 @@ class ThreadedPipeline(AbstractPipeline):
                                                                                         self.loaders_alive,
                                                                                         self.queue_block_timeout_sec,
                                                                                         self.logger)))
-            self.logger.log_msg("{} loading processes created".format(len(self.loaders)), level=INFO)
+            self.logger.log_msg("{} loaders processes created".format(len(self.loaders)), level=INFO)
             for l in self.loaders:
                 self.logger.log_msg("Loader uuid : {}".format(l.uuid), level=INFO)
 
