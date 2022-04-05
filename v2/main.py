@@ -19,32 +19,37 @@ from core.transformers import FileTextReaderTransformer
 from core.transformers import AddStaticValuesTransformer
 from core.loaders import LoadBalanceLoader
 from core.loaders import NoopLoader
+from core.commons import basename_backwards
 
 LOGGING_FORMAT = '%(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
 console_handler.setFormatter(logging.Formatter(LOGGING_FORMAT))
 console_handler.setLevel(logging.INFO)
 logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
-                                                                    filename=os.path.abspath(f'logs/log-{date.today()}.log'),
+                                                                    filename=os.path.abspath(f'logs/log-{date.today()}-.log'),
                                                                     maxBytes=50*1024*1024, backupCount=100), console_handler], 
                                                 level=logging.DEBUG,
                                                 encoding='utf-8',
                                                 format=LOGGING_FORMAT)
 LOGGER = logging.getLogger("my-logger")
                           
+
+def basename_backwards_x3(path: str) -> str:
+    return basename_backwards(path, 3)
+
 if __name__=="__main__":
     config = {
-        # 'in_dir': '../bdall_test_data/one_book',
-        'in_dir': '../bdall_test_data',
+        'in_dir': '../bdall_test_data/one_book',
+        # 'in_dir': '../bdall_test_data',
         'out_dir': 'out_dir',
-        'save_to_db': True, 
+        'save_to_db': False, 
         'buffer_size': 10_000, 
         'db_host': 'localhost', 
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'parallel_loader_count': 20,
-        'max_transformation_pipelines': 100,
+        'parallel_loader_count': 2,
+        'max_transformation_pipelines': 2,
         'use_threads_as_transformation_pipelines':False
     }
 
@@ -104,20 +109,20 @@ if __name__=="__main__":
                                                                    input_key_path=['_', 'line'], 
                                                                    output_key='_', 
                                                                    copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]),
-                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename),
+                                    ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=basename_backwards_x3),
+                                    # ItemUpdaterCallbackTransformer(LOGGER, input_key_path=['file_path'], callback=os.path.basename),
                                     ],
                             loaders=[
-                                    # ConditionalLoader(  LOGGER, 
-                                    #                     condition = not config['save_to_db'],
-                                    #                     # condition = False,
-                                    #                     wrapped_loader= CSV_FileLoader( LOGGER,
-                                    #                                                     input_key_path=None,
-                                    #                                                     values_path=[('word', ['_', 'word'], True), 
-                                    #                                                                     ('file', ['file_path'], True),
-                                    #                                                                     ('words_count', ['words_count'], True)],
-                                    #                                                     out_dir=os.path.abspath(out_dir),
-                                    #                                                     out_file_ext='txt',
-                                    #                                                     buffer_size=config['buffer_size'])),
+                                    ConditionalLoader(  LOGGER, 
+                                                        not config['save_to_db'],
+                                                        CSV_FileLoader( LOGGER,
+                                                                        input_key_path=None,
+                                                                        values_path=[('word', ['_', 'word'], True), 
+                                                                                        ('file', ['file_path'], True),
+                                                                                        ('words_count', ['words_count'], True)],
+                                                                        out_dir=os.path.abspath(config['out_dir']),
+                                                                        out_file_ext='txt',
+                                                                        buffer_size=config['buffer_size'])),
                                     # ConditionalLoader(  LOGGER, 
                                     #                     config['save_to_db'],
                                     #                     #  False,

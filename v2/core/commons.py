@@ -3,6 +3,7 @@ from functools import reduce
 import logging
 from logging import ERROR, Logger
 import multiprocessing
+import os
 import threading
 import traceback
 from typing import Any, Callable, Generator
@@ -132,3 +133,21 @@ def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[
                 if not ignore_exception:
                     raise ex
     return True
+
+
+def basename_backwards(path: str, backwards_level: int=2) -> str:
+    backwards_level = max(2, backwards_level)
+    paths = []
+    while backwards_level>0:
+        if len(path)==0 or path == '.' or path=='..':
+            break
+        paths.append(os.path.basename(path))
+        path = os.path.dirname(path)
+        backwards_level-=1
+
+    if len(paths)==0:
+        return path
+    else:
+        paths.reverse()
+        return os.path.join(paths[0], *paths[1:])
+    
