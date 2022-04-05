@@ -2,7 +2,7 @@ from math import ceil
 import os
 import shutil
 
-def get_size_in_mo(start_path = '.'):
+def _get_size_in_mo(start_path = '.'):
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(start_path):
         for f in filenames:
@@ -25,7 +25,7 @@ if __name__=="__main__":
         os.mkdir(destination_dir)
         print(destination_dir + ' created')
 
-    source_dir_size = get_size_in_mo(source_dir)
+    source_dir_size = _get_size_in_mo(source_dir)
     print('{} has the size of {} Mo'.format(source_dir, str(source_dir_size)))
     nbr_dirs = ceil(data_size_mo/source_dir_size)
     print('Begin. {} folder will be generated'.format(nbr_dirs))

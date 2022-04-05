@@ -121,6 +121,8 @@ def block_join_threads_or_processes(threads: list[Any],
                                     log_msg: str=None,
                                     log_level=DEBUG) -> bool:
     nbr_threads = len(threads)
+    if nbr_threads==0:
+        return
     joined_ids = set()
     while len(joined_ids) < nbr_threads:
         for t in threads:
@@ -167,3 +169,14 @@ def make_thread_process(use_thread: bool, target, args) -> threading.Thread | mu
         return threading.Thread(target=target, args=args)
     else:
         return multiprocessing.Process(target=target, args=args)
+
+def get_dir_size_in_mo(start_path = '.'):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            # skip if it is symbolic link
+            if not os.path.islink(fp):
+                total_size += os.path.getsize(fp)
+
+    return total_size/1024/1024

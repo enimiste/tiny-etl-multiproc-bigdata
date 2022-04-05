@@ -1,4 +1,5 @@
 import json
+import math
 import traceback
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 import logging
@@ -7,6 +8,8 @@ import time
 from datetime import date
 import os
 import sys
+
+import psutil
 from core.extractors import FilesListExtractor
 from core.loaders import CSV_FileLoader
 from core.pipline import ThreadedPipeline
@@ -22,6 +25,7 @@ from core.loaders import LoadBalanceLoader
 from core.loaders import NoopLoader
 from core.commons import basename_backwards
 from core.commons import block_join_threads_or_processes
+from core.commons import get_dir_size_in_mo
 
 LOGGING_FORMAT = '%(name)s \t %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -45,7 +49,7 @@ def basename_backwards_x2(path: str) -> str:
 if __name__=="__main__":
     config = {
         'in_dir': '../bdall_test_data/__generated',
-        # 'in_dir': '../bdall_test_data/__generated/books_0',
+        #'in_dir': '../bdall_test_data/__generated/books_0_101',
         'out_dir': 'out_dir',
         'save_to_db': True, 
         'buffer_size': 10_000, 
@@ -53,11 +57,11 @@ if __name__=="__main__":
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'max_transformation_pipelines': 6,
+        'max_transformation_pipelines': 9,
         'use_threads_as_transformation_pipelines': False,
         'use_threads_as_loaders_executors': False,
         'use_threads_as_extractors_executors': False,
-        'load_balancer_parallel_loader_count': 2,
+        'load_balancer_parallel_loader_count': 4,
         'use_threads_as_load_balancer_loaders_executors': True,
         'load_balancer_buffer_size': 1000
     }
@@ -79,13 +83,52 @@ if __name__=="__main__":
             'database': config['db_name'],
             'user': config['db_user'],
             'password': config['db_password']}
-            
-    LOGGER.log(INFO, "Script started")
+    
     LOGGER.log(INFO, 'Config : {}'.format(json.dumps(config, indent=4)))
     LOGGER.log(INFO, 'MySQL Loader Config : {}'.format(json.dumps(mysql_db_loader_config, indent=4)))
+
+    # Check RAM availability
+    in_dir_size_go = round(get_dir_size_in_mo(config['in_dir'])/1024, 2)
+    LOGGER.log(INFO, 'IN DIR has the size of : {}Go'.format(in_dir_size_go))
+    dirs = os.listdir(config['in_dir'])
+    nbr_dirs = len(dirs)
+    nbr_processes_per_pip=(1 + config['max_transformation_pipelines'] + config['load_balancer_parallel_loader_count'] +1)
+    nbr_processes = nbr_dirs * nbr_processes_per_pip
+    ram_per_process_mo = 50
+    ram_mo = math.floor(psutil.virtual_memory()[1]/(1024*1024))
+    ram_reserv_mo = 512
+    ram_secur_mo = max(0, ram_mo - ram_reserv_mo)
+    estim_processes_mo = nbr_processes*ram_per_process_mo #80Mo by process
+    nbr_dirs_secur = math.floor((ram_secur_mo/ram_per_process_mo)/nbr_processes_per_pip)
+    LOGGER.log(INFO, """
+                        Nbr processes \t~= {}, 
+                        RAM free \t= {}Mo, 
+                        RAM available \t= {}Mo (RAM free - {}Mo), 
+                        Estim. RAM for all processes \t= {}Mo ({}Mo each one), 
+                        Recommanded in_dir root folder count \t= {} folders,
+                        Nbr folder in in_dir \t= {} folders""".format(nbr_processes, 
+                                                                                    ram_mo, 
+                                                                                    ram_reserv_mo, 
+                                                                                    ram_secur_mo, 
+                                                                                    estim_processes_mo, 
+                                                                                    ram_per_process_mo,
+                                                                                    nbr_dirs_secur,
+                                                                                    nbr_dirs))
+    if ram_secur_mo<estim_processes_mo:
+        LOGGER.log(INFO, 'RAM not enough for running the {} processes ({}Mo each). You should structure the {} folder to have at most {} root folders, {} found'.format(
+            nbr_processes, ram_per_process_mo, config['in_dir'], nbr_dirs_secur, nbr_dirs
+        ))
+        exit()
+    if '-s' not in sys.argv:
+        LOGGER.log(INFO, 'To run the script add the -s option to the command')
+        exit()
+        
+    # Start program
+    LOGGER.log(INFO, "Script started")
     pipelines = []
     try:
-        for (idx, dir) in enumerate(os.listdir(config['in_dir'])):
+        
+        for (idx, dir) in enumerate(dirs):
             in_dir = os.path.join(config['in_dir'], dir)
             _LOGGER=logging.getLogger("Pipeline " + str(idx+1))
             pipelines.append(ThreadedPipeline(_LOGGER, 
