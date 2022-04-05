@@ -11,6 +11,7 @@ import uuid
 from core.commons import WithLogging
 from core.commons import dict_deep_get
 from core.commons import rotary_iter
+from core.commons import block_join_threads_or_processes
  
 class AbstractLoader(WithLogging):
     def __init__(self, logger: Logger, 
@@ -35,6 +36,9 @@ class AbstractLoader(WithLogging):
     @abstractmethod
     def close(self) -> None:
         pass
+
+    def has_buffered_data(self) -> bool:
+        return False
 
 class NoopLoader(AbstractLoader):
     def __init__(self, logger, 
@@ -95,7 +99,13 @@ class ConditionalLoader(AbstractLoader):
 
     def close(self) -> None:
         if self.check_condition():
-            self.wrapped_loader.close()
+            return self.wrapped_loader.close()
+
+    def has_buffered_data(self) -> bool:
+        if self.check_condition():
+            return self.wrapped_loader.has_buffered_data()
+        else:
+            return super().has_buffered_data()
 
 class LoadBalanceLoader(AbstractLoader):
     def __init__(self, 
@@ -109,24 +119,26 @@ class LoadBalanceLoader(AbstractLoader):
         self.started = False
         self.buffer_size=buffer_size
         self.buffer = []
+        self.ack_dec = 0
         self.queues = []
+        self.rotary_iter_queues = []
         self.queue_no_block_timeout_sec=max(0.01, queue_no_block_timeout_sec)
         self.queue_block_timeout_sec = max(0.1, queue_block_timeout_sec)
-        self.banlancer_closed = Value('i', 0)
+        self.load_balancer_closed = Value('i', 0)
         self.loaders_threads = []
 
         if len(loaders)<=1:
             raise RuntimeError('At least two loaders should be passed to the load balancer')
 
     def start_loadbalancer(self, job_uuid: str):
-        _queues = [Queue(maxsize=max(100, q_size)) for (q_size, loader) in self.loaders]
-        self.queues = rotary_iter(_queues)
-        for (idx, queue_) in enumerate(_queues):
+        self.queues = [Queue(maxsize=max(100, q_size)) for (q_size, _) in self.loaders]
+        self.rotary_iter_queues = rotary_iter(self.queues)
+        for (idx, queue_) in enumerate(self.queues):
                 self.loaders_threads.append(threading.Thread(target=LoadBalanceLoader.load_items, args=(job_uuid, 
                                                                                         queue_, 
                                                                                         self.loaders[idx][1], 
                                                                                         self.queue_block_timeout_sec,
-                                                                                        self.banlancer_closed, 
+                                                                                        self.load_balancer_closed, 
                                                                                         self)))
         for t in self.loaders_threads:
             t.start()
@@ -135,61 +147,90 @@ class LoadBalanceLoader(AbstractLoader):
 
     def loadWithAck(self, job_uuid: str, items: list[dict], ack_counter: Value, last_call: bool) -> None:
         self.load(job_uuid, items, last_call, ack_counter)
-        ack_counter.value -= 1
 
     def load(self, job_uuid: str, items: list[dict], last_call: bool, ack_counter: Value=None) -> None:
         if not self.started:
             self.start_loadbalancer(job_uuid)
+            self.started=True
 
         if len(items) >0: 
             self.buffer = self.buffer + items
+            self.ack_dec += len(items)
 
-        if last_call or len(self.buffer) > self.buffer_size:
+        if last_call or len(self.buffer) >= self.buffer_size:
             self.balance(ack_counter)
+            self.load_balancer_closed.value = 1 if last_call else 0
 
-    def balance(self, ack_counter: Value):
-        for queue_ in self.queues:
+
+    def balance(self, ack_counter: Value=None, last_call: bool = False):
+        for queue_ in self.rotary_iter_queues:
             try:
-                queue_.put([] + self.buffer, timeout=self.queue_no_block_timeout_sec)
-                self.buffer.clear()
+                queue_.put((last_call, [] + self.buffer), timeout=self.queue_no_block_timeout_sec)
                 break
             except queue.Full:
                 pass
-
+        if ack_counter is not None:
+            ack_counter.value -= self.ack_dec
+        self.clear_buffer_and_ack()
+        
     @staticmethod
     def load_items(job_uuid: str, 
                     in_queue: Queue, 
                     loader: AbstractLoader, 
                     queue_block_timeout_sec: int,
-                    banlancer_closed: Value,
+                    load_balancer_closed: Value,
                     logger: WithLogging) -> None:
         finished = False
         while True:
             try:
-                items = in_queue.get(timeout=queue_block_timeout_sec)
-                loader.load(job_uuid, items, last_call=finished)
+                (last_call, items) = in_queue.get(timeout=queue_block_timeout_sec)
+                loader.load(job_uuid, items, last_call=finished or last_call)
             except queue.Empty:
-                pass
-            finally:
                 if finished:
                     break
-                finished=banlancer_closed.value==1
+            finally:
+                finished=load_balancer_closed.value==1
 
         logger.log_msg("loader in the Loadbalancer <{}> stopped".format(str(loader.__class__.__name__)), level=INFO)
 
     def close(self) -> None:
-        super().log_msg("Closing the Loadbalancer <{}> ...".format(str(loader.__class__.__name__)), level=INFO)
+        super().log_msg("Closing the Loadbalancer <{}> ...".format(str(self.__class__.__name__)), level=INFO)
         try:
-            if len(self.buffer) > self.buffer_size:
-                self.balance()
-        except Exception:
-            pass
-        self.banlancer_closed.value=1
+            if self.has_buffered_data():
+                super().log_msg('Flushing buffered data in the LoadBalancer <{}>'.format(str(self.__class__.__name__)), level=INFO)
+                self.balance(last_call=True)
+                self.clear_buffer_and_ack()
+                super().log_msg('Flushed buffered data in the LoadBalancer <{}>'.format(str(self.__class__.__name__)), level=INFO)
+        except Exception as ex:
+            raise ex
+
+        super().log_msg('Joining loaders threads in the LoadBalancer <{}>'.format(str(self.__class__.__name__)), level=INFO)
+        self.load_balancer_closed.value=1
+        block_join_threads_or_processes(self.loaders_threads, ignore_exception=False)
+
+        super().log_msg('Closing loaders in the LoadBalancer <{}>'.format(str(self.__class__.__name__)), level=INFO)
         for (_, loader) in self.loaders:
             try:
                 loader.close()
             except Exception :
                 pass
+
+        super().log_msg('Closing queues in the LoadBalancer <{}>'.format(str(self.__class__.__name__)), level=INFO)
+        for q in self.queues:
+            try:
+                q.close()
+                q.cancel_join_thread()
+            except Exception :
+                pass
+        self.started=False
+        self.loaders_threads.clear()
+
+    def clear_buffer_and_ack(self):
+        self.buffer.clear()
+        self.ack_dec = 0
+
+    def has_buffered_data(self) -> bool:
+        return len(self.buffer)>0
 
 
 class MySQL_DBLoader(AbstractLoader):
@@ -299,6 +340,9 @@ class MySQL_DBLoader(AbstractLoader):
                 super().log_msg("MySQL connection is closed successfully",  level=INFO)
             except Exception as ex:
                 super().log_msg("Error closing MySQL connection", exception=ex , level=ERROR)
+
+    def has_buffered_data(self) -> bool:
+        return len(self.buffer)>0
             
 class CSV_FileLoader(AbstractLoader):
     def __init__(self, 
@@ -382,4 +426,7 @@ class CSV_FileLoader(AbstractLoader):
                 super().log_msg("File closed successfully")
             except Exception as ex:
                 super().log_msg("Error closing File handler", exception=ex , level=ERROR)
+
+    def has_buffered_data(self) -> bool:
+        return len(self.buffer)>0
 

@@ -38,12 +38,12 @@ if __name__=="__main__":
         # 'in_dir': '../bdall_test_data',
         'out_dir': 'out_dir',
         'save_to_db': True, 
-        'buffer_size': 2_000, 
+        'buffer_size': 2_00, 
         'db_host': 'localhost', 
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'parallel_loader_count': 10
+        'parallel_loader_count': 3
     }
 
     start_exec_time = time.perf_counter()
@@ -120,7 +120,7 @@ if __name__=="__main__":
                                     #                     config['save_to_db'],
                                     #                     #  False,
                                     #                     MySQL_DBLoader( LOGGER, **mysql_db_loader_config)
-                                    ),
+                                    # ),
                                     ConditionalLoader(  LOGGER, 
                                                         config['save_to_db'],
                                                         # False,

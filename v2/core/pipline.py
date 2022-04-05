@@ -146,17 +146,21 @@ class ThreadedPipeline(AbstractPipeline):
         finished = False
         ack_counter = Value('i', 0)
         while pipeline_closed.value==0:
+            item = None
             try:
                 item = out_queue.get(timeout=queue_block_timeout_sec)
                 ack_counter.value += 1
-                loader.loadWithAck(job_uuid, [item], ack_counter, last_call=finished)
+                x = ack_counter.value
+                loader.loadWithAck(job_uuid, [item], ack_counter, last_call=out_queue.qsize()==0 and finished)
             except queue.Empty:
-                if finished is True and ack_counter.value==0:
-                    logger.log_msg("Closing loader <{}> ({})".format(str(loader.__class__.__name__), loader.uuid), level=INFO)
+                if finished and (ack_counter.value==0 or loader.has_buffered_data()):
+                    logger.log_msg("Closing loader <{}> ({}) : buffered_data: {}".format(str(loader.__class__.__name__), loader.uuid, str(loader.has_buffered_data())), level=INFO)
                     loader.close()
                     break
+            finally:
                 if transformation_pipeline_alive.value==0: # no more transformers to push data to loaders
                     finished=pipeline_started.value==1
+
         loaders_alive.value -= 1
         logger.log_msg("A loader <{}> finished his work ({})".format(str(loader.__class__.__name__), loader.uuid), level=INFO)
     
@@ -266,6 +270,7 @@ class ThreadedPipeline(AbstractPipeline):
             try:
                 for q in queues:
                     q.close()
+                    q.cancel_join_thread()
             except Exception:
                 pass
             finally:

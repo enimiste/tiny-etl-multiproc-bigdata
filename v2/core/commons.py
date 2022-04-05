@@ -76,7 +76,7 @@ def get_thread_process_id(th):
 
 def get_thread_process_is_joined(th) -> bool:
     if type(th) is threading.Thread:
-        return not t.is_alive()
+        return not th.is_alive()
     elif type(th) is multiprocessing.Process:
         return th.exitcode is not None
     raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
@@ -84,7 +84,7 @@ def get_thread_process_is_joined(th) -> bool:
 def kill_threads_processes(threads: list[Any], ignore_exception:bool=True):
     for th in threads:
         kill_thread_process(th, ignore_exception)
-        
+
 def kill_thread_process(th, ignore_exception:bool=True):
     try:
         if type(th) is threading.Thread:
@@ -98,7 +98,20 @@ def kill_thread_process(th, ignore_exception:bool=True):
             raise ex
     raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
 
-def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[], bool], join_timeout: int = 0.01, ignore_exception:bool=True) -> bool:
+def terminate_thread_process(th, ignore_exception:bool=True):
+    try:
+        if type(th) is threading.Thread:
+            th._stop()
+            return
+        elif type(th) is multiprocessing.Process:
+            th.terminate()
+            return
+    except Exception as ex:
+        if not ignore_exception:
+            raise ex
+    raise RuntimeError('Invalid thread/process object <>'.format(str(type(th))))
+
+def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[], bool] = None, join_timeout: int = 0.01, ignore_exception:bool=True) -> bool:
     nbr_threads = len(threads)
     joined_ids = set()
     while len(joined_ids) < nbr_threads:
@@ -106,7 +119,7 @@ def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[
             try:
                 t_id = get_thread_process_id(t)
                 if t_id not in joined_ids:
-                    if interrupt_on():
+                    if interrupt_on is not None and interrupt_on():
                         joined_ids.add(t_id) # should be before terminate()
                         kill_thread_process(t)
                     else:
@@ -114,7 +127,7 @@ def block_join_threads_or_processes(threads: list[Any], interrupt_on: Callable[[
                         is_joined = get_thread_process_is_joined(t)
                         if is_joined:
                             joined_ids.add(t_id)
-                            t.terminate()
+                            terminate_thread_process(t)
             except Exception as ex:
                 if not ignore_exception:
                     raise ex
