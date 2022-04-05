@@ -52,11 +52,11 @@ if __name__=="__main__":
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'parallel_loader_count': 20,
         'max_transformation_pipelines': 200,
         'use_threads_as_transformation_pipelines': False,
         'use_threads_as_loaders_executors': False,
         'use_threads_as_extractors_executors': False,
+        'load_balancer_parallel_loader_count': 20,
         'use_threads_as_load_balancer_loaders_executors': True,
         'load_balancer_buffer_size': 1000
     }
@@ -150,7 +150,7 @@ if __name__=="__main__":
                                                                         loaders= [(
                                                                                     config['buffer_size']*10, 
                                                                                     MySQL_DBLoader( LOGGER, **mysql_db_loader_config)) 
-                                                                                    for _ in range(0, max(1, config['parallel_loader_count']))]
+                                                                                    for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
                                                                         # loaders= [(
                                                                         #             config['buffer_size']*10, 
                                                                         #             NoopLoader( LOGGER, 
