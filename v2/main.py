@@ -94,7 +94,7 @@ if __name__=="__main__":
     nbr_dirs = len(dirs)
     nbr_processes_per_pip=(1 + config['max_transformation_pipelines'] + config['load_balancer_parallel_loader_count'] +1)
     nbr_processes = nbr_dirs * nbr_processes_per_pip
-    ram_per_process_mo = 50
+    ram_per_process_mo = 30
     ram_mo = math.floor(psutil.virtual_memory()[1]/(1024*1024))
     ram_reserv_mo = 512
     ram_secur_mo = max(0, ram_mo - ram_reserv_mo)
