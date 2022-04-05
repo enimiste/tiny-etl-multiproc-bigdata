@@ -79,7 +79,7 @@ if __name__=="__main__":
             'user': config['db_user'],
             'password': config['db_password']}
             
-    LOGGER.log(INFO, "Script started : {}".format(config['in_dir']))
+    LOGGER.log(INFO, "Script started")
     LOGGER.log(INFO, 'Config : '.format(json.dumps(config, indent=4)))
     LOGGER.log(INFO, 'MySQL Loader Config : '.format(json.dumps(mysql_db_loader_config, indent=4)))
     try:
