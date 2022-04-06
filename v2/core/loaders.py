@@ -5,6 +5,7 @@ import multiprocessing
 from multiprocessing.sharedctypes import Value
 import queue
 import threading
+from typing import AnyStr, List, Tuple
 import uuid
 
 from core.commons import WithLogging
@@ -16,14 +17,14 @@ from core.commons import make_thread_process
  
 class AbstractLoader(WithLogging):
     def __init__(self, logger: Logger, 
-                input_key_path: list[str],
-                values_path: list[tuple[str, list[str]], bool]) -> None:
+                input_key_path: List[AnyStr],
+                values_path: List[Tuple[str, List[AnyStr], bool]]) -> None:
         super().__init__(logger)
         self.input_key_path = input_key_path
         self.values_path = values_path
         self.uuid = str(uuid.uuid1())
         
-    def loadWithAck(self, job_uuid: str, items: list[dict], ack_counter: Value, last_call: bool) -> None:
+    def loadWithAck(self, job_uuid: str, items: List[dict], ack_counter: Value, last_call: bool) -> None:
         try:
             self.load(job_uuid, items, last_call)
         finally:
@@ -31,7 +32,7 @@ class AbstractLoader(WithLogging):
             
 
     @abstractmethod
-    def load(self, job_uuid: str, items: list[dict], last_call: bool) -> None:
+    def load(self, job_uuid: str, items: List[dict], last_call: bool) -> None:
         pass
 
     @abstractmethod
@@ -46,15 +47,15 @@ class AbstractLoader(WithLogging):
 
 class NoopLoader(AbstractLoader):
     def __init__(self, logger, 
-                input_key_path: list[str],
-                values_path: list[tuple[str, list[str], bool]] = [],
+                input_key_path: List[AnyStr],
+                values_path: List[Tuple[str, List[AnyStr], bool]] = [],
                 log: bool = False,
                 log_level=DEBUG) -> None:
         super().__init__(logger, input_key_path, values_path)
         self.log = log
         self.log_level = log_level
 
-    def load(self, job_uuid: str, items: list[dict], last_call: bool) -> None:
+    def load(self, job_uuid: str, items: List[dict], last_call: bool) -> None:
         if self.log:
             for item in items:
                 super().log_msg("Item loaded : {}".format(str(self._row_from_data(dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item))), level=self.log_level)
@@ -88,14 +89,14 @@ class ConditionalLoader(AbstractLoader):
         else:
             return self.condition
 
-    def loadWithAck(self, job_uuid: str, items: list[dict], ack_counter: Value, last_call: bool) -> None:
+    def loadWithAck(self, job_uuid: str, items: List[dict], ack_counter: Value, last_call: bool) -> None:
         if self.check_condition():
             return self.wrapped_loader.loadWithAck(job_uuid, items, ack_counter, last_call)
         elif self.else_log:
             super().log_msg("Item loaded : {}".format(str(items)))
         ack_counter.value -= 1
 
-    def load(self, job_uuid: str, items: list[dict], last_call: bool) -> None:
+    def load(self, job_uuid: str, items: List[dict], last_call: bool) -> None:
         if self.check_condition():
             return self.wrapped_loader.load(job_uuid, items, last_call)
         elif self.else_log:
@@ -118,7 +119,7 @@ class ConditionalLoader(AbstractLoader):
 class LoadBalanceLoader(AbstractLoader):
     def __init__(self, 
                     logger,
-                    loaders: list[tuple[int, AbstractLoader]],
+                    loaders: List[Tuple[int, AbstractLoader]],
                     buffer_size: int = 1000,
                     queue_no_block_timeout_sec: int = 0.09,
                     queue_block_timeout_sec: int = 0.1,
@@ -182,10 +183,10 @@ class LoadBalanceLoader(AbstractLoader):
         super().log_msg('{} threads started for loadbalancing'.format(len(self.loaders_threads)), level=INFO)
         self.started=True
 
-    def loadWithAck(self, job_uuid: str, items: list[dict], ack_counter: Value, last_call: bool) -> None:
+    def loadWithAck(self, job_uuid: str, items: List[dict], ack_counter: Value, last_call: bool) -> None:
         self.load(job_uuid, items, last_call, ack_counter)
 
-    def load(self, job_uuid: str, items: list[dict], last_call: bool, ack_counter: Value=None) -> None:
+    def load(self, job_uuid: str, items: List[dict], last_call: bool, ack_counter: Value=None) -> None:
         if not self.started:
             self.start_loadbalancer(job_uuid)
             self.started=True
@@ -259,8 +260,8 @@ class LoadBalanceLoader(AbstractLoader):
 class MySQL_DBLoader(AbstractLoader):
     def __init__(self, 
                 logger: Logger, 
-                input_key_path: list[str],
-                values_path: list[tuple[str, list[str], bool]],
+                input_key_path: List[AnyStr],
+                values_path: List[Tuple[str, List[AnyStr], bool]],
                 sql_query: str,
                 buffer_size: int, 
                 host: str, 
@@ -303,7 +304,7 @@ class MySQL_DBLoader(AbstractLoader):
             super().log_msg("Failed to connect to database {}".format(str(error.args)), exception=error, level=ERROR)
             raise error
 
-    def load(self, job_uuid: str, items: list[dict], last_call: bool) -> None:
+    def load(self, job_uuid: str, items: List[dict], last_call: bool) -> None:
         id = threading.get_ident()
         if self.calling_thread.value==-1:
             self.calling_thread.value=id
@@ -354,15 +355,17 @@ class MySQL_DBLoader(AbstractLoader):
                     super().log_msg("Failed to rollback inserted records {}".format(str(ex.args)), exception=ex, level=ERROR)
 
     def close(self) -> None:
-        if not self.connection is None and self.connection.is_connected():
-            try:
-                if len(self.buffer) > 0:
-                    self.write_buffered_data_to_disk()
-                    self.buffer.clear()
+        try:
+            if len(self.buffer) > 0:
+                super().log_msg('Flushing buffered data in <{}>'.format(str(self.__class__.__name__)), level=INFO)
+                self.write_buffered_data_to_disk()
+                self.buffer.clear()
+                super().log_msg('Flushed buffered data in <{}>'.format(str(self.__class__.__name__)), level=INFO)
+            if self.connection is not None:
                 self.connection.close()
-                super().log_msg("MySQL connection is closed successfully",  level=INFO)
-            except Exception as ex:
-                super().log_msg("Error closing MySQL connection", exception=ex , level=ERROR)
+            super().log_msg("MySQL connection is closed successfully",  level=INFO)
+        except Exception as ex:
+            super().log_msg("Error closing MySQL connection", exception=ex , level=ERROR)
 
     def has_buffered_data(self) -> bool:
         return len(self.buffer)>0
@@ -370,8 +373,8 @@ class MySQL_DBLoader(AbstractLoader):
 class CSV_FileLoader(AbstractLoader):
     def __init__(self, 
                 logger: Logger, 
-                input_key_path: list[str],
-                values_path: list[tuple[str, list[str], bool]],
+                input_key_path: List[AnyStr],
+                values_path: List[Tuple[str, List[AnyStr], bool]],
                 out_dir: str,
                 col_sep: str=";",
                 out_file_ext="txt",
@@ -387,8 +390,9 @@ class CSV_FileLoader(AbstractLoader):
         self.calling_thread = Value('i', -1)
         self.buffer_size=buffer_size
         self.buffer = []
+        self.uuid = str(uuid.uuid1())
 
-    def _row_from_item(self, item: dict) -> list[str]:
+    def _row_from_item(self, item: dict) -> List[AnyStr]:
         row = []
         for (title, key_path, required) in self.values_path:
             val = dict_deep_get(item, key_path)
@@ -397,21 +401,13 @@ class CSV_FileLoader(AbstractLoader):
             row.append(str(val))
         return row
 
-    def load(self, job_uuid: str, items: list[dict], last_call: bool):
-        import codecs
-        import os
+    def load(self, job_uuid: str, items: List[dict], last_call: bool):
 
         id = threading.get_ident()
         if self.calling_thread.value==-1:
             self.calling_thread.value=id
         elif id != self.calling_thread.value:
             raise RuntimeError('Calling the same loader from diffrent threads')
-
-        if self.file_hd is None:
-            file_name = self._out_filename(job_uuid)
-            file_path = os.path.join(self.out_dir, file_name)
-            self.file_hd = codecs.open(file_path, 'a', encoding = "utf-8")
-            super().log_msg("File {} opened using the buffering {}bytes".format(file_path, io.DEFAULT_BUFFER_SIZE))
         
         rows = []
         for item in items:
@@ -430,25 +426,38 @@ class CSV_FileLoader(AbstractLoader):
     def _out_filename(self, job_uuid: str) -> str:
         return "{}_{}.{}".format(self.out_file_name_prefix, job_uuid, self.out_file_ext)
 
+    def _open_file(self):
+        import codecs
+        import os
+
+        if self.file_hd is None:
+            file_name = self._out_filename(self.uuid)
+            file_path = os.path.join(self.out_dir, file_name)
+            self.file_hd = codecs.open(file_path, 'a', encoding = "utf-8")
+            super().log_msg("File {} opened using the buffering {}bytes".format(file_path, io.DEFAULT_BUFFER_SIZE))
+        return self.file_hd
+
     def write_buffered_data_to_disk(self):
         rows_nbr = len(self.buffer)  
         if rows_nbr>0:
-            self.file_hd.write("\n".join(self.buffer) + "\n")
+            fhd = self._open_file()
+            fhd.write("\n".join(self.buffer) + "\n")
             super().log_msg("{} total rows written in the file".format(rows_nbr))
             self.buffer.clear()
 
     def close(self) -> None:
         super().log_msg("Closing loader <>".format(__class__.__name__), level=INFO)
-        if not self.file_hd is None:
-            try:
-                if len(self.buffer) > 0:
-                    self.write_buffered_data_to_disk()
-                    self.buffer.clear()
-                self.file_hd.flush()
-                self.file_hd.close()
-                super().log_msg("File closed successfully")
-            except Exception as ex:
-                super().log_msg("Error closing File handler", exception=ex , level=ERROR)
+        try:
+            if len(self.buffer) > 0:
+                super().log_msg('Flushing buffered data in <{}>'.format(str(self.__class__.__name__)), level=INFO)
+                self.write_buffered_data_to_disk()
+                self.buffer.clear()
+                super().log_msg('Flushed buffered data in <{}>'.format(str(self.__class__.__name__)), level=INFO)
+            self.file_hd.flush()
+            self.file_hd.close()
+            super().log_msg("File closed successfully")
+        except Exception as ex:
+            super().log_msg("Error closing File handler", exception=ex , level=ERROR)
 
     def has_buffered_data(self) -> bool:
         return len(self.buffer)>0

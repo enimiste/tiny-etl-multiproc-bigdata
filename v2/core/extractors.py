@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from logging import Logger
-from typing import Generator
+from typing import Dict, Generator
 from core.commons import WithLogging
 import os
 
@@ -9,7 +9,7 @@ class AbstractExtractor(WithLogging):
         super().__init__(logger)
         
     @abstractmethod
-    def extract(self) -> Generator[dict, None, None]:
+    def extract(self) -> Generator[Dict, None, None]:
         pass
 
     def close(self) -> None:

@@ -1,4 +1,5 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+from audioop import add
 from functools import reduce
 import logging
 from logging import ERROR, Logger, DEBUG
@@ -6,7 +7,7 @@ import multiprocessing
 import os
 import threading
 import traceback
-from typing import Any, Callable, Generator
+from typing import Any, AnyStr, Callable, Generator, List, Tuple
 
 class WithLogging(ABC):
     def __init__(self, logger: Logger) -> None:
@@ -39,16 +40,16 @@ def rotary_iter(items: list):
         i = (i+1)%n
         yield items[i]
 
-def dict_deep_get(dictionary: dict, keys: list[str]):
+def dict_deep_get(dictionary: dict, keys: List[AnyStr]):
     return reduce(lambda d, key: d.get(key) if (type(d) is dict and key in d) else None, keys, dictionary)
 
-def dict_deep_set(dictionary: dict, keys: list[str], value):
+def dict_deep_set(dictionary: dict, keys: List[AnyStr], value):
     if len(keys)==0:
         return
     container = reduce(lambda d, key: d.get(key) if (type(d) is dict and key in d) else {}, keys[:-1], dictionary)
     container[keys[-1]] = value
 
-def dict_deep_remove(dictionary: dict, keys: list[str]):
+def dict_deep_remove(dictionary: dict, keys: List[AnyStr]):
     if keys is not None:
         if len(keys)==0:
             return
@@ -56,7 +57,7 @@ def dict_deep_remove(dictionary: dict, keys: list[str]):
         if container is not None and keys[-1] in container:
             del container[keys[-1]]
 
-def flatMapApply(item:Any, mappers: list[Callable[[Any], Generator[Any, None, None]]], **kwargs) -> Generator[Any, None, None]:
+def flatMapApply(item:Any, mappers: List[Callable[[Any], Generator[Any, None, None]]], **kwargs) -> Generator[Any, None, None]:
         if len(mappers)==0:
             yield item
         else:
@@ -82,7 +83,7 @@ def get_thread_process_is_joined(th) -> bool:
         return th.exitcode is not None
     raise RuntimeError('Invalid thread/process object {}'.format(type(th)))
 
-def kill_threads_processes(threads: list[Any], ignore_exception:bool=True):
+def kill_threads_processes(threads: List[Any], ignore_exception:bool=True):
     for th in threads:
         kill_thread_process(th, ignore_exception)
 
@@ -112,7 +113,7 @@ def terminate_thread_process(th, ignore_exception:bool=True):
             raise ex
     raise RuntimeError('Invalid thread/process object {}'.format(type(th)))
 
-def block_join_threads_or_processes(threads: list[Any], 
+def block_join_threads_or_processes(threads: List[Any], 
                                     interrupt_on: Callable[[], bool] = None, 
                                     join_timeout: int = 0.01, 
                                     ignore_exception:bool=True,
@@ -180,3 +181,77 @@ def get_dir_size_in_mo(start_path = '.'):
                 total_size += os.path.getsize(fp)
 
     return total_size/1024/1024
+
+class AbstractConcurrentKeyBagSet(ABC):
+    def __init__(self) -> None:
+        super().__init__()
+
+    @abstractmethod
+    def add_if_absent(self, bag_key, value) -> bool:
+        pass
+
+    @abstractmethod
+    def clear(self, bag_key):
+        pass
+
+    @abstractmethod
+    def clearAll(self):
+        pass
+
+    @abstractmethod
+    def contains(self, bag_key, value):
+        pass
+    
+    def __contains__(self, bag_key_and_value: Tuple[Any, Any]) -> bool:
+        self.contains(bag_key_and_value[0], bag_key_and_value[1])
+
+class ConcurrentKeyBagSet(AbstractConcurrentKeyBagSet):
+    def __init__(self, lock: multiprocessing.Lock) -> None:
+        self.lock = lock
+        self.content = dict()
+
+    def add_if_absent(self, bag_key, value) -> bool:
+        self.lock.acquire()
+        added=False
+        try:
+            if bag_key not in self.content:
+                self.content[bag_key] = set()
+            bag = self.content[bag_key]
+            if value not in bag:
+                bag.add(value)
+                added = True
+        except Exception:
+            pass
+        finally:
+            self.lock.release()
+        return added
+
+    def clear(self, bag_key):
+        self.lock.acquire()
+        try:
+            if bag_key in self.content:
+                self.content[bag_key].clear()
+        except Exception:
+            pass
+        finally:
+            self.lock.release()
+
+    def clearAll(self):
+        self.lock.acquire()
+        try:
+            self.content.clear()
+        except Exception:
+            pass
+        finally:
+            self.lock.release()
+
+    def contains(self, bag_key, value) -> bool:
+        self.lock.acquire()
+        try:
+            if bag_key in self.content:
+                return value in self.content[bag_key]
+            return False
+        except Exception:
+            pass
+        finally:
+            self.lock.release()

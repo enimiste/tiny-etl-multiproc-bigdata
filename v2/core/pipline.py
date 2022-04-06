@@ -1,15 +1,13 @@
 
 from abc import ABC, abstractmethod
 from concurrent.futures import thread
-import datetime
 from logging import Logger, INFO, WARN, ERROR
 from multiprocessing import Process, Queue
-import multiprocessing
 from multiprocessing.sharedctypes import Value
 import queue
 import signal
-from threading import Thread, Timer
-import threading
+from threading import Timer
+from typing import List
 
 import uuid
 
@@ -41,8 +39,8 @@ class AbstractPipeline(Process, ABC):
 class ThreadedPipeline(AbstractPipeline):
     def __init__(self, logger: Logger, 
                 extractor: AbstractExtractor, 
-                transformers: list[AbstractTransformer],
-                loaders: list[AbstractLoader],
+                transformers: List[AbstractTransformer],
+                loaders: List[AbstractLoader],
                 max_transformation_pipelines: int = 5,
                 use_threads_as_transformation_pipelines: bool = False,
                 use_threads_as_loaders_executors: bool = False,
@@ -78,7 +76,7 @@ class ThreadedPipeline(AbstractPipeline):
             raise RuntimeError("At least one transformer is required. Or use the NoopTransformer class")
 
     @staticmethod
-    def extract_items(out_queues: list[Queue], 
+    def extract_items(out_queues: List[Queue], 
                         extractor: AbstractExtractor, 
                         pipeline_started: Value,
                         pipeline_closed: Value, 
@@ -103,8 +101,8 @@ class ThreadedPipeline(AbstractPipeline):
     @staticmethod
     def transform_items(idx: int,
                         in_queue: Queue, 
-                        out_queues: list[Queue], 
-                        trans: list[AbstractTransformer], 
+                        out_queues: List[Queue], 
+                        trans: List[AbstractTransformer], 
                         pipeline_started: Value,
                         pipeline_closed: Value, 
                         extractor_finished: Value,

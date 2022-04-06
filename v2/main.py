@@ -1,5 +1,6 @@
 import json
 import math
+from multiprocessing import Lock
 import traceback
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 import logging
@@ -26,6 +27,8 @@ from core.loaders import NoopLoader
 from core.commons import basename_backwards
 from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
+from core.transformers import UniqueItemFilterTransformer
+from core.commons import ConcurrentKeyBagSet
 
 LOGGING_FORMAT = '%(name)s \t %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -48,8 +51,8 @@ def basename_backwards_x2(path: str) -> str:
 
 if __name__=="__main__":
     config = {
-        'in_dir': '../bdall_test_data/__generated',
-        #'in_dir': '../bdall_test_data/__generated/books_0_101',
+        # 'in_dir': '../bdall_test_data/__generated',
+        'in_dir': '../bdall_test_data/small_data',
         'out_dir': 'out_dir',
         'save_to_db': True, 
         'buffer_size': 10_000, 
@@ -57,7 +60,7 @@ if __name__=="__main__":
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'max_transformation_pipelines': 9,
+        'max_transformation_pipelines': 6,
         'use_threads_as_transformation_pipelines': False,
         'use_threads_as_loaders_executors': False,
         'use_threads_as_extractors_executors': False,
@@ -104,8 +107,8 @@ if __name__=="__main__":
                         Nbr processes \t~= {}, 
                         RAM free \t= {}Mo, 
                         RAM available \t= {}Mo (RAM free - {}Mo), 
-                        Estim. RAM for all processes \t= {}Mo ({}Mo each one), 
-                        Recommanded in_dir root folder count \t= {} folders,
+                        Estimated RAM for all processes \t= {}Mo ({}Mo each one), 
+                        Recommended in_dir root folder count \t= {} folders,
                         Nbr folder in in_dir \t= {} folders""".format(nbr_processes, 
                                                                                     ram_mo, 
                                                                                     ram_reserv_mo, 
@@ -131,6 +134,8 @@ if __name__=="__main__":
         for (idx, dir) in enumerate(dirs):
             in_dir = os.path.join(config['in_dir'], dir)
             _LOGGER=logging.getLogger("Pipeline " + str(idx+1))
+            _UNIQUE_DICT = ConcurrentKeyBagSet(Lock())
+
             pipelines.append(ThreadedPipeline(_LOGGER, 
                                 use_threads_as_extractors_executors=config['use_threads_as_extractors_executors'],
                                 max_transformation_pipelines=config['max_transformation_pipelines'],
@@ -139,15 +144,14 @@ if __name__=="__main__":
                                 trans_in_queue_max_size=config['buffer_size'],
                                 extractor=FilesListExtractor(_LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                                 transformers=[
-                                        #NoopTransformer(_LOGGER, log=True, log_level=INFO, log_prefix='X'),
+                                        # NoopTransformer(_LOGGER, log=True, log_level=INFO, log_prefix='X'),
                                         ItemUpdaterCallbackTransformer(_LOGGER, input_key_path=['_'], callback=os.path.abspath),
                                         # AddStaticValuesTransformer(_LOGGER,
                                         #                             static_values=[(['words_count'], 0)],
                                         #                             copy_values_key_paths=[('file_path', ['_'])],
                                         #                             remove_key_paths = [['_']]),
                                         ReduceItemTransformer(  _LOGGER,
-                                                                input_key_path=['_'], 
-                                                                input_value_type=(str),
+                                                                input_key_path=(['_'], str), 
                                                                 output_key='words_count', 
                                                                 copy_values_key_paths=[('file_path', ['_'])],
                                                                 transformers=[
@@ -170,7 +174,11 @@ if __name__=="__main__":
                                                                     output_key='_', 
                                                                     copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]),
                                         ItemUpdaterCallbackTransformer(_LOGGER, input_key_path=['file_path'], callback=basename_backwards_x3),
-                                        # ItemUpdaterCallbackTransformer(_LOGGER, input_key_path=['file_path'], callback=os.path.basename),
+                                        # UniqueItemFilterTransformer(_LOGGER, 
+                                        #                         bag_key_path=(['file_path'], str), 
+                                        #                         unique_key_path=(['_', 'word'], str),
+                                        #                         unique_value_normalizer=str.lower,
+                                        #                         bag=_UNIQUE_DICT), # bug : some words aren't catched by this control
                                         ],
                                 loaders=[
                                         # ConditionalLoader(  _LOGGER, 
@@ -199,14 +207,6 @@ if __name__=="__main__":
                                                                                         config['buffer_size']*10, 
                                                                                         MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)) 
                                                                                         for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
-                                                                            # loaders= [(
-                                                                            #             config['buffer_size']*10, 
-                                                                            #             NoopLoader( _LOGGER, 
-                                                                            #                         input_key_path=None,
-                                                                            #                         values_path=[('word', ['_', 'word'], None), 
-                                                                            #                                     ('file', ['file_path'], None),
-                                                                            #                                     ('words_count', ['words_count'], None)])) 
-                                                                            #                         for _ in range(0, max(1, config['parallel_loader_count']))]
                                                                             )
                                                         )
                                         ]))
