@@ -134,7 +134,7 @@ if __name__=="__main__":
         for (idx, dir) in enumerate(dirs):
             in_dir = os.path.join(config['in_dir'], dir)
             _LOGGER=logging.getLogger("Pipeline " + str(idx+1))
-            _UNIQUE_DICT = ConcurrentKeyBagSet(Lock())
+            # _UNIQUE_DICT = ConcurrentKeyBagSet(Lock())
 
             pipelines.append(ThreadedPipeline(_LOGGER, 
                                 use_threads_as_extractors_executors=config['use_threads_as_extractors_executors'],
