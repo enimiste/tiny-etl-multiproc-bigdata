@@ -58,7 +58,7 @@ if __name__=="__main__":
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'max_transformation_pipelines': 1,
+        'max_transformation_pipelines': 5,
         'use_threads_as_transformation_pipelines': False,
         'use_threads_as_loaders_executors': False,
         'use_threads_as_extractors_executors': False,
@@ -89,8 +89,8 @@ if __name__=="__main__":
     LOGGER.log(INFO, 'MySQL Loader Config : {}'.format(json.dumps(mysql_db_loader_config, indent=4)))
 
     # Check RAM availability
-    in_dir_size_go = round(get_dir_size_in_mo(config['in_dir'])/1024, 2)
-    LOGGER.log(INFO, 'IN DIR has the size of : {}Go'.format(in_dir_size_go))
+    in_dir_size_mo = round(get_dir_size_in_mo(config['in_dir']), 3)
+    LOGGER.log(INFO, 'IN DIR has the size of : {} Mo'.format(in_dir_size_mo))
     dirs = os.listdir(config['in_dir'])
     nbr_dirs = len(dirs)
     nbr_processes_per_pip=(1 + config['max_transformation_pipelines'] + config['load_balancer_parallel_loader_count'] +1)
@@ -197,24 +197,24 @@ if __name__=="__main__":
                                         #                                     out_dir=os.path.abspath(config['out_dir']),
                                         #                                     out_file_ext='txt',
                                         #                                     buffer_size=config['buffer_size'])),
-                                        ConditionalLoader(  _LOGGER, 
-                                                            config['save_to_db'],
-                                                            #  False,
-                                                            MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)
-                                        ),
                                         # ConditionalLoader(  _LOGGER, 
                                         #                     config['save_to_db'],
-                                        #                     # False,
-                                        #                     LoadBalanceLoader(_LOGGER, 
-                                        #                                     queue_no_block_timeout_sec = 0.09,
-                                        #                                     buffer_size=config['load_balancer_buffer_size'],
-                                        #                                     use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
-                                        #                                     loaders= [(
-                                        #                                                 config['buffer_size']*10, 
-                                        #                                                 MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)) 
-                                        #                                                 for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
-                                        #                                     )
-                                        #                 )
+                                        #                     #  False,
+                                        #                     MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)
+                                        # ),
+                                        ConditionalLoader(  _LOGGER, 
+                                                            config['save_to_db'],
+                                                            # False,
+                                                            LoadBalanceLoader(_LOGGER, 
+                                                                            queue_no_block_timeout_sec = 0.09,
+                                                                            buffer_size=config['load_balancer_buffer_size'],
+                                                                            use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
+                                                                            loaders= [(
+                                                                                        config['buffer_size']*10, 
+                                                                                        MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)) 
+                                                                                        for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
+                                                                            )
+                                                        ),
                                         ]))
         LOGGER.log(INFO, '{} pipelines created by root folder in {}'.format(len(pipelines), config['in_dir']))
         for pipeline in pipelines:
