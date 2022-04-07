@@ -151,6 +151,7 @@ if __name__=="__main__":
                                                 output_key='words_count', 
                                                 copy_values_key_paths=[('file_path', ['_'])],
                                                 transformers=[
+                                                        # FileTextReaderTransformer consumes a lot of RAM but FileToTextLinesTransformer takes more time
                                                         FileToTextLinesTransformer(_LOGGER, 
                                                                 pattern=".txt", 
                                                                 input_key_path=None, 
