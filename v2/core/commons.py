@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from audioop import add
 from functools import reduce
+import functools
 import logging
 from logging import ERROR, Logger, DEBUG
 import multiprocessing

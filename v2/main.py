@@ -1,6 +1,5 @@
 import json
 import math
-from multiprocessing import Lock
 import traceback
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 import logging
@@ -15,8 +14,8 @@ from core.extractors import FilesListExtractor
 from core.loaders import CSV_FileLoader
 from core.pipline import ThreadedPipeline
 from core.transformers import  FileToTextLinesTransformer, TextWordTokenizerTransformer
-from transformers import ArabicRemoveDiacFromWordTransformer, ArabicTextWordsTokenizerTransformer
-from core.transformers import ItemUpdaterCallbackTransformer
+from custom_transformers import ArabicRemoveDiacFromWordTransformer, ArabicTextWordsTokenizerTransformer
+from core.transformers import ItemAttributeTransformer
 from core.loaders import ConditionalLoader, MySQL_DBLoader
 from core.transformers import NoopTransformer
 from core.transformers import ReduceItemTransformer
@@ -27,8 +26,7 @@ from core.loaders import NoopLoader
 from core.commons import basename_backwards
 from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
-from core.transformers import UniqueItemFilterTransformer
-from core.commons import ConcurrentKeyBagSet
+from core.transformers import UniqueFilterTransformer
 
 LOGGING_FORMAT = '%(name)s \t %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -60,7 +58,7 @@ if __name__=="__main__":
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'max_transformation_pipelines': 6,
+        'max_transformation_pipelines': 1,
         'use_threads_as_transformation_pipelines': False,
         'use_threads_as_loaders_executors': False,
         'use_threads_as_extractors_executors': False,
@@ -134,7 +132,6 @@ if __name__=="__main__":
         for (idx, dir) in enumerate(dirs):
             in_dir = os.path.join(config['in_dir'], dir)
             _LOGGER=logging.getLogger("Pipeline " + str(idx+1))
-            # _UNIQUE_DICT = ConcurrentKeyBagSet(Lock())
 
             pipelines.append(ThreadedPipeline(_LOGGER, 
                                 use_threads_as_extractors_executors=config['use_threads_as_extractors_executors'],
@@ -145,7 +142,7 @@ if __name__=="__main__":
                                 extractor=FilesListExtractor(_LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                                 transformers=[
                                         # NoopTransformer(_LOGGER, log=True, log_level=INFO, log_prefix='X'),
-                                        ItemUpdaterCallbackTransformer(_LOGGER, input_key_path=['_'], callback=os.path.abspath),
+                                        ItemAttributeTransformer(_LOGGER, input_key_path=['_'], mappers=[os.path.abspath]),
                                         # AddStaticValuesTransformer(_LOGGER,
                                         #                             static_values=[(['words_count'], 0)],
                                         #                             copy_values_key_paths=[('file_path', ['_'])],
@@ -166,19 +163,27 @@ if __name__=="__main__":
                                                                             ],
                                                                 initial_value=0,
                                                                 reducer=ReduceItemTransformer.count),
-                                        FileToTextLinesTransformer(_LOGGER, pattern=".txt", input_key_path=['file_path'], output_key='_',
-                                                                copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]), 
-                                        TextWordTokenizerTransformer(_LOGGER, 
-                                                                    pattern="\\s+", 
-                                                                    input_key_path=['_', 'line'], 
-                                                                    output_key='_', 
-                                                                    copy_values_key_paths=[('file_path', ['file_path']), ('words_count', ['words_count'])]),
-                                        ItemUpdaterCallbackTransformer(_LOGGER, input_key_path=['file_path'], callback=basename_backwards_x3),
-                                        # UniqueItemFilterTransformer(_LOGGER, 
-                                        #                         bag_key_path=(['file_path'], str), 
-                                        #                         unique_key_path=(['_', 'word'], str),
-                                        #                         unique_value_normalizer=str.lower,
-                                        #                         bag=_UNIQUE_DICT), # bug : some words aren't catched by this control
+                                        UniqueFilterTransformer(_LOGGER, 
+                                                                bag_key_path=(['file_path'], str), 
+                                                                unique_key_path=(['_', 'word'], str),
+                                                                unique_value_normalizers=[str.lower, str.strip],
+                                                                transformers=[
+                                                                        FileToTextLinesTransformer(_LOGGER, 
+                                                                                                    pattern=".txt", 
+                                                                                                    input_key_path=['file_path'], 
+                                                                                                    output_key='_',
+                                                                                                    copy_values_key_paths=[('file_path', ['file_path']), 
+                                                                                                                        ('words_count', ['words_count'])]), 
+                                                                        TextWordTokenizerTransformer(_LOGGER, 
+                                                                                                    pattern="\\s+", 
+                                                                                                    input_key_path=['_', 'line'], 
+                                                                                                    output_key='_', 
+                                                                                                    copy_values_key_paths=[('file_path', ['file_path']), 
+                                                                                                                        ('words_count', ['words_count'])]),
+                                                                ]),
+                                        ItemAttributeTransformer(_LOGGER, 
+                                                                        input_key_path=['file_path'], 
+                                                                        mappers=[basename_backwards_x3]),
                                         ],
                                 loaders=[
                                         # ConditionalLoader(  _LOGGER, 
@@ -191,24 +196,24 @@ if __name__=="__main__":
                                         #                                     out_dir=os.path.abspath(config['out_dir']),
                                         #                                     out_file_ext='txt',
                                         #                                     buffer_size=config['buffer_size'])),
-                                        # ConditionalLoader(  _LOGGER, 
-                                        #                     config['save_to_db'],
-                                        #                     #  False,
-                                        #                     MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)
-                                        # ),
                                         ConditionalLoader(  _LOGGER, 
                                                             config['save_to_db'],
-                                                            # False,
-                                                            LoadBalanceLoader(_LOGGER, 
-                                                                            queue_no_block_timeout_sec = 0.09,
-                                                                            buffer_size=config['load_balancer_buffer_size'],
-                                                                            use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
-                                                                            loaders= [(
-                                                                                        config['buffer_size']*10, 
-                                                                                        MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)) 
-                                                                                        for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
-                                                                            )
-                                                        )
+                                                            #  False,
+                                                            MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)
+                                        ),
+                                        # ConditionalLoader(  _LOGGER, 
+                                        #                     config['save_to_db'],
+                                        #                     # False,
+                                        #                     LoadBalanceLoader(_LOGGER, 
+                                        #                                     queue_no_block_timeout_sec = 0.09,
+                                        #                                     buffer_size=config['load_balancer_buffer_size'],
+                                        #                                     use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
+                                        #                                     loaders= [(
+                                        #                                                 config['buffer_size']*10, 
+                                        #                                                 MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)) 
+                                        #                                                 for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
+                                        #                                     )
+                                        #                 )
                                         ]))
         LOGGER.log(INFO, '{} pipelines created by root folder in {}'.format(len(pipelines), config['in_dir']))
         for pipeline in pipelines:

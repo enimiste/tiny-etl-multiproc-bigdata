@@ -14,7 +14,7 @@ import uuid
 from core.commons import LoggerWrapper, WithLogging, rotary_iter
 from core.extractors import AbstractExtractor
 from core.loaders import AbstractLoader
-from transformers import AbstractTransformer
+from core.transformers import AbstractTransformer
 from core.commons import flatMapApply
 from core.commons import block_join_threads_or_processes, kill_threads_processes
 from core.commons import make_thread_process

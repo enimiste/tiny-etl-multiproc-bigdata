@@ -1,16 +1,16 @@
 from abc import abstractmethod
 import codecs
-import collections
+from functools import reduce
 from logging import Logger, ERROR, DEBUG, INFO
 from multiprocessing import Lock
 import os
-from typing import Any, AnyStr, Callable, Dict, Generator, Tuple, List
+from typing import Any, AnyStr, Callable, Generator, Tuple, List
 from core.commons import WithLogging
 from core.commons import dict_deep_get, dict_deep_set
 from core.commons import flatMapApply
 from core.commons import dict_deep_remove
 from core.commons import AbstractConcurrentKeyBagSet
-from v2.core.commons import ConcurrentKeyBagSet
+from core.commons import ConcurrentKeyBagSet
 
 IgnoreTransformationResult = object()
 
@@ -46,7 +46,7 @@ class AbstractTransformer(WithLogging):
             raise RuntimeError("Item doesn't contains the input_key_path={}".format('.'.join(self.input_key_path)))
 
         if not isinstance(input_value, self._input_value_type):
-            raise RuntimeError("Input value expected type : {}, is different from the given one : {}".format(elf._input_value_type, type(input_value)))
+            raise RuntimeError("Input value expected type : {}, is different from the given one : {}".format(self._input_value_type, type(input_value)))
         
         context['__input_item__'] = item
         for res in self._map_item(input_value, context):
@@ -272,20 +272,20 @@ class TextWordTokenizerTransformer(AbstractTextWordTokenizerTransformer):
         for x in re.split(self.pattern, text):
             yield x
 
-class ItemUpdaterCallbackTransformer(AbstractTransformer):
+class ItemAttributeTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
                 input_key_path: List[AnyStr],
-                callback,
+                mappers: List[Callable[[Any], Any]],
                 remove_key_paths: List[List[AnyStr]]=None) -> None:
         """
         input_key_path: Tuple[List[in_path], value_type]
-        callback: function or method reference (lambda are not allowed)
+        mappers: functions or methods reference (lambda are not allowed)
         remove_key_paths : List[List[in_path]]
 
         Yield elements the same input item
         """
         super().__init__(logger, input_key_path, None, None, None, remove_key_paths)
-        self.callback = callback
+        self.callbacks = mappers
 
     def transform(self, item: dict, context: dict={}) -> Generator[dict, None, None]:
         if item is None:
@@ -295,7 +295,7 @@ class ItemUpdaterCallbackTransformer(AbstractTransformer):
         if input_value is None:
             return None
 
-        new_val = self.callback(input_value)
+        new_val = reduce(lambda val, uvn: uvn(val), self.callbacks, input_value)
         if new_val is None:
             return None
 
@@ -342,22 +342,27 @@ class UniqueFilterTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
                     bag_key_path: Tuple[List[AnyStr], Any],
                     unique_key_path: Tuple[List[AnyStr], Any],
+                    transformers: List[AbstractTransformer],
                     bag: AbstractConcurrentKeyBagSet = None,
-                    unique_value_normalizer: Callable[[Any], Any] = None,
-                    copy_values_key_paths: List[Tuple[AnyStr, List[AnyStr]]] = None,
-                    remove_key_paths: List[List[AnyStr]]=None) -> None:
+                    unique_value_normalizers: List[Callable[[Any], Any]] = []) -> None:
         """
-        bag_key_path: Tuple[List[in_path], value_type]
-        unique_key_path: Tuple[List[in_path], value_type]
-        copy_values_key_paths : List[Tuple[out_path, List[in_path]]]
-        remove_key_paths : List[List[in_path]]
-        bag: dict[Any, set]
+        This is a wrapper transformer class :
+
+        bag_key_path: Tuple[List[in_path], value_type] in the context of the first transformer among the transformers list
+        unique_key_path: Tuple[List[in_path], value_type] in the context of the last transformer among the transformers list
+        unique_value_normalizers : functions or methods ref that takes the value as input and return a new value
+        transformers : List[? extends AbstractTransformer]
+        bag: AbstractConcurrentKeyBagSet
         """
-        super().__init__(logger, None, None, None, copy_values_key_paths=copy_values_key_paths, remove_key_paths=remove_key_paths)
+        super().__init__(logger, None, None, None, None, None)
         self.bag_key_path = bag_key_path
         self.unique_key_path = unique_key_path
-        self.unique_value_normalizer = unique_value_normalizer
+        self.unique_value_normalizers = [uvn for uvn in unique_value_normalizers if uvn is not None]
         self.bag = bag if bag is not None else ConcurrentKeyBagSet(Lock())
+        self.transformers = transformers
+
+        if transformers is None:
+            raise RuntimeError('transformers arg cannot be None')
 
     def transform(self, item: dict, context: dict = {}) -> Generator[dict, None, None]:
         item = AbstractTransformer._copy_input_values_to_output(self.copy_values_key_paths, item, item)
@@ -372,18 +377,21 @@ class UniqueFilterTransformer(AbstractTransformer):
         if not isinstance(bag_key, self.bag_key_path[1]):
             raise RuntimeError('{} bag key path should have the type {}, but {} was given'.format(self.bag_key_path[0], self.bag_key_path[1], type(bag_key)))
 
-        unique_key = dict_deep_get(item, self.unique_key_path[0])
-        if unique_key is None:
-            yield item
-        else:
-            if not isinstance(unique_key, self.unique_key_path[1]):
-                raise RuntimeError('{} unique key path should have the type {}, but {} was given'.format(self.unique_key_path[0], self.unique_key_path[1], type(unique_key)))
-            
-            if self.unique_value_normalizer is not None:
-                unique_key = self.unique_value_normalizer(unique_key)
-            
-            if self.bag.add_if_absent(bag_key, unique_key):
-                yield item
+        self.bag.clear(bag_key)
+
+        for res in flatMapApply(item, list(map(lambda mapper: mapper.transform, self.transformers)), context=context):
+            unique_key = dict_deep_get(res, self.unique_key_path[0])
+            if unique_key is None:
+                yield res
+            else:
+                if not isinstance(unique_key, self.unique_key_path[1]):
+                    raise RuntimeError('{} unique key path should have the type {}, but {} was given'.format(self.unique_key_path[0], self.unique_key_path[1], type(unique_key)))
+                
+                unique_key = reduce(lambda val, uvn: uvn(val), self.unique_value_normalizers, unique_key)
+                
+                if self.bag.add_if_absent(bag_key, unique_key):
+                    yield res
+        self.bag.clear(bag_key)
 
     def _map_item(self, item, context: dict = {}) -> Generator[dict, None, None]:
         yield item
