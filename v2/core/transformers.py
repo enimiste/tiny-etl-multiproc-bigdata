@@ -344,7 +344,8 @@ class UniqueFilterTransformer(AbstractTransformer):
                     unique_key_path: Tuple[List[AnyStr], Any],
                     transformers: List[AbstractTransformer],
                     bag: AbstractConcurrentKeyBagSet = None,
-                    unique_value_normalizers: List[Callable[[Any], Any]] = []) -> None:
+                    unique_value_normalizers: List[Callable[[Any], Any]] = [],
+                    yield_unique_values: bool=True) -> None:
         """
         This is a wrapper transformer class :
 
@@ -353,6 +354,7 @@ class UniqueFilterTransformer(AbstractTransformer):
         unique_value_normalizers : functions or methods ref that takes the value as input and return a new value
         transformers : List[? extends AbstractTransformer]
         bag: AbstractConcurrentKeyBagSet
+        yield_unique_values : True to yield unique values, False otherwise
         """
         super().__init__(logger, None, None, None, None, None)
         self.bag_key_path = bag_key_path
@@ -360,6 +362,7 @@ class UniqueFilterTransformer(AbstractTransformer):
         self.unique_value_normalizers = [uvn for uvn in unique_value_normalizers if uvn is not None]
         self.bag = bag if bag is not None else ConcurrentKeyBagSet(Lock())
         self.transformers = transformers
+        self.yield_unique_values = yield_unique_values
 
         if transformers is None:
             raise RuntimeError('transformers arg cannot be None')
@@ -382,14 +385,16 @@ class UniqueFilterTransformer(AbstractTransformer):
         for res in flatMapApply(item, list(map(lambda mapper: mapper.transform, self.transformers)), context=context):
             unique_key = dict_deep_get(res, self.unique_key_path[0])
             if unique_key is None:
-                yield res
+                raise RuntimeError('Unique key {} value found None'.format(self.unique_key_path))
             else:
                 if not isinstance(unique_key, self.unique_key_path[1]):
                     raise RuntimeError('{} unique key path should have the type {}, but {} was given'.format(self.unique_key_path[0], self.unique_key_path[1], type(unique_key)))
                 
                 unique_key = reduce(lambda val, uvn: uvn(val), self.unique_value_normalizers, unique_key)
-                
-                if self.bag.add_if_absent(bag_key, unique_key):
+                if unique_key is None:
+                    raise RuntimeError('Unique key {} value found None after applying inner transformers'.format(self.unique_key_path))
+
+                if not (self.yield_unique_values ^ self.bag.add_if_absent(bag_key, unique_key)):
                     yield res
         self.bag.clear(bag_key)
 

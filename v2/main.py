@@ -167,6 +167,7 @@ if __name__=="__main__":
                                                                 bag_key_path=(['file_path'], str), 
                                                                 unique_key_path=(['_', 'word'], str),
                                                                 unique_value_normalizers=[str.lower, str.strip],
+                                                                yield_unique_values=True,
                                                                 transformers=[
                                                                         FileToTextLinesTransformer(_LOGGER, 
                                                                                                     pattern=".txt", 
