@@ -24,11 +24,9 @@ class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
 
 class ArabicRemoveDiacFromWordTransformer(ItemAttributeTransformer):
     def __init__(self, logger: Logger, 
-                input_key_path: List[AnyStr], 
-                input_value_type: Any, 
-                output_key: str,
+                input_key_path: List[AnyStr],
                 remove_key_paths: List[List[AnyStr]]=None) -> None:
-        super().__init__(logger, input_key_path, input_value_type, output_key, callback=ArabicRemoveDiacFromWordTransformer.remove_diac, remove_key_paths=remove_key_paths)
+        super().__init__(logger, input_key_path, mappers=[ArabicRemoveDiacFromWordTransformer.remove_diac], remove_key_paths=remove_key_paths)
 
     def remove_diac(text: str) -> str:
         if text is None:
