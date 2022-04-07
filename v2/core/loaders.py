@@ -58,7 +58,7 @@ class NoopLoader(AbstractLoader):
     def load(self, job_uuid: str, items: List[dict], last_call: bool) -> None:
         if self.log:
             for item in items:
-                super().log_msg("Item loaded : {}".format(str(self._row_from_data(dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item))), level=self.log_level)
+                super().log_msg("NoopLoader <Item loaded> : {}".format(str(self._row_from_data(dict_deep_get(item, self.input_key_path) if self.input_key_path is not None else item))), level=self.log_level)
 
     def _row_from_data(self, item: dict)->list:
         row = []
@@ -83,9 +83,9 @@ class ConditionalLoader(AbstractLoader):
         self.wrapped_loader = wrapped_loader
         self.else_log = else_log
 
-    def check_condition(self):
+    def check_condition(self, items=None):
         if callable(self.condition):
-            return self.condition()
+            return self.condition(items)
         else:
             return self.condition
 
@@ -97,7 +97,7 @@ class ConditionalLoader(AbstractLoader):
         ack_counter.value -= 1
 
     def load(self, job_uuid: str, items: List[dict], last_call: bool) -> None:
-        if self.check_condition():
+        if self.check_condition(items):
             return self.wrapped_loader.load(job_uuid, items, last_call)
         elif self.else_log:
             super().log_msg("Item loaded : {}".format(str(items)))
