@@ -2,6 +2,7 @@ from abc import abstractmethod
 import codecs
 import collections
 from logging import Logger, ERROR, DEBUG, INFO
+from multiprocessing import Lock
 import os
 from typing import Any, AnyStr, Callable, Dict, Generator, Tuple, List
 from core.commons import WithLogging
@@ -9,6 +10,7 @@ from core.commons import dict_deep_get, dict_deep_set
 from core.commons import flatMapApply
 from core.commons import dict_deep_remove
 from core.commons import AbstractConcurrentKeyBagSet
+from v2.core.commons import ConcurrentKeyBagSet
 
 IgnoreTransformationResult = object()
 
@@ -336,11 +338,11 @@ class AddStaticValuesTransformer(AbstractTransformer):
     def _map_item(self, item, context: dict = {}) -> Generator[dict, None, None]:
         yield item
 
-class UniqueItemFilterTransformer(AbstractTransformer):
+class UniqueFilterTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
                     bag_key_path: Tuple[List[AnyStr], Any],
                     unique_key_path: Tuple[List[AnyStr], Any],
-                    bag: AbstractConcurrentKeyBagSet,
+                    bag: AbstractConcurrentKeyBagSet = None,
                     unique_value_normalizer: Callable[[Any], Any] = None,
                     copy_values_key_paths: List[Tuple[AnyStr, List[AnyStr]]] = None,
                     remove_key_paths: List[List[AnyStr]]=None) -> None:
@@ -355,7 +357,7 @@ class UniqueItemFilterTransformer(AbstractTransformer):
         self.bag_key_path = bag_key_path
         self.unique_key_path = unique_key_path
         self.unique_value_normalizer = unique_value_normalizer
-        self.bag = bag
+        self.bag = bag if bag is not None else ConcurrentKeyBagSet(Lock())
 
     def transform(self, item: dict, context: dict = {}) -> Generator[dict, None, None]:
         item = AbstractTransformer._copy_input_values_to_output(self.copy_values_key_paths, item, item)
