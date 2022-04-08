@@ -27,7 +27,7 @@ from core.commons import basename_backwards
 from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
 from core.transformers import UniqueFilterTransformer
-from v2.core.commons import basename_backwards_x3, format_duree, truncate_str_255, truncate_str_270
+from core.commons import basename_backwards_x3, format_duree, truncate_str_255, truncate_str_270
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
