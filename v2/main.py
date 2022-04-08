@@ -14,7 +14,7 @@ from core.extractors import FilesListExtractor
 from core.loaders import CSV_FileLoader
 from core.pipline import ThreadedPipeline
 from core.transformers import  FileToTextLinesTransformer, TextWordTokenizerTransformer
-from custom_transformers import ArabicRemoveDiacFromWordTransformer, ArabicTextWordsTokenizerTransformer
+from custom_transformers import ArabicTextWordsTokenizerTransformer
 from core.transformers import ItemAttributeTransformer
 from core.loaders import ConditionalLoader, MySQL_DBLoader
 from core.transformers import NoopTransformer
@@ -138,7 +138,9 @@ if __name__=="__main__":
         LOGGER.log(INFO, 'RAM not enough for running the {} processes ({}Mo each). You should structure the {} folder to have at most {} root folders, {} found'.format(
             nbr_processes, ram_per_process_mo, config['in_dir'], nbr_dirs_secur, nbr_dirs
         ))
-        exit()
+        if '-f' not in sys.argv:
+            exit()
+
     if '-s' not in sys.argv:
         LOGGER.log(INFO, 'To run the script add the -s option to the command')
         exit()
@@ -164,7 +166,7 @@ if __name__=="__main__":
                                 trans_in_queue_max_size=config['buffer_size'],
                                 extractor=FilesListExtractor(_LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                                 transformers=[
-                                        ItemAttributeTransformer(_LOGGER, input_key_path=['_'], mappers=[os.path.abspath]),
+                                        ItemAttributeTransformer(_LOGGER, operations=[(['_'], [os.path.abspath])]),
                                         # AddStaticValuesTransformer(_LOGGER,
                                         #         static_values=[(['words_count'], 0)],
                                         #         copy_values_key_paths=[('file_path', ['_'])],
@@ -220,13 +222,12 @@ if __name__=="__main__":
                                                                 ignore_word_fn=str.isspace,
                                                                 copy_values_key_paths=[('file_path', ['file_path']), 
                                                                                     ('words_count', ['words_count'])]),
-                                                        ArabicRemoveDiacFromWordTransformer(_LOGGER, 
-                                                                input_key_path=['_', 'word']),
+                                                        ItemAttributeTransformer(_LOGGER, 
+                                                                operations=[(['_', 'word'], [ArabicTextWordsTokenizerTransformer.remove_diac])]),
                                                 ]
                                         ),                                        
                                         ItemAttributeTransformer(_LOGGER, 
-                                                input_key_path=['file_path'], 
-                                                mappers=[basename_backwards_x3]
+                                                operations=[(['file_path'], [basename_backwards_x3])]
                                         ),
                                 ],
                                 loaders=[

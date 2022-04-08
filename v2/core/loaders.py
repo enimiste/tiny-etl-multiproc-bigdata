@@ -8,6 +8,8 @@ import threading
 from typing import AnyStr, List, Tuple
 import uuid
 
+from mysqlx import DataError
+
 from core.commons import WithLogging
 from core.commons import dict_deep_get
 from core.commons import rotary_iter
@@ -329,30 +331,43 @@ class MySQL_DBLoader(AbstractLoader):
         import mysql.connector
 
         connection = self._connect()
-        try:
-            items =  [] + self.buffer
-            data_len=len(items)
-            inserted_data = 0
-            super().log_msg("{0} rows available to be inserted".format(data_len))
+        reconnection_retries = 0
+        while True:
+            try:
+                items =  [] + self.buffer
+                data_len=len(items)
+                inserted_data = 0
+                super().log_msg("{0} rows available to be inserted".format(data_len))
 
-            cursor = connection.cursor()
-            connection.start_transaction()
-            cursor.executemany(self.sql_query, items)   
-            connection.commit()
+                cursor = connection.cursor()
+                connection.start_transaction()
+                cursor.executemany(self.sql_query, items)   
+                connection.commit()
 
-            inserted_data+=cursor.rowcount
-            super().log_msg("{} Record inserted successfully".format(cursor.rowcount))
-            super().log_msg("{} Total record inserted successfully".format(data_len))
-            self.buffer.clear()
-            cursor.close()
-
-        except mysql.connector.Error as error:
-            super().log_msg("Failed to insert records {}".format(error), exception=error, level=ERROR)
-            if not connection is None and connection.in_transaction:
-                try:
-                    connection.rollback()
-                except Exception as ex:
-                    super().log_msg("Failed to rollback inserted records {}".format(str(ex.args)), exception=ex, level=ERROR)
+                inserted_data+=cursor.rowcount
+                cursor.close()
+                super().log_msg("{} Record inserted successfully".format(cursor.rowcount))
+                super().log_msg("{} Total record inserted successfully".format(data_len))
+                self.buffer.clear()
+            except mysql.connector.OperationalError as error:
+                connection = self._connect()
+                if reconnection_retries<5:
+                    reconnection_retries += 1
+                    super().log_msg("Reconnection {}/5".format(reconnection_retries))
+                    continue
+                else:
+                    super().log_msg("Reconnection max retries reached (=5)".format(reconnection_retries))
+            except mysql.connector.DataError as error:
+                super().log_msg("Failed to insert records. Error={}".format(error), exception=error, level=ERROR)
+                if connection is not None and connection.in_transaction:
+                    try:
+                        connection.rollback()
+                    except Exception as ex:
+                        super().log_msg("Failed to rollback inserted records {}".format(ex.args), exception=ex, level=ERROR)
+            except mysql.connector.Error as error:
+                super().log_msg("Failed to insert records. Error={}".format(error), exception=error, level=ERROR)
+            
+            return
 
     def close(self) -> None:
         try:

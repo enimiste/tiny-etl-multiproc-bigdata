@@ -2,7 +2,6 @@ from logging import Logger
 from typing import Any, AnyStr, Generator, List, Tuple, Callable
 
 from core.transformers import AbstractTextWordTokenizerTransformer
-from core.transformers import ItemAttributeTransformer
 
 class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
     def __init__(self, logger: Logger, 
@@ -25,13 +24,9 @@ class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
                 if w and w.strip():
                     yield w
 
-class ArabicRemoveDiacFromWordTransformer(ItemAttributeTransformer):
-    def __init__(self, logger: Logger, 
-                input_key_path: List[AnyStr],
-                remove_key_paths: List[List[AnyStr]]=None) -> None:
-        super().__init__(logger, input_key_path, mappers=[ArabicRemoveDiacFromWordTransformer.remove_diac], remove_key_paths=remove_key_paths)
-
     def remove_diac(text: str) -> str:
         if text is None:
             return text
         return text.replace('َ', '').replace('ّ', '').replace('ِ', '').replace('ُ', '').replace('ْ', '').replace('ً', '').replace('ٌ', '').replace('ٍ', '')
+
+    

@@ -293,34 +293,32 @@ class TextWordTokenizerTransformer(AbstractTextWordTokenizerTransformer):
 
 class ItemAttributeTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
-                input_key_path: List[AnyStr],
-                mappers: List[Callable[[Any], Any]],
+                operations: List[Tuple[List[AnyStr], List[Callable[[Any], Any]]]],
                 remove_key_paths: List[List[AnyStr]]=None) -> None:
         """
-        input_key_path: Tuple[List[in_path], value_type]
-        mappers: functions or methods reference (lambda are not allowed)
+        operations: List[[paths], List[mappers]]
         remove_key_paths : List[List[in_path]]
 
         Yield elements the same input item
         """
-        super().__init__(logger, input_key_path, None, None, None, remove_key_paths)
-        self.callbacks = mappers
+        super().__init__(logger, None, None, None, None, remove_key_paths)
+        self.operations = operations
 
     def transform(self, item: dict, context: dict={}) -> Generator[dict, None, None]:
         if item is None:
             return None
-        input_value = dict_deep_get(item, self.input_key_path)
-        
-        if input_value is None:
-            return None
-
-        new_val = reduce(lambda val, uvn: uvn(val), self.callbacks, input_value)
-        if new_val is None:
-            return None
 
         item_ = {}
         item_.update(item)
-        dict_deep_set(item_, self.input_key_path, new_val)
+        for (key_path, mappers) in self.operations:
+            input_value = dict_deep_get(item, key_path)
+            if input_value is None:
+                continue
+            new_val = reduce(lambda val, uvn: uvn(val), mappers, input_value)
+            if new_val is None:
+                continue
+            dict_deep_set(item_, key_path, new_val)
+
         if self.remove_key_paths is not None:
             for remove_key_path in self.remove_key_paths:
                 dict_deep_remove(item, remove_key_path)
