@@ -71,23 +71,10 @@ if __name__=="__main__":
     start_exec_time = time.perf_counter()
     words_saver = None
     
-    mysql_db_loader_config =  {
-            'input_key_path': None, 
-            'values_path': [('word', ['_', 'word'], True), 
-                            ('file', ['file_path'], True),
-                            ('words_count', ['words_count'], True)],
-        #    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
-        #                    VALUES(%s,%s,%s)""",
-            'sql_query': """INSERT INTO words (word, file_path, file_words_count)
-                            VALUES(%s,%s,%s)""",
-            'buffer_size': config['buffer_size'],
-            'host': config['db_host'],
-            'database': config['db_name'],
-            'user': config['db_user'],
-            'password': config['db_password']}
+    # sql_query="""INSERT INTO allwordstemp (word, filename, filecount)  VALUES(%s,%s,%s)"""
+    sql_query= """INSERT INTO words (word, file_path, file_words_count)  VALUES(%s,%s,%s)"""
     
     LOGGER.log(INFO, 'Config : {}'.format(json.dumps(config, indent=4)))
-    LOGGER.log(INFO, 'MySQL Loader Config : {}'.format(json.dumps(mysql_db_loader_config, indent=4)))
 
     # Check RAM availability
     in_dir_size_mo = round(get_dir_size_in_mo(config['in_dir']), 3)
@@ -116,16 +103,24 @@ if __name__=="__main__":
     estim_processes_mo = nbr_processes*ram_per_process_mo #80Mo by process
     nbr_dirs_secur = max(1, math.ceil((ram_secur_mo/ram_per_process_mo)/math.floor(nbr_processes_per_pip * 1.6))) #1.6 majoration factor
     LOGGER.log(INFO, """
-                        IN_DIR size                = {}Mo ({}Go),
-                        Execution time             = {} sec ({} min = {} hours),
-                        CPU                       ~= {},
-                        RAM free                   = {}Mo, 
+                        Execution rate             = 0.00050067901 sec/ko
+                        Ref. CPU                   = 8 logical
+                        Ref. CPU type              = 2.4Ghz, i5 11Gen
+                        Ref. RAM                   = 8Go
                         _____________________________________________________________________
-                        Nbr processes              = {}, 
-                        RAM available              = {}Mo (RAM free - {}Mo), 
-                        Estimated RAM              = {}Mo ({}Mo each one) (for all processes), 
-                        Recommended root folders   = {} folders (in_dir root folders count),
-                        Folders in in_dir          = {} folders""".format(in_dir_size_mo,
+                        IN_DIR path                = {}
+                        IN_DIR size                = {}Mo ({}Go)
+                        Estimated execution time   = {} sec ({} min = {} hours)
+                        CPU                       ~= {}
+                        RAM free                   = {}Mo
+                        _____________________________________________________________________
+                        Nbr processes              = {}
+                        RAM available              = {}Mo (RAM free - {}Mo)
+                        Estimated RAM              = {}Mo ({}Mo each one) (for all processes)
+                        Recommended root folders   = {} folders (in_dir root folders count)
+                        Folders in in_dir          = {} folders
+                        """.format(os.path.abspath(config['in_dir']),
+                                                                        in_dir_size_mo,
                                                                         math.ceil(in_dir_size_mo/1024),
                                                                         math.ceil(exec_time_sec),
                                                                         math.ceil(exec_time_sec/60),
@@ -148,6 +143,10 @@ if __name__=="__main__":
         LOGGER.log(INFO, 'To run the script add the -s option to the command')
         exit()
         
+    if not os.path.isdir(config['out_dir']):
+        os.mkdir(config['out_dir'])
+    if not os.path.isdir('logs'):
+        os.mkdir('logs')
     # Start program
     LOGGER.log(INFO, "Script started")
     pipelines = []
@@ -264,7 +263,17 @@ if __name__=="__main__":
                                                         use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
                                                         loaders= [(
                                                                     config['buffer_size']*10, 
-                                                                    MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)) 
+                                                                    MySQL_DBLoader( _LOGGER, **{
+                                                                                    'input_key_path': None, 
+                                                                                    'values_path': [('word', ['_', 'word'], True), 
+                                                                                                    ('file', ['file_path'], True),
+                                                                                                    ('words_count', ['words_count'], True)],
+                                                                                    'sql_query': sql_query,
+                                                                                    'buffer_size': config['buffer_size'],
+                                                                                    'host': config['db_host'],
+                                                                                    'database': config['db_name'],
+                                                                                    'user': config['db_user'],
+                                                                                    'password': config['db_password']})) 
                                                                     for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
                                                 )
                                         ),
