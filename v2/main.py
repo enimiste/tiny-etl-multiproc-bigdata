@@ -62,9 +62,9 @@ if __name__=="__main__":
         'use_threads_as_transformation_pipelines': False,
         'use_threads_as_loaders_executors': False,
         'use_threads_as_extractors_executors': False,
-        'load_balancer_parallel_loader_count': 20,
+        'load_balancer_parallel_loader_count': 4,
         'use_threads_as_load_balancer_loaders_executors': True,
-        'load_balancer_buffer_size': 1000
+        'load_balancer_buffer_size': 1_000
     }
 
     start_exec_time = time.perf_counter()
@@ -93,14 +93,26 @@ if __name__=="__main__":
     LOGGER.log(INFO, 'IN DIR has the size of : {} Mo'.format(in_dir_size_mo))
     dirs = os.listdir(config['in_dir'])
     nbr_dirs = len(dirs)
-    nbr_processes_per_pip=(1 + config['max_transformation_pipelines'] + config['load_balancer_parallel_loader_count'] +1)
+    nbr_processes_per_pip=0
+    if not config['use_threads_as_extractors_executors'] :
+        nbr_processes_per_pip+=1
+
+    if not config['use_threads_as_loaders_executors'] :
+        nbr_processes_per_pip+=1
+
+    if not config['use_threads_as_transformation_pipelines'] :
+        nbr_processes_per_pip+=config['max_transformation_pipelines']
+
+    if not config['use_threads_as_load_balancer_loaders_executors'] :
+        nbr_processes_per_pip+=config['load_balancer_parallel_loader_count']
+    
     nbr_processes = nbr_dirs * nbr_processes_per_pip
-    ram_per_process_mo = 30
+    ram_per_process_mo = 100
     ram_mo = math.floor(psutil.virtual_memory()[1]/(1024*1024))
-    ram_reserv_mo = 512
+    ram_reserv_mo = 1024
     ram_secur_mo = max(0, ram_mo - ram_reserv_mo)
     estim_processes_mo = nbr_processes*ram_per_process_mo #80Mo by process
-    nbr_dirs_secur = math.floor((ram_secur_mo/ram_per_process_mo)/nbr_processes_per_pip)
+    nbr_dirs_secur = max(1, math.ceil((ram_secur_mo/ram_per_process_mo)/math.floor(nbr_processes_per_pip * 1.6))) #1.6 majoration factor
     LOGGER.log(INFO, """
                         Nbr processes \t~= {}, 
                         RAM free \t= {}Mo, 
