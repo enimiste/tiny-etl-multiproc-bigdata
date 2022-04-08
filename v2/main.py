@@ -107,7 +107,7 @@ if __name__=="__main__":
         nbr_processes_per_pip+=config['load_balancer_parallel_loader_count']
     
     cpus_count = psutil.cpu_count()
-    exec_time_sec = (0.00050067901 * cpus_count/8) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
+    exec_time_sec = (0.00050067901 * 8/cpus_count) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
     nbr_processes = nbr_dirs * nbr_processes_per_pip
     ram_per_process_mo = 100
     ram_mo = math.floor(psutil.virtual_memory()[1]/(1024*1024))
