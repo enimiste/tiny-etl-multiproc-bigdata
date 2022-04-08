@@ -19,11 +19,9 @@ from core.transformers import ItemAttributeTransformer
 from core.loaders import ConditionalLoader, MySQL_DBLoader
 from core.transformers import NoopTransformer
 from core.transformers import ReduceItemTransformer
-from core.transformers import FileTextReaderTransformer
 from core.transformers import AddStaticValuesTransformer
 from core.loaders import LoadBalanceLoader
 from core.loaders import NoopLoader
-from core.commons import basename_backwards
 from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
 from core.transformers import UniqueFilterTransformer
