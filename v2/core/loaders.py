@@ -353,10 +353,10 @@ class MySQL_DBLoader(AbstractLoader):
                 connection = self._connect()
                 if reconnection_retries<5:
                     reconnection_retries += 1
-                    super().log_msg("Reconnection {}/5".format(reconnection_retries))
+                    super().log_msg("Reconnection {}/5".format(reconnection_retries), level=INFO)
                     continue
                 else:
-                    super().log_msg("Reconnection max retries reached (=5)".format(reconnection_retries))
+                    super().log_msg("Reconnection max retries reached (=5)".format(reconnection_retries), level=INFO)
             except mysql.connector.DataError as error:
                 super().log_msg("Failed to insert records. Error={}".format(error), exception=error, level=ERROR)
                 if connection is not None and connection.in_transaction:
