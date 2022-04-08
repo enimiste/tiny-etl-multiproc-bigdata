@@ -53,18 +53,18 @@ if __name__=="__main__":
         'in_dir': '../bdall_test_data/small_data',
         'out_dir': 'out_dir',
         'save_to_db': True, 
-        'buffer_size': 10_000, 
+        'buffer_size': 10_000,#10_000 optimal
         'db_host': 'localhost', 
         'db_name': 'words', 
         'db_user': 'root', 
         'db_password': 'root',
-        'max_transformation_pipelines': 2,
-        'use_threads_as_transformation_pipelines': False,
-        'use_threads_as_loaders_executors': False,
-        'use_threads_as_extractors_executors': False,
-        'load_balancer_parallel_loader_count': 4,
-        'use_threads_as_load_balancer_loaders_executors': True,
-        'load_balancer_buffer_size': 1_000
+        'max_transformation_pipelines': 2,#2 optimal
+        'use_threads_as_transformation_pipelines': False,#False optimal
+        'use_threads_as_loaders_executors': False,#False optimal
+        'use_threads_as_extractors_executors': False,#False optimal
+        'load_balancer_parallel_loader_count': 4,#4 optimal
+        'use_threads_as_load_balancer_loaders_executors': True,#True optimal
+        'load_balancer_buffer_size': 1_000#1_000 optimal
     }
 
     start_exec_time = time.perf_counter()
