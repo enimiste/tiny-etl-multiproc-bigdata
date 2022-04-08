@@ -117,10 +117,10 @@ if __name__=="__main__":
     nbr_dirs_secur = max(1, math.ceil((ram_secur_mo/ram_per_process_mo)/math.floor(nbr_processes_per_pip * 1.6))) #1.6 majoration factor
     LOGGER.log(INFO, """
                         IN_DIR size                = {}Mo ({}Go),
-                        Execution time             = {} sec ({} min={} hours),
+                        Execution time             = {} sec ({} min = {} hours),
                         CPU                       ~= {},
                         RAM free                   = {}Mo, 
-                        _________________________________________________________
+                        _____________________________________________________________________
                         Nbr processes              = {}, 
                         RAM available              = {}Mo (RAM free - {}Mo), 
                         Estimated RAM              = {}Mo ({}Mo each one) (for all processes), 
