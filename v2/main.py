@@ -27,6 +27,7 @@ from core.commons import basename_backwards
 from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
 from core.transformers import UniqueFilterTransformer
+from v2.core.commons import basename_backwards_x3, format_duree, truncate_str_255, truncate_str_270
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -39,30 +40,37 @@ logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
                                                 encoding='utf-8',
                                                 format=LOGGING_FORMAT)
 LOGGER = logging.getLogger("Global")
-                          
 
-def basename_backwards_x3(path: str) -> str:
-    return basename_backwards(path, 3)
-
-def basename_backwards_x2(path: str) -> str:
-    return basename_backwards(path, 2)
+# IN_DIR = '../bdall_test_data/__generated'
+# IN_DIR = '../bdall_test_data/small_data'
+IN_DIR = '../bdall_test_data/tiny_data'
+SAVE_TO_DB = True
+DB_HOST = 'localhost'
+DB_NAME = 'words'
+DB_USER = 'root'
+DB_PWD = 'root'
+# DB_SQL_QUERY="""INSERT INTO allwordstemp (word, filename, filecount)  VALUES(%s,%s,%s)"""
+DB_SQL_QUERY= """INSERT INTO words (word, file_path, file_words_count)  VALUES(%s,%s,%s)"""
 
 if __name__=="__main__":
     #0.00050067901 sec/ko
     config = {
-        # 'in_dir': '../bdall_test_data/__generated',
-        'in_dir': '../bdall_test_data/small_data',
+        'in_dir': IN_DIR,
         'out_dir': 'out_dir',
-        'save_to_db': True, 
+        'save_to_db': SAVE_TO_DB, 
         'buffer_size': 10_000,#10_000 optimal
-        'db_host': 'localhost', 
-        'db_name': 'words', 
-        'db_user': 'root', 
-        'db_password': 'root',
+        'db_host': DB_HOST, 
+        'db_name': DB_NAME, 
+        'db_user': DB_USER, 
+        'db_password': DB_PWD,
+        'db_sql_query': DB_SQL_QUERY,
+        'use_threads_as_extractors_executors': False,#False optimal
         'max_transformation_pipelines': 2,#2 optimal
         'use_threads_as_transformation_pipelines': False,#False optimal
         'use_threads_as_loaders_executors': False,#False optimal
-        'use_threads_as_extractors_executors': False,#False optimal
+        'values_to_load_path': [('word', ['_', 'word'], True), 
+                                ('file', ['file_path'], True),
+                                ('words_count', ['words_count'], True)],
         'load_balancer_parallel_loader_count': 4,#4 optimal
         'use_threads_as_load_balancer_loaders_executors': True,#True optimal
         'load_balancer_buffer_size': 1_000#1_000 optimal
@@ -70,9 +78,6 @@ if __name__=="__main__":
 
     start_exec_time = time.perf_counter()
     words_saver = None
-    
-    # sql_query="""INSERT INTO allwordstemp (word, filename, filecount)  VALUES(%s,%s,%s)"""
-    sql_query= """INSERT INTO words (word, file_path, file_words_count)  VALUES(%s,%s,%s)"""
     
     LOGGER.log(INFO, 'Config : {}'.format(json.dumps(config, indent=4)))
 
@@ -110,7 +115,7 @@ if __name__=="__main__":
                         _____________________________________________________________________
                         IN_DIR path                = {}
                         IN_DIR size                = {}Mo ({}Go)
-                        Estimated execution time   = {} sec ({} min = {} hours)
+                        Estimated execution time   = {} (Total : {}sec)
                         CPU                       ~= {}
                         RAM free                   = {}Mo
                         _____________________________________________________________________
@@ -122,9 +127,8 @@ if __name__=="__main__":
                         """.format(os.path.abspath(config['in_dir']),
                                                                         in_dir_size_mo,
                                                                         math.ceil(in_dir_size_mo/1024),
-                                                                        math.ceil(exec_time_sec),
-                                                                        math.ceil(exec_time_sec/60),
-                                                                        math.ceil(exec_time_sec/3600),
+                                                                        format_duree(exec_time_sec),
+                                                                        math.floor(exec_time_sec),
                                                                         cpus_count,
                                                                         ram_mo, 
                                                                         nbr_processes, 
@@ -223,11 +227,13 @@ if __name__=="__main__":
                                                                 copy_values_key_paths=[('file_path', ['file_path']), 
                                                                                     ('words_count', ['words_count'])]),
                                                         ItemAttributeTransformer(_LOGGER, 
-                                                                operations=[(['_', 'word'], [ArabicTextWordsTokenizerTransformer.remove_diac])]),
+                                                                operations=[
+                                                                    (['_', 'word'], [ArabicTextWordsTokenizerTransformer.remove_diac, truncate_str_255]),
+                                                                ]),
                                                 ]
                                         ),                                        
                                         ItemAttributeTransformer(_LOGGER, 
-                                                operations=[(['file_path'], [basename_backwards_x3])]
+                                                operations=[(['file_path'], [basename_backwards_x3, truncate_str_270])]
                                         ),
                                 ],
                                 loaders=[
@@ -235,9 +241,7 @@ if __name__=="__main__":
                                         #         not config['save_to_db'],
                                         #         CSV_FileLoader( _LOGGER,
                                         #                 input_key_path=None,
-                                        #                 values_path=[('word', ['_', 'word'], True), 
-                                        #                                 ('file', ['file_path'], True),
-                                        #                                 ('words_count', ['words_count'], True)],
+                                        #                 values_path= config['values_to_load_path']
                                         #                 out_dir=os.path.abspath(config['out_dir']),
                                         #                 out_file_ext='txt',
                                         #                 buffer_size=config['buffer_size'])
@@ -251,9 +255,7 @@ if __name__=="__main__":
                                         #         input_key_path=None, 
                                         #         log=True, 
                                         #         log_level=INFO, 
-                                        #         values_path=[('word', ['_', 'word'], True), 
-                                        #                     ('file', ['file_path'], True),
-                                        #                     ('words_count', ['words_count'], True)],
+                                        #         values_path=config['values_to_load_path'],
                                         # ),
                                         ConditionalLoader(  _LOGGER, 
                                                 config['save_to_db'],
@@ -266,10 +268,8 @@ if __name__=="__main__":
                                                                     config['buffer_size']*10, 
                                                                     MySQL_DBLoader( _LOGGER, **{
                                                                                     'input_key_path': None, 
-                                                                                    'values_path': [('word', ['_', 'word'], True), 
-                                                                                                    ('file', ['file_path'], True),
-                                                                                                    ('words_count', ['words_count'], True)],
-                                                                                    'sql_query': sql_query,
+                                                                                    'values_path': config['values_to_load_path'],
+                                                                                    'sql_query': config['db_sql_query'],
                                                                                     'buffer_size': config['buffer_size'],
                                                                                     'host': config['db_host'],
                                                                                     'database': config['db_name'],

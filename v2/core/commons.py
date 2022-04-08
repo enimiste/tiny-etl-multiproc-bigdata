@@ -166,6 +166,25 @@ def basename_backwards(path: str, backwards_level: int=2) -> str:
         paths.reverse()
         return os.path.join(paths[0], *paths[1:])
     
+def basename_backwards_x3(path: str) -> str:
+    return basename_backwards(path, 3)
+
+def basename_backwards_x2(path: str) -> str:
+    return basename_backwards(path, 2)
+
+def truncate_str_255(txt: str) -> str:
+    return txt if txt is None else txt[0:min(254, len(txt))]
+
+def truncate_str_270(txt: str) -> str:
+    return txt if txt is None else txt[0:min(269, len(txt))]
+
+def format_duree(duree_sec: int) -> str:
+    duree_sec = math.floor(duree_sec)
+    h = int(duree_sec//3600)
+    m = int((duree_sec%3600)//60)
+    s = duree_sec - (h*3600 + m*60)
+    return '{}h {}m {}sec'.format(h, m, s)
+    
 def make_thread_process(use_thread: bool, target, args) -> threading.Thread | multiprocessing.Process:
     if use_thread:
         return threading.Thread(target=target, args=args)
