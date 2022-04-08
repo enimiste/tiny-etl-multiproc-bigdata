@@ -77,7 +77,7 @@ if __name__=="__main__":
                             ('file', ['file_path'], True),
                             ('words_count', ['words_count'], True)],
         #    sql_query= """INSERT INTO allwordstemp (word, filename, filecount)
-        #                    VALUES(%s,%s,0)""",
+        #                    VALUES(%s,%s,%s)""",
             'sql_query': """INSERT INTO words (word, file_path, file_words_count)
                             VALUES(%s,%s,%s)""",
             'buffer_size': config['buffer_size'],
