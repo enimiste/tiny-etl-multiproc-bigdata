@@ -48,6 +48,7 @@ def basename_backwards_x2(path: str) -> str:
     return basename_backwards(path, 2)
 
 if __name__=="__main__":
+    #0.00050067901 sec/ko
     config = {
         # 'in_dir': '../bdall_test_data/__generated',
         'in_dir': '../bdall_test_data/small_data',
@@ -272,13 +273,25 @@ if __name__=="__main__":
 
 """
 SELECT COUNT(*) FROM words; 
-2_140_380 rows in 2 min/28 files (12.9Mo)
-28_160_000 rows in 39 min/491 files
+-- 2_140_380 in 2 min/28 fichiers (12.9Mo)  ==> 0.00908430232 sec/ko
+-- 676_360_080 in 9.65 hour/8848 fichiers (4Go)
 
-~ 676_360_080 rows in 9.65 hour/8848 files (4Go)
+-- arabic : 32_288_256 words processed in 8.25 min/01  file   324Mo (1_001 unique rows + file words count fulltext) ==> 2go RAM
+-- arabic : 32_288_256 words processed in 5.61 min/01  file   324Mo (1_001 unique rows without file words count) ==> qlqs mo RAM
+-- arabic : 32_288_256 words processed in 9.89 min/01  file   324Mo (1_001 unique rows + file words count by lines) ==> 700mo RAM
+-- arabic : 32_288_256 words processed in 9.16 min/196 file   324Mo (1_961_96 unique rows + file words count by lines one folder)  ==> 700mo RAM
+-- arabic : 32_288_256 words processed in 7.81 min/196 file   324Mo (1_961_96 unique rows + file words count by lines two folders) ==> 700mo RAM
+-- ===> 0.00178855613 sec/ko
+-- arabic : 407_886_336   words processed in 35 min/2_476 file     4Go   (24_78_476 unique value + file words count by lines two folders) ==> 1go RAM
+-- arabic : 1_223_659_008 words processed in 1h31 min/7_428 file  12Go   (7_435_428 unique value + file words count by lines two folders) ==> 1go RAM
+-- ===> 0.00050067901 sec/ko
 
-SELECT DISTINCT(file_path) FROM words;
+SELECT count(DISTINCT(file_path)) FROM words;
 
-SELECT * FROM words LIMIT 100;
+select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words AS w) AS x;
+
+SELECT * FROM words LIMIT 1000;
+
+SELECT concat(word, file_path), COUNT(*) AS x FROM words GROUP BY 1 HAVING X>1; 
 """
     
