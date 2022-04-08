@@ -91,7 +91,6 @@ if __name__=="__main__":
 
     # Check RAM availability
     in_dir_size_mo = round(get_dir_size_in_mo(config['in_dir']), 3)
-    LOGGER.log(INFO, 'IN DIR has the size of : {} Mo'.format(in_dir_size_mo))
     dirs = os.listdir(config['in_dir'])
     nbr_dirs = len(dirs)
     nbr_processes_per_pip=0
@@ -107,6 +106,8 @@ if __name__=="__main__":
     if not config['use_threads_as_load_balancer_loaders_executors'] :
         nbr_processes_per_pip+=config['load_balancer_parallel_loader_count']
     
+    cpus_count = psutil.cpu_count()
+    exec_time_sec = (0.00050067901 * cpus_count/8) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
     nbr_processes = nbr_dirs * nbr_processes_per_pip
     ram_per_process_mo = 100
     ram_mo = math.floor(psutil.virtual_memory()[1]/(1024*1024))
@@ -115,13 +116,23 @@ if __name__=="__main__":
     estim_processes_mo = nbr_processes*ram_per_process_mo #80Mo by process
     nbr_dirs_secur = max(1, math.ceil((ram_secur_mo/ram_per_process_mo)/math.floor(nbr_processes_per_pip * 1.6))) #1.6 majoration factor
     LOGGER.log(INFO, """
-                        Nbr processes \t~= {}, 
-                        RAM free \t= {}Mo, 
-                        RAM available \t= {}Mo (RAM free - {}Mo), 
-                        Estimated RAM for all processes \t= {}Mo ({}Mo each one), 
-                        Recommended in_dir root folder count \t= {} folders,
-                        Nbr folder in in_dir \t= {} folders""".format(nbr_processes, 
+                        IN_DIR size                = {}Mo ({}Go),
+                        Execution time             = {} sec ({} min={} hours),
+                        CPU                       ~= {},
+                        RAM free                   = {}Mo, 
+                        _________________________________________________________
+                        Nbr processes              = {}, 
+                        RAM available              = {}Mo (RAM free - {}Mo), 
+                        Estimated RAM              = {}Mo ({}Mo each one) (for all processes), 
+                        Recommended root folders   = {} folders (in_dir root folders count),
+                        Folders in in_dir          = {} folders""".format(in_dir_size_mo,
+                                                                        math.ceil(in_dir_size_mo/1024),
+                                                                        math.ceil(exec_time_sec),
+                                                                        math.ceil(exec_time_sec/60),
+                                                                        math.ceil(exec_time_sec/3600),
+                                                                        cpus_count,
                                                                         ram_mo, 
+                                                                        nbr_processes, 
                                                                         ram_secur_mo, 
                                                                         ram_reserv_mo, 
                                                                         estim_processes_mo, 
