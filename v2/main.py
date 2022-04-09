@@ -10,7 +10,7 @@ import os
 import sys
 
 import psutil
-from core.extractors import FilesListExtractor, FoldersFilesListExtractor
+from core.extractors import FilesListExtractor, FoldersFilesListExtractor, AbstractExtractor
 from core.loaders import CSV_FileLoader
 from core.pipline import ThreadedPipeline
 from core.transformers import  FileToTextLinesTransformer, TextWordTokenizerTransformer
