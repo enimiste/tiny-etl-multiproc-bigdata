@@ -25,7 +25,7 @@ from core.loaders import NoopLoader
 from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
 from core.transformers import UniqueFilterTransformer
-from core.commons import basename_backwards_x3, format_duree, truncate_str_255, truncate_str_270
+from core.commons import basename_backwards_x4, format_duree, truncate_str_255, truncate_str_270
 from core.commons import rotary_iter
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
@@ -46,7 +46,7 @@ LOGGER = logging.getLogger("Global")
 # IN_DIR = '../bdall_test_data/__generated'
 # IN_DIR = '../bdall_test_data/small_data'
 # IN_DIR = '../bdall_test_data/tiny_data'
-IN_DIR = '../bdall'
+IN_DIR = 'E:/bdall'
 SAVE_TO_DB = True
 DB_HOST = 'localhost'
 DB_NAME = 'words'
@@ -54,7 +54,7 @@ DB_USER = 'root'
 DB_PWD = 'root'
 # DB_SQL_QUERY="""INSERT INTO allwordstemp (word, filename, filecount)  VALUES(%s,%s,%s)"""
 DB_SQL_QUERY= """INSERT INTO words (word, file_path, file_words_count)  VALUES(%s,%s,%s)"""
-CPU_MAX_USAGE = 0.80 #0...1
+CPU_MAX_USAGE = 0.5 #0...1
 MONO_PIPELINE = True
 #==========================================================
 
@@ -80,7 +80,7 @@ if __name__=="__main__":
         'cpu_pax_usage': max(0, min(1, CPU_MAX_USAGE)),
         'cpus_affinity_options': [],# will be calculated below
         'use_threads_as_extractors_executors': False,#False optimal
-        'max_transformation_pipelines': 2,#2 optimal
+        'max_transformation_pipelines': 3,#2 optimal
         'use_threads_as_transformation_pipelines': False,#False optimal
         'use_threads_as_loaders_executors': False,#False optimal
         'values_to_load_path': [('word', ['_', 'word'], True), 
@@ -96,6 +96,7 @@ if __name__=="__main__":
     words_saver = None
 
     # Check RAM availability
+    LOGGER.log(INFO, 'Calculating in_dir size ....')
     in_dir_size_mo = round(get_dir_size_in_mo(config['in_dir']), 3)
     dirs = os.listdir(config['in_dir'])
     nbr_dirs = len(dirs)
@@ -118,7 +119,8 @@ if __name__=="__main__":
         cpus_max = 1
         if '--all-cpu' in sys.argv:
             cpus_max = cpus_count
-        cpus_max = math.floor(cpus_count*config['cpu_pax_usage'])
+        else:
+            cpus_max = math.floor(cpus_count*config['cpu_pax_usage'])
         if cpus_max==0:
             cpus_max=1
         config['cpus_affinity_options'] = [0] if cpus_count == 1 else [i for i in range(0, cpus_max)]
@@ -128,7 +130,7 @@ if __name__=="__main__":
         exit()
     #endregion
     exec_time_sec = (0.00050067901 * 8/nbr_cpus_affinity_options) * (1+(1 - nbr_cpus_affinity_options/cpus_count)) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
-    nbr_processes = nbr_dirs * nbr_processes_per_pip
+    nbr_processes = (1 if config['mono_pipeline'] else nbr_dirs) * nbr_processes_per_pip
     ram_per_process_mo = 100
     ram_mo = math.floor(psutil.virtual_memory()[1]/(1024*1024))
     ram_reserv_mo = 1024
@@ -139,6 +141,7 @@ if __name__=="__main__":
     
     LOGGER.log(INFO, 'Config : {}'.format(json.dumps(config, indent=4)))
     LOGGER.log(INFO, """
+
                         Execution rate             = 0.00050067901 sec/ko
                         Ref. CPU                   = 8 logical
                         Ref. CPU type              = 2.4Ghz, i5 11Gen
@@ -146,28 +149,29 @@ if __name__=="__main__":
                         _____________________________________________________________________
                         IN_DIR path                = {}
                         IN_DIR size                = {}Mo ({}Go)
-                        Estimated execution time   = {} (Total : {}sec)
                         CPU                       ~= {}
                         RAM free                   = {}Mo
-                        _____________________________________________________________________
-                        Nbr processes              = {}
                         CPUs affinity options      = {} vCpu ({}%)
+                        Estimated execution time   = {} (Total : {}sec)
+                        _____________________________________________________________________
+                        Nbr processes python       = {}
                         RAM available              = {}Mo (RAM free - {}Mo)
                         Estimated RAM              = {}Mo ({}Mo each one) (for all processes)
                         Pipelines                  = {}
                         _____________________________________________________________________
                         Recommended root folders   = {} folders (in_dir root folders count)
                         Folders in in_dir          = {} folders
+                        
                         """.format(os.path.abspath(config['in_dir']),
                                                                         in_dir_size_mo,
                                                                         math.ceil(in_dir_size_mo/1024),
-                                                                        format_duree(exec_time_sec),
-                                                                        math.floor(exec_time_sec),
                                                                         cpus_count,
                                                                         ram_mo, 
-                                                                        nbr_processes, 
-                                                                        config['cpus_affinity_options'],
+                                                                        len(config['cpus_affinity_options']),
                                                                         round(100*nbr_cpus_affinity_options/cpus_count, 2),
+                                                                        format_duree(exec_time_sec),
+                                                                        math.floor(exec_time_sec),
+                                                                        nbr_processes, 
                                                                         ram_secur_mo, 
                                                                         ram_reserv_mo, 
                                                                         estim_processes_mo, 
@@ -308,7 +312,7 @@ def make_threaded_pipeline(extractor_: AbstractExtractor):
                                 ]
                         ),                                        
                         ItemAttributeTransformer(_LOGGER, 
-                                operations=[(['file_path'], [basename_backwards_x3, truncate_str_270])]
+                                operations=[(['file_path'], [basename_backwards_x4, truncate_str_270])]
                         ),
                 ],
                 loaders=[

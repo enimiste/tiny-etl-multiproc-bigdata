@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from functools import reduce
 import logging
-from logging import ERROR, Logger, DEBUG
+from logging import ERROR, Logger, DEBUG, INFO
 import math
 import multiprocessing
 import os
@@ -154,6 +154,9 @@ def basename_backwards(path: str, backwards_level: int=2) -> str:
 def basename_backwards_x3(path: str) -> str:
     return basename_backwards(path, 3)
 
+def basename_backwards_x4(path: str) -> str:
+    return basename_backwards(path, 4)
+
 def basename_backwards_x2(path: str) -> str:
     return basename_backwards(path, 2)
 
@@ -165,10 +168,14 @@ def truncate_str_270(txt: str) -> str:
 
 def format_duree(duree_sec: int) -> str:
     duree_sec = math.floor(duree_sec)
+    d = 0
     h = int(duree_sec//3600)
+    if h > 24:
+        d = int(h//24)
+        h = h%24
     m = int((duree_sec%3600)//60)
     s = duree_sec - (h*3600 + m*60)
-    return '{}h {}m {}sec'.format(h, m, s)
+    return '{}d {}h {}m {}sec'.format(d, h, m, s)
     
 def make_thread_process(use_thread: bool, target, args) -> threading.Thread | multiprocessing.Process:
     if use_thread:
@@ -177,14 +184,14 @@ def make_thread_process(use_thread: bool, target, args) -> threading.Thread | mu
         p = multiprocessing.Process(target=target, args=args)
         return p
 
-def set_process_affinity(process, cpus_affinities: Set[int], print_log: bool=False, log_prefix: str=''):
+def set_process_affinity(process, cpus_affinities: Set[int], logger: Logger=None, print_log: bool=False, log_prefix: str='', log_level=INFO):
     if isinstance(process, multiprocessing.Process):
         pid = process.pid
         if pid is not None:
             if sys.platform.startswith('win32'):
                 set_process_affinity_mask(pid, reduce( lambda acc, x: acc + math.floor(math.pow(2, x)), cpus_affinities, 0))
-                if print_log:
-                    print('{} CPU  N° {} used as process affinity'.format(log_prefix, cpus_affinities))
+                if print_log and logger is not None:
+                    logger.log(log_level, '{} CPU  N° {} used as process affinity'.format(log_prefix, cpus_affinities))
 
 def get_dir_size_in_mo(start_path = '.'):
     total_size = 0
