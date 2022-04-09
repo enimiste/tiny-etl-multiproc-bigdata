@@ -40,6 +40,9 @@ logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
                                                 format=LOGGING_FORMAT)
 LOGGER = logging.getLogger("Global")
 
+
+
+#============================================= PARAMETRAGE :
 # IN_DIR = '../bdall_test_data/__generated'
 # IN_DIR = '../bdall_test_data/small_data'
 IN_DIR = '../bdall_test_data/tiny_data'
@@ -51,6 +54,14 @@ DB_PWD = 'root'
 # DB_SQL_QUERY="""INSERT INTO allwordstemp (word, filename, filecount)  VALUES(%s,%s,%s)"""
 DB_SQL_QUERY= """INSERT INTO words (word, file_path, file_words_count)  VALUES(%s,%s,%s)"""
 CPU_MAX_USAGE = 0.80 #0...1
+#==========================================================
+
+
+
+
+
+
+
 
 if __name__=="__main__":
     #0.00050067901 sec/ko
