@@ -5,19 +5,26 @@ from logging import ERROR, Logger, DEBUG
 import math
 import multiprocessing
 import os
+import random
 import sys
 import threading
 import traceback
 from typing import Any, AnyStr, Callable, Generator, List, Set, Tuple
+import uuid
 
 from core.affinity import set_process_affinity_mask
 
-def rotary_iter(items: list):
+def rotary_iter(items: list, rand: bool=False):
+    random.seed(str(uuid.uuid1()))
     n = len(items)
-    i = n-1
-    while True:
-        i = (i+1)%n
-        yield items[i]
+    if rand:
+        while True:
+            yield items[random.randrange(0, n)]
+    else:
+        i = n-1
+        while True:
+            i = (i+1)%n
+            yield items[i]
 
 def dict_deep_get(dictionary: dict, keys: List[AnyStr]):
     return reduce(lambda d, key: d.get(key) if (type(d) is dict and key in d) else None, keys, dictionary)
@@ -170,14 +177,18 @@ def make_thread_process(use_thread: bool, target, args) -> threading.Thread | mu
         p = multiprocessing.Process(target=target, args=args)
         return p
 
-def set_process_affinity(process, cpus_affinity: int):
+def set_process_affinity(process, cpus_affinity: Callable[[], int], print_log: bool=False):
     if isinstance(process, multiprocessing.Process):
         pid = process.pid
         if pid is not None:
             if sys.platform.startswith('linux'):
-                os.sched_setaffinity(pid, cpus_affinity)
+                x = cpus_affinity()
+                os.sched_setaffinity(pid, x)
+                print('CPU  N° {} used as process affinity'.format(x))
             elif sys.platform.startswith('win32'):
-                set_process_affinity_mask(pid, math.floor(math.pow(2, cpus_affinity)))
+                x = cpus_affinity()
+                set_process_affinity_mask(pid, math.floor(math.pow(2, x)))
+                print('CPU  N° {} used as process affinity'.format(x))
 
 def get_dir_size_in_mo(start_path = '.'):
     total_size = 0

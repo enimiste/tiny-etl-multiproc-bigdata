@@ -245,10 +245,10 @@ class ThreadedPipeline(AbstractPipeline):
 
             threads = load_threads +  trans_threads + extract_threads
             self.logger.log_msg("Starting {} threads of the pipeline {}.".format(len(threads), self.job_uuid), level=INFO)
-            cpus_affinity_gen = rotary_iter(self.cpus_affinity_options)
+            cpus_affinity_gen = rotary_iter(self.cpus_affinity_options, rand=True)
             for p in threads:
                 p.start()
-                set_process_affinity(p, next(cpus_affinity_gen))
+                set_process_affinity(p, lambda: next(cpus_affinity_gen))
             self.pipeline_started.value=1
             self.logger.log_msg("Pipeline {} running".format(self.job_uuid), level=INFO)
 
