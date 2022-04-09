@@ -72,7 +72,7 @@ if __name__=="__main__":
                                 ('file', ['file_path'], True),
                                 ('words_count', ['words_count'], True)],
         'load_balancer_parallel_loader_count': 4,#4 optimal
-        'use_threads_as_load_balancer_loaders_executors': True,#True optimal
+        'use_threads_as_load_balancer_loaders_executors': False,#True optimal
         'load_balancer_buffer_size': 1_000#1_000 optimal
     }
 
@@ -151,6 +151,15 @@ if __name__=="__main__":
         LOGGER.log(INFO, 'RAM not enough for running the {} processes ({}Mo each). You should structure the {} folder to have at most {} root folders, {} found'.format(
             nbr_processes, ram_per_process_mo, config['in_dir'], nbr_dirs_secur, nbr_dirs
         ))
+        LOGGER.log(INFO, """
+        Help :
+        python main.py options
+        
+        -s           Start processing
+        -f           Start processing even if the estimated RAM isn't enough
+        --all-cpus   Start processing using the full CPUs (default to 75% of CPUs are used)
+
+        """)
         if '-f' not in sys.argv:
             exit()
 
