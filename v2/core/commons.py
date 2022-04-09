@@ -152,13 +152,13 @@ def basename_backwards(path: str, backwards_level: int=2) -> str:
         return os.path.join(paths[0], *paths[1:])
     
 def basename_backwards_x3(path: str) -> str:
-    return basename_backwards(path, 3)
-
-def basename_backwards_x4(path: str) -> str:
     return basename_backwards(path, 4)
 
+def basename_backwards_x4(path: str) -> str:
+    return basename_backwards(path, 5)
+
 def basename_backwards_x2(path: str) -> str:
-    return basename_backwards(path, 2)
+    return basename_backwards(path, 3)
 
 def truncate_str_255(txt: str) -> str:
     return txt if txt is None else txt[0:min(254, len(txt))]
