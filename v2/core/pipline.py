@@ -274,6 +274,11 @@ class ThreadedPipeline(AbstractPipeline):
                     extractor_joined = block_join_threads_or_processes(extract_threads, lambda: self.pipeline_closed.value==1)
                     self.logger.log_msg("Extract threads joined", level=INFO)
 
+                #region : Transformers
+                if extractor_joined and not transformators_joined:
+                    affinities = set.union(self.transformers_cpus_affinity_options, self.global_cpus_affinity_options)
+                    for p in trans_threads:
+                        set_process_affinity(p, affinities, log_prefix='Transformer 2nd round', print_log=True)
                 if not transformators_joined and self.transformation_pipeline_alive.value==0:
                     transformators_joined = block_join_threads_or_processes(trans_threads, lambda: self.pipeline_closed.value==1,
                                                                             logger=self.logger, 
@@ -281,7 +286,13 @@ class ThreadedPipeline(AbstractPipeline):
                                                                             log_when_joined=True, 
                                                                             log_msg="Transformation joined")
                     self.logger.log_msg("Transformation threads joined. Waiting for loaders to finish their words...", level=INFO)
+                #endregion
 
+                #region : Loaders
+                if extractor_joined and transformators_joined and not loaders_joined:
+                    affinities = set.union(self.loaders_cpus_affinity_options, self.transformers_cpus_affinity_options, self.global_cpus_affinity_options)
+                    for p in load_threads:
+                        set_process_affinity(p, affinities, log_prefix='Loader executor 2nd round', print_log=True)
                 if not loaders_joined and self.loaders_alive.value==0:
                     loaders_joined = block_join_threads_or_processes(load_threads, lambda: self.pipeline_closed.value==1,
                                                                             logger=self.logger, 
@@ -289,7 +300,7 @@ class ThreadedPipeline(AbstractPipeline):
                                                                             log_when_joined=True, 
                                                                             log_msg="Loader joined")
                     self.logger.log_msg("Loaders threads joined", level=INFO)
-
+                #endregion
                 if extractor_joined and transformators_joined and loaders_joined:
                     self.close()
 
