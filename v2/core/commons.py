@@ -177,20 +177,14 @@ def make_thread_process(use_thread: bool, target, args) -> threading.Thread | mu
         p = multiprocessing.Process(target=target, args=args)
         return p
 
-def set_process_affinity(process, cpus_affinity: Callable[[], int], print_log: bool=False, log_prefix: str=''):
+def set_process_affinity(process, cpus_affinities: Set[int], print_log: bool=False, log_prefix: str=''):
     if isinstance(process, multiprocessing.Process):
         pid = process.pid
         if pid is not None:
-            if sys.platform.startswith('linux'):
-                x = cpus_affinity()
-                os.sched_setaffinity(pid, x)
+            if sys.platform.startswith('win32'):
+                set_process_affinity_mask(pid, reduce( lambda acc, x: acc + math.floor(math.pow(2, x)), cpus_affinities, 0))
                 if print_log:
-                    print('{} CPU  N° {} used as process affinity'.format(log_prefix, x))
-            elif sys.platform.startswith('win32'):
-                x = cpus_affinity()
-                set_process_affinity_mask(pid, math.floor(math.pow(2, x)))
-                if print_log:
-                    print('{} CPU  N° {} used as process affinity'.format(log_prefix, x))
+                    print('{} CPU  N° {} used as process affinity'.format(log_prefix, cpus_affinities))
 
 def get_dir_size_in_mo(start_path = '.'):
     total_size = 0

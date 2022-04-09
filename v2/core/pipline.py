@@ -57,9 +57,9 @@ class ThreadedPipeline(AbstractPipeline):
         self.extractor = extractor
         self.transformers = transformers
         self.loaders = loaders
-        self.global_cpus_affinity_options = global_cpus_affinity_options
-        self.transformers_cpus_affinity_options = transformers_cpus_affinity_options
-        self.loaders_cpus_affinity_options = loaders_cpus_affinity_options
+        self.global_cpus_affinity_options = set(global_cpus_affinity_options)
+        self.transformers_cpus_affinity_options = set(transformers_cpus_affinity_options)
+        self.loaders_cpus_affinity_options = set(loaders_cpus_affinity_options)
         self.use_threads_as_transformation_pipelines = use_threads_as_transformation_pipelines
         self.use_threads_as_loaders_executors = use_threads_as_loaders_executors
         self.use_threads_as_extractors_executors = use_threads_as_extractors_executors
@@ -253,19 +253,16 @@ class ThreadedPipeline(AbstractPipeline):
 
             threads = load_threads +  trans_threads + extract_threads
             self.logger.log_msg("Starting {} threads of the pipeline {}.".format(len(threads), self.job_uuid), level=INFO)
-            global_cpus_affinity_options_gen = rotary_iter(self.global_cpus_affinity_options, rand=True)
-            transformers_cpus_affinity_options_gen = rotary_iter(self.transformers_cpus_affinity_options, rand=True)
-            loaders_cpus_affinity_options_gen = rotary_iter(self.loaders_cpus_affinity_options, rand=True)
             for p in threads:
                 p.start()
             for p in extract_threads:
-                set_process_affinity(p, lambda: next(global_cpus_affinity_options_gen), log_prefix='Extractor', print_log=True)
+                set_process_affinity(p,  self.global_cpus_affinity_options, log_prefix='Extractor', print_log=True)
             for p in trans_threads:
-                set_process_affinity(p, lambda: next(transformers_cpus_affinity_options_gen), log_prefix='Transformer', print_log=True)
+                set_process_affinity(p, self.transformers_cpus_affinity_options, log_prefix='Transformer', print_log=True)
             for p in load_threads:
-                set_process_affinity(p, lambda: next(loaders_cpus_affinity_options_gen), log_prefix='Loader executor', print_log=True)
+                set_process_affinity(p, self.loaders_cpus_affinity_options, log_prefix='Loader executor', print_log=True)
 
-            set_process_affinity(self, lambda: next(global_cpus_affinity_options_gen), log_prefix='Pipeline', print_log=True)
+            set_process_affinity(self, self.global_cpus_affinity_options, log_prefix='Pipeline', print_log=True)
             self.pipeline_started.value=1
             self.logger.log_msg("Pipeline {} running".format(self.job_uuid), level=INFO)
 
