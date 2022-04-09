@@ -187,7 +187,7 @@ class LoadBalanceLoader(AbstractLoader):
         cpus_affinity_gen = rotary_iter(self.cpus_affinity_options, rand=True)
         for t in self.loaders_threads:
             t.start()
-            set_process_affinity(t, lambda: next(cpus_affinity_gen))
+            set_process_affinity(t, lambda: next(cpus_affinity_gen), log_prefix='Loader balancer loaders', print_log=True)
         super().log_msg('{} threads started for loadbalancing'.format(len(self.loaders_threads)), level=INFO)
         self.started=True
 

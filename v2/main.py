@@ -26,6 +26,7 @@ from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
 from core.transformers import UniqueFilterTransformer
 from core.commons import basename_backwards_x3, format_duree, truncate_str_255, truncate_str_270
+from core.commons import rotary_iter
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -62,7 +63,11 @@ if __name__=="__main__":
         'db_user': DB_USER, 
         'db_password': DB_PWD,
         'db_sql_query': DB_SQL_QUERY,
-        'cpus_affinity_options': None,# will be calculated below
+        'cpus_affinity_options': {
+            'loaders': [],#ints 0, 1
+            'transformers': [],#ints 0, 1
+            'global': []#ints 0, 1
+        },# will be calculated below
         'use_threads_as_extractors_executors': False,#False optimal
         'max_transformation_pipelines': 2,#2 optimal
         'use_threads_as_transformation_pipelines': False,#False optimal
@@ -77,8 +82,6 @@ if __name__=="__main__":
 
     start_exec_time = time.perf_counter()
     words_saver = None
-    
-    LOGGER.log(INFO, 'Config : {}'.format(json.dumps(config, indent=4)))
 
     # Check RAM availability
     in_dir_size_mo = round(get_dir_size_in_mo(config['in_dir']), 3)
@@ -98,8 +101,17 @@ if __name__=="__main__":
         nbr_processes_per_pip+=config['load_balancer_parallel_loader_count']
     
     cpus_count = psutil.cpu_count()
-    if config['cpus_affinity_options'] is None or len(config['cpus_affinity_options'])==0:
-        config['cpus_affinity_options'] = {0} if cpus_count == 1 else [i for i in range(0, int(cpus_count*0.75))]
+    #region CPU affinity
+    cpus_affinity_options = config['cpus_affinity_options']
+    options = rotary_iter([0] if cpus_count == 1 else [i for i in range(0, int(cpus_count*0.75))])
+    used_cpu_affinities = []
+    for k in cpus_affinity_options:
+        if cpus_affinity_options[k] is None or len(cpus_affinity_options[k])==0:
+            xs = [next(options), next(options)]
+            config['cpus_affinity_options'][k] = xs
+            used_cpu_affinities = used_cpu_affinities + xs
+    used_cpu_affinities = set(used_cpu_affinities)
+    #endregion
     exec_time_sec = (0.00050067901 * 8/cpus_count) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
     nbr_processes = nbr_dirs * nbr_processes_per_pip
     ram_per_process_mo = 100
@@ -108,6 +120,9 @@ if __name__=="__main__":
     ram_secur_mo = max(0, ram_mo - ram_reserv_mo)
     estim_processes_mo = nbr_processes*ram_per_process_mo #80Mo by process
     nbr_dirs_secur = max(1, math.ceil((ram_secur_mo/ram_per_process_mo)/math.floor(nbr_processes_per_pip * 1.6))) #1.6 majoration factor
+    
+    
+    LOGGER.log(INFO, 'Config : {}'.format(json.dumps(config, indent=4)))
     LOGGER.log(INFO, """
                         Execution rate             = 0.00050067901 sec/ko
                         Ref. CPU                   = 8 logical
@@ -134,8 +149,8 @@ if __name__=="__main__":
                                                                         cpus_count,
                                                                         ram_mo, 
                                                                         nbr_processes, 
-                                                                        config['cpus_affinity_options'],
-                                                                        round(100*len(config['cpus_affinity_options'])/cpus_count, 2),
+                                                                        used_cpu_affinities,
+                                                                        round(100*len(used_cpu_affinities)/cpus_count, 2),
                                                                         ram_secur_mo, 
                                                                         ram_reserv_mo, 
                                                                         estim_processes_mo, 
@@ -172,7 +187,9 @@ if __name__=="__main__":
                                 use_threads_as_transformation_pipelines=config['use_threads_as_transformation_pipelines'],
                                 use_threads_as_loaders_executors=config['use_threads_as_loaders_executors'],
                                 trans_in_queue_max_size=config['buffer_size'],
-                                cpus_affinity_options=config['cpus_affinity_options'],
+                                global_cpus_affinity_options=config['cpus_affinity_options']['global'],
+                                transformers_cpus_affinity_options=config['cpus_affinity_options']['transformers'],
+                                loaders_cpus_affinity_options=config['cpus_affinity_options']['loaders'],
                                 extractor=FilesListExtractor(_LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                                 transformers=[
                                         ItemAttributeTransformer(_LOGGER, operations=[(['_'], [os.path.abspath])]),
@@ -269,7 +286,7 @@ if __name__=="__main__":
                                                         queue_no_block_timeout_sec = 0.09,
                                                         buffer_size=config['load_balancer_buffer_size'],
                                                         use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
-                                                        cpus_affinity_options=config['cpus_affinity_options'],
+                                                        cpus_affinity_options=config['cpus_affinity_options']['loaders'],
                                                         loaders= [(
                                                                     config['buffer_size']*10, 
                                                                     MySQL_DBLoader( _LOGGER, **{
