@@ -50,6 +50,7 @@ DB_USER = 'root'
 DB_PWD = 'root'
 # DB_SQL_QUERY="""INSERT INTO allwordstemp (word, filename, filecount)  VALUES(%s,%s,%s)"""
 DB_SQL_QUERY= """INSERT INTO words (word, file_path, file_words_count)  VALUES(%s,%s,%s)"""
+CPU_MAX_USAGE = 0.80 #0...1
 
 if __name__=="__main__":
     #0.00050067901 sec/ko
@@ -63,6 +64,7 @@ if __name__=="__main__":
         'db_user': DB_USER, 
         'db_password': DB_PWD,
         'db_sql_query': DB_SQL_QUERY,
+        'cpu_pax_usage': max(0, min(1, CPU_MAX_USAGE)),
         'cpus_affinity_options': [],# will be calculated below
         'use_threads_as_extractors_executors': False,#False optimal
         'max_transformation_pipelines': 2,#2 optimal
@@ -98,11 +100,20 @@ if __name__=="__main__":
     
     cpus_count = psutil.cpu_count()
     #region CPU affinity
-    cpus_affinity_options = config['cpus_affinity_options']
     if config['cpus_affinity_options'] is None or len(config['cpus_affinity_options'])==0:
-        config['cpus_affinity_options'] = [0] if cpus_count == 1 else [i for i in range(0, cpus_count if '--all-cpu' in sys.argv else int(cpus_count*0.75))]
+        cpus_max = 1
+        if '--all-cpu' in sys.argv:
+            cpus_max = cpus_count
+        cpus_max = math.floor(cpus_count*config['cpu_pax_usage'])
+        if cpus_max==0:
+            cpus_max=1
+        config['cpus_affinity_options'] = [0] if cpus_count == 1 else [i for i in range(0, cpus_max)]
+    nbr_cpus_affinity_options = len(config['cpus_affinity_options'])
+    if nbr_cpus_affinity_options==0:
+        LOGGER.log(INFO, "CPU affinities options can't be empty. cpus_count*CPU_MAX_USAGE = {}".format(cpus_count*config['cpu_pax_usage']))
+        exit()
     #endregion
-    exec_time_sec = (0.00050067901 * 8/cpus_count) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
+    exec_time_sec = (0.00050067901 * 8/nbr_cpus_affinity_options) * (1+(1 - nbr_cpus_affinity_options/cpus_count)) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
     nbr_processes = nbr_dirs * nbr_processes_per_pip
     ram_per_process_mo = 100
     ram_mo = math.floor(psutil.virtual_memory()[1]/(1024*1024))
@@ -140,7 +151,7 @@ if __name__=="__main__":
                                                                         ram_mo, 
                                                                         nbr_processes, 
                                                                         config['cpus_affinity_options'],
-                                                                        round(100*len(config['cpus_affinity_options'])/cpus_count, 2),
+                                                                        round(100*nbr_cpus_affinity_options/cpus_count, 2),
                                                                         ram_secur_mo, 
                                                                         ram_reserv_mo, 
                                                                         estim_processes_mo, 
@@ -157,9 +168,9 @@ if __name__=="__main__":
         
         -s           Start processing
         -f           Start processing even if the estimated RAM isn't enough
-        --all-cpus   Start processing using the full CPUs (default to 75% of CPUs are used)
+        --all-cpus   Start processing using the full CPUs (default to {}% of CPUs are used)
 
-        """)
+        """.format(config['cpu_pax_usage']*100))
         if '-f' not in sys.argv:
             exit()
 
@@ -170,9 +181,9 @@ if __name__=="__main__":
         
         -s           Start processing
         -f           Start processing even if the estimated RAM isn't enough
-        --all-cpus   Start processing using the full CPUs (default to 75% of CPUs are used)
+        --all-cpus   Start processing using the full CPUs (default to {}% of CPUs are used)
 
-        """)
+        """.format(config['cpu_pax_usage']*100))
         exit()
         
     if not os.path.isdir(config['out_dir']):
