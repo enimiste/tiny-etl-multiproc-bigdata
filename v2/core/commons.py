@@ -166,6 +166,12 @@ def truncate_str_255(txt: str) -> str:
 def truncate_str_270(txt: str) -> str:
     return txt if txt is None else txt[0:min(269, len(txt))]
 
+def len_str_gt_255(txt: str) -> bool:
+    return txt if txt is None else (len(txt)>255)
+
+def len_str_gt_270(txt: str) -> bool:
+    return txt if txt is None else (len(txt)>270)
+
 def format_duree(duree_sec: int) -> str:
     duree_sec = math.floor(duree_sec)
     d = 0

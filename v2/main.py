@@ -16,11 +16,10 @@ from core.loaders import CSV_FileLoader
 from core.pipline import ThreadedPipeline
 from core.transformers import  FileToTextLinesTransformer, TextWordTokenizerTransformer
 from custom_transformers import ArabicTextWordsTokenizerTransformer
-from core.transformers import ItemAttributeTransformer
+from core.transformers import OneToOneItemAttributesTransformer
 from core.loaders import ConditionalLoader, MySQL_DBLoader
-from core.transformers import NoopTransformer
+from core.transformers import OneToOneNoopTransformer
 from core.transformers import ReduceItemTransformer
-from core.transformers import AddStaticValuesTransformer
 from core.loaders import LoadBalanceLoader
 from core.loaders import NoopLoader
 from core.commons import block_join_threads_or_processes
@@ -28,6 +27,7 @@ from core.commons import get_dir_size_in_mo
 from core.transformers import UniqueFilterTransformer
 from core.commons import basename_backwards_x4, format_duree, truncate_str_255, truncate_str_270
 from core.commons import rotary_iter
+from v2.core.commons import len_str_gt_255
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -53,14 +53,22 @@ DB_HOST = 'localhost'
 DB_NAME = 'words'
 DB_USER = 'root'
 DB_PWD = 'root'
-# DB_SQL_QUERY="""INSERT INTO allwordstemp (word, filename, filecount)  VALUES(%s,%s,%s)"""
-DB_SQL_QUERY= """INSERT INTO words (word, file_path, file_words_count)  VALUES(%s,%s,%s)"""
+# DB_SQL_QUERY="""INSERT INTO allwordstemp (word, word_len, word_truncated, filename, filecount)  VALUES(%s,%s,%s,%s,%s)"""
+DB_SQL_QUERY= """INSERT INTO words (word, word_len, word_truncated, file_path, file_words_count)  VALUES(%s,%s,%s,%s,%s)"""
 CPU_MAX_USAGE = 0.90 #0...1
 MONO_PIPELINE = True
 #==========================================================
 
 
-
+""""
+CREATE TABLE `words` (
+	`word` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`word_len` INT(10) NOT NULL,
+	`word_truncated` TINYINT(3) NOT NULL,
+	`file_path` VARCHAR(270) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`file_words_count` INT(10) NOT NULL DEFAULT '0'
+)
+"""
 
 
 def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config: Dict[AnyStr, Any]):
@@ -73,11 +81,9 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                 global_cpus_affinity_options=config['cpus_affinity_options'],
                 extractor=extractor_,
                 transformers=[
-                        ItemAttributeTransformer(logger, operations=[(['_'], [os.path.abspath])]),
-                        # AddStaticValuesTransformer(_LOGGER,
-                        #         static_values=[(['words_count'], 0)],
-                        #         copy_values_key_paths=[('file_path', ['_'])],
-                        #         remove_key_paths = [['_']]),
+                        OneToOneItemAttributesTransformer(logger, operations=[(['_'], [os.path.abspath])]),
+                        # OneToOneItemAttributesTransformer(logger,
+                        #         static_values_1=[(['words_count'], 0), (['word_len'], 0), (['word_truncated', 0])]),
                         ReduceItemTransformer(  logger,
                                 input_key_path=(['_'], str), 
                                 output_key='words_count', 
@@ -129,14 +135,18 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                                 ignore_word_fn=str.isspace,
                                                 copy_values_key_paths=[('file_path', ['file_path']), 
                                                                     ('words_count', ['words_count'])]),
-                                        ItemAttributeTransformer(logger, 
-                                                operations=[
-                                                    (['_', 'word'], [ArabicTextWordsTokenizerTransformer.remove_diac, truncate_str_255]),
-                                                ]),
+                                        OneToOneItemAttributesTransformer(logger, 
+                                                derived_values_2=[
+                                                    (['_', 'word'], ['_', 'word_len'], [ArabicTextWordsTokenizerTransformer.remove_diac, str.__len__]),
+                                                    (['_', 'word_len'], ['_', 'word_truncated'], [len_str_gt_255]),
+                                                ],
+                                                trans_values_3=[
+                                                    (['_', 'word'], [truncate_str_255]),
+                                                ],),
                                 ]
                         ),                                        
-                        ItemAttributeTransformer(logger, 
-                                operations=[(['file_path'], [basename_backwards_x4, truncate_str_270])]
+                        OneToOneItemAttributesTransformer(logger, 
+                                trans_values_3=[(['file_path'], [basename_backwards_x4, truncate_str_270])]
                         ),
                 ],
                 loaders=[
@@ -205,6 +215,8 @@ if __name__=="__main__":
         'use_threads_as_transformation_pipelines': False,#False optimal
         'use_threads_as_loaders_executors': False,#False optimal
         'values_to_load_path': [('word', ['_', 'word'], True), 
+                                ('word_len', ['_', 'word_len'], True),
+                                ('word_truncated', ['_', 'word_truncated'], True),
                                 ('file', ['file_path'], True),
                                 ('words_count', ['words_count'], True)],
         'load_balancer_parallel_loader_count': 4,#4 optimal
