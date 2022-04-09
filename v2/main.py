@@ -62,6 +62,7 @@ if __name__=="__main__":
         'db_user': DB_USER, 
         'db_password': DB_PWD,
         'db_sql_query': DB_SQL_QUERY,
+        'cpus_affinity_options': None,# will be calculated below
         'use_threads_as_extractors_executors': False,#False optimal
         'max_transformation_pipelines': 2,#2 optimal
         'use_threads_as_transformation_pipelines': False,#False optimal
@@ -97,6 +98,8 @@ if __name__=="__main__":
         nbr_processes_per_pip+=config['load_balancer_parallel_loader_count']
     
     cpus_count = psutil.cpu_count()
+    if config['cpus_affinity_options'] is None or len(config['cpus_affinity_options'])==0:
+        config['cpus_affinity_options'] = {0} if cpus_count == 1 else [i for i in range(0, int(cpus_count*0.75))]
     exec_time_sec = (0.00050067901 * 8/cpus_count) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
     nbr_processes = nbr_dirs * nbr_processes_per_pip
     ram_per_process_mo = 100
@@ -118,6 +121,7 @@ if __name__=="__main__":
                         RAM free                   = {}Mo
                         _____________________________________________________________________
                         Nbr processes              = {}
+                        CPUs affinity options      = {} vCpu ({}%)
                         RAM available              = {}Mo (RAM free - {}Mo)
                         Estimated RAM              = {}Mo ({}Mo each one) (for all processes)
                         Recommended root folders   = {} folders (in_dir root folders count)
@@ -130,6 +134,8 @@ if __name__=="__main__":
                                                                         cpus_count,
                                                                         ram_mo, 
                                                                         nbr_processes, 
+                                                                        config['cpus_affinity_options'],
+                                                                        round(100*len(config['cpus_affinity_options'])/cpus_count, 2),
                                                                         ram_secur_mo, 
                                                                         ram_reserv_mo, 
                                                                         estim_processes_mo, 
@@ -166,6 +172,7 @@ if __name__=="__main__":
                                 use_threads_as_transformation_pipelines=config['use_threads_as_transformation_pipelines'],
                                 use_threads_as_loaders_executors=config['use_threads_as_loaders_executors'],
                                 trans_in_queue_max_size=config['buffer_size'],
+                                cpus_affinity_options=config['cpus_affinity_options'],
                                 extractor=FilesListExtractor(_LOGGER, intput_dir=in_dir, pattern=".txt", output_key='_'),
                                 transformers=[
                                         ItemAttributeTransformer(_LOGGER, operations=[(['_'], [os.path.abspath])]),
@@ -262,6 +269,7 @@ if __name__=="__main__":
                                                         queue_no_block_timeout_sec = 0.09,
                                                         buffer_size=config['load_balancer_buffer_size'],
                                                         use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
+                                                        cpus_affinity_options=config['cpus_affinity_options'],
                                                         loaders= [(
                                                                     config['buffer_size']*10, 
                                                                     MySQL_DBLoader( _LOGGER, **{

@@ -1,38 +1,16 @@
 from abc import ABC, abstractmethod
-from audioop import add
 from functools import reduce
-import functools
 import logging
 from logging import ERROR, Logger, DEBUG
+import math
 import multiprocessing
 import os
+import sys
 import threading
 import traceback
-from typing import Any, AnyStr, Callable, Generator, List, Tuple
+from typing import Any, AnyStr, Callable, Generator, List, Set, Tuple
 
-class WithLogging(ABC):
-    def __init__(self, logger: Logger) -> None:
-        self.logger = logger
-
-    @staticmethod
-    def log_msg_sync(logger: Logger, msg: str, exception: Exception = None, level: int = logging.DEBUG):
-        if not logger is None:
-            if not exception is None and level==ERROR:
-                logger.log(level, "{}, Trace : {}".format(msg, str(traceback.format_exception(exception))))
-            else:
-                logger.log(level, msg)
-        else:
-            print(msg)
-        
-    def log_msg(self, msg: str, exception: Exception = None, level: int = logging.DEBUG):
-        WithLogging.log_msg_sync(self.logger, msg, exception, level)
-        # threading.Thread(target=WithLogging.log_msg_sync, args=(self.logger, msg, exception, level)).start()
-    
-
-class LoggerWrapper(WithLogging):
-    def __init__(self, logger: Logger) -> None:
-        super().__init__(logger)
-        
+from core.affinity import set_process_affinity_mask
 
 def rotary_iter(items: list):
     n = len(items)
@@ -189,7 +167,17 @@ def make_thread_process(use_thread: bool, target, args) -> threading.Thread | mu
     if use_thread:
         return threading.Thread(target=target, args=args)
     else:
-        return multiprocessing.Process(target=target, args=args)
+        p = multiprocessing.Process(target=target, args=args)
+        return p
+
+def set_process_affinity(process, cpus_affinity: int):
+    if isinstance(process, multiprocessing.Process):
+        pid = process.pid
+        if pid is not None:
+            if sys.platform.startswith('linux'):
+                os.sched_setaffinity(pid, cpus_affinity)
+            elif sys.platform.startswith('win32'):
+                set_process_affinity_mask(pid, math.floor(math.pow(2, cpus_affinity)))
 
 def get_dir_size_in_mo(start_path = '.'):
     total_size = 0
@@ -201,6 +189,30 @@ def get_dir_size_in_mo(start_path = '.'):
                 total_size += os.path.getsize(fp)
 
     return total_size/1024/1024
+#=========================================================== Classes :
+class WithLogging(ABC):
+    def __init__(self, logger: Logger) -> None:
+        self.logger = logger
+
+    @staticmethod
+    def log_msg_sync(logger: Logger, msg: str, exception: Exception = None, level: int = logging.DEBUG):
+        if not logger is None:
+            if not exception is None and level==ERROR:
+                logger.log(level, "{}, Trace : {}".format(msg, str(traceback.format_exception(exception))))
+            else:
+                logger.log(level, msg)
+        else:
+            print(msg)
+        
+    def log_msg(self, msg: str, exception: Exception = None, level: int = logging.DEBUG):
+        WithLogging.log_msg_sync(self.logger, msg, exception, level)
+        # threading.Thread(target=WithLogging.log_msg_sync, args=(self.logger, msg, exception, level)).start()
+    
+
+class LoggerWrapper(WithLogging):
+    def __init__(self, logger: Logger) -> None:
+        super().__init__(logger)
+        
 
 class AbstractConcurrentKeyBagSet(ABC):
     def __init__(self) -> None:

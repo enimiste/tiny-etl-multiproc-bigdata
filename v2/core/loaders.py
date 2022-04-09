@@ -5,10 +5,8 @@ import multiprocessing
 from multiprocessing.sharedctypes import Value
 import queue
 import threading
-from typing import AnyStr, List, Tuple
+from typing import AnyStr, List, Set, Tuple
 import uuid
-
-from mysqlx import DataError
 
 from core.commons import WithLogging
 from core.commons import dict_deep_get
@@ -16,6 +14,7 @@ from core.commons import rotary_iter
 from core.commons import block_join_threads_or_processes
 from core.commons import LoggerWrapper
 from core.commons import make_thread_process
+from core.commons import set_process_affinity
  
 class AbstractLoader(WithLogging):
     def __init__(self, logger: Logger, 
@@ -122,12 +121,14 @@ class LoadBalanceLoader(AbstractLoader):
     def __init__(self, 
                     logger,
                     loaders: List[Tuple[int, AbstractLoader]],
+                    cpus_affinity_options: List[int],
                     buffer_size: int = 1000,
                     queue_no_block_timeout_sec: int = 0.09,
                     queue_block_timeout_sec: int = 0.1,
                     use_threads_as_loaders_executors: bool = True) -> None:
         super().__init__(logger, None, None)
         self.loaders = loaders
+        self.cpus_affinity_options = cpus_affinity_options
         self.started = False
         self.buffer_size=buffer_size
         self.buffer = []
@@ -142,6 +143,8 @@ class LoadBalanceLoader(AbstractLoader):
 
         if len(loaders)<=1:
             raise RuntimeError('At least two loaders should be passed to the load balancer')
+        if len(cpus_affinity_options)==0:
+            raise RuntimeError('Cpu affinity options should be not empty')
 
     @staticmethod
     def load_items(idx: int,
@@ -178,10 +181,13 @@ class LoadBalanceLoader(AbstractLoader):
                             self.load_balancer_closed, 
                             LoggerWrapper(self.logger))
                 }
-                self.loaders_threads.append(make_thread_process(self.use_threads_as_loaders_executors, params["target"], params["args"]))
-
+                self.loaders_threads.append(make_thread_process(self.use_threads_as_loaders_executors, 
+                                                                params["target"], 
+                                                                params["args"]))
+        cpus_affinity_gen = rotary_iter(self.cpus_affinity_options)
         for t in self.loaders_threads:
             t.start()
+            set_process_affinity(t, next(cpus_affinity_gen))
         super().log_msg('{} threads started for loadbalancing'.format(len(self.loaders_threads)), level=INFO)
         self.started=True
 

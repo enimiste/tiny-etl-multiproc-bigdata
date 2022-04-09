@@ -7,7 +7,7 @@ from multiprocessing.sharedctypes import Value
 import queue
 import signal
 from threading import Timer
-from typing import List
+from typing import List, Set
 
 import uuid
 
@@ -18,6 +18,7 @@ from core.transformers import AbstractTransformer
 from core.commons import flatMapApply
 from core.commons import block_join_threads_or_processes, kill_threads_processes
 from core.commons import make_thread_process
+from core.commons import set_process_affinity
 
 class AbstractPipeline(Process, ABC):
     def __init__(self, logger: Logger) -> None:
@@ -41,6 +42,7 @@ class ThreadedPipeline(AbstractPipeline):
                 extractor: AbstractExtractor, 
                 transformers: List[AbstractTransformer],
                 loaders: List[AbstractLoader],
+                cpus_affinity_options: List[int],
                 max_transformation_pipelines: int = 5,
                 use_threads_as_transformation_pipelines: bool = False,
                 use_threads_as_loaders_executors: bool = False,
@@ -53,6 +55,7 @@ class ThreadedPipeline(AbstractPipeline):
         self.extractor = extractor
         self.transformers = transformers
         self.loaders = loaders
+        self.cpus_affinity_options = cpus_affinity_options
         self.use_threads_as_transformation_pipelines = use_threads_as_transformation_pipelines
         self.use_threads_as_loaders_executors = use_threads_as_loaders_executors
         self.use_threads_as_extractors_executors = use_threads_as_extractors_executors
@@ -66,6 +69,9 @@ class ThreadedPipeline(AbstractPipeline):
         self.transformation_pipeline_alive = Value('i', 0)
         self.loaders_alive = Value('i', 0)
 
+        if len(cpus_affinity_options)==0:
+            raise RuntimeError('Cpu affinity options should be not empty')
+            
         if extractor is None:
             raise RuntimeError("Extractor required")
 
@@ -213,7 +219,9 @@ class ThreadedPipeline(AbstractPipeline):
                             self.queue_no_block_timeout_sec,
                             self.logger)
                 }
-                trans_threads.append(make_thread_process(self.use_threads_as_transformation_pipelines, params["target"], params["args"]))
+                trans_threads.append(make_thread_process(self.use_threads_as_transformation_pipelines, 
+                                                                        params["target"], 
+                                                                        params["args"]))
             
             self.logger.log_msg("{} transformation pipelines created".format(self.transformation_pipeline_alive.value), level=INFO)
 
@@ -237,8 +245,10 @@ class ThreadedPipeline(AbstractPipeline):
 
             threads = load_threads +  trans_threads + extract_threads
             self.logger.log_msg("Starting {} threads of the pipeline {}.".format(len(threads), self.job_uuid), level=INFO)
+            cpus_affinity_gen = rotary_iter(self.cpus_affinity_options)
             for p in threads:
                 p.start()
+                set_process_affinity(p, next(cpus_affinity_gen))
             self.pipeline_started.value=1
             self.logger.log_msg("Pipeline {} running".format(self.job_uuid), level=INFO)
 
