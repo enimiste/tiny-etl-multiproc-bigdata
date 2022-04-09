@@ -184,10 +184,12 @@ class LoadBalanceLoader(AbstractLoader):
                 self.loaders_threads.append(make_thread_process(self.use_threads_as_loaders_executors, 
                                                                 params["target"], 
                                                                 params["args"]))
+        threads_started_count = 0
         for t in self.loaders_threads:
             t.start()
+            threads_started_count+=1
             set_process_affinity(t, self.cpus_affinity_options, log_prefix='Loader balancer loaders', print_log=True)
-        super().log_msg('{} threads started for loadbalancing'.format(len(self.loaders_threads)), level=INFO)
+        super().log_msg('{}/{} threads started for loadbalancing'.format(threads_started_count, len(self.loaders_threads)), level=INFO)
         self.started=True
 
     def loadWithAck(self, job_uuid: str, items: List[dict], ack_counter: Value, last_call: bool) -> None:

@@ -43,8 +43,6 @@ class ThreadedPipeline(AbstractPipeline):
                 transformers: List[AbstractTransformer],
                 loaders: List[AbstractLoader],
                 global_cpus_affinity_options: List[int],
-                transformers_cpus_affinity_options: List[int],
-                loaders_cpus_affinity_options: List[int],
                 max_transformation_pipelines: int = 5,
                 use_threads_as_transformation_pipelines: bool = False,
                 use_threads_as_loaders_executors: bool = False,
@@ -58,8 +56,6 @@ class ThreadedPipeline(AbstractPipeline):
         self.transformers = transformers
         self.loaders = loaders
         self.global_cpus_affinity_options = set(global_cpus_affinity_options)
-        self.transformers_cpus_affinity_options = set(transformers_cpus_affinity_options)
-        self.loaders_cpus_affinity_options = set(loaders_cpus_affinity_options)
         self.use_threads_as_transformation_pipelines = use_threads_as_transformation_pipelines
         self.use_threads_as_loaders_executors = use_threads_as_loaders_executors
         self.use_threads_as_extractors_executors = use_threads_as_extractors_executors
@@ -75,10 +71,6 @@ class ThreadedPipeline(AbstractPipeline):
 
         if len(global_cpus_affinity_options)==0:
             raise RuntimeError('Cpu affinity options <global_cpus_affinity_options> should be not empty')
-        if len(transformers_cpus_affinity_options)==0:
-            raise RuntimeError('Cpu affinity options <transformers_cpus_affinity_options> should be not empty')
-        if len(loaders_cpus_affinity_options)==0:
-            raise RuntimeError('Cpu affinity options <loaders_cpus_affinity_options> should be not empty')
             
         if extractor is None:
             raise RuntimeError("Extractor required")
@@ -258,9 +250,9 @@ class ThreadedPipeline(AbstractPipeline):
             for p in extract_threads:
                 set_process_affinity(p,  self.global_cpus_affinity_options, log_prefix='Extractor', print_log=True)
             for p in trans_threads:
-                set_process_affinity(p, self.transformers_cpus_affinity_options, log_prefix='Transformer', print_log=True)
+                set_process_affinity(p, self.global_cpus_affinity_options, log_prefix='Transformer', print_log=True)
             for p in load_threads:
-                set_process_affinity(p, self.loaders_cpus_affinity_options, log_prefix='Loader executor', print_log=True)
+                set_process_affinity(p, self.global_cpus_affinity_options, log_prefix='Loader executor', print_log=True)
 
             set_process_affinity(self, self.global_cpus_affinity_options, log_prefix='Pipeline', print_log=True)
             self.pipeline_started.value=1
@@ -272,34 +264,29 @@ class ThreadedPipeline(AbstractPipeline):
             while self.pipeline_closed.value==0:
                 if not extractor_joined and self.extractor_finished.value==1:
                     extractor_joined = block_join_threads_or_processes(extract_threads, lambda: self.pipeline_closed.value==1)
-                    self.logger.log_msg("Extract threads joined", level=INFO)
+                    if extractor_joined:
+                        self.logger.log_msg("Extract threads joined", level=INFO)
 
                 #region : Transformers
-                if extractor_joined and not transformators_joined:
-                    affinities = set.union(self.transformers_cpus_affinity_options, self.global_cpus_affinity_options)
-                    for p in trans_threads:
-                        set_process_affinity(p, affinities, log_prefix='Transformer 2nd round', print_log=True)
                 if not transformators_joined and self.transformation_pipeline_alive.value==0:
                     transformators_joined = block_join_threads_or_processes(trans_threads, lambda: self.pipeline_closed.value==1,
                                                                             logger=self.logger, 
                                                                             log_level=INFO, 
                                                                             log_when_joined=True, 
                                                                             log_msg="Transformation joined")
-                    self.logger.log_msg("Transformation threads joined. Waiting for loaders to finish their words...", level=INFO)
+                    if transformators_joined:
+                        self.logger.log_msg("Transformation threads joined. Waiting for loaders to finish their words...", level=INFO)
                 #endregion
 
                 #region : Loaders
-                if extractor_joined and transformators_joined and not loaders_joined:
-                    affinities = set.union(self.loaders_cpus_affinity_options, self.transformers_cpus_affinity_options, self.global_cpus_affinity_options)
-                    for p in load_threads:
-                        set_process_affinity(p, affinities, log_prefix='Loader executor 2nd round', print_log=True)
                 if not loaders_joined and self.loaders_alive.value==0:
                     loaders_joined = block_join_threads_or_processes(load_threads, lambda: self.pipeline_closed.value==1,
                                                                             logger=self.logger, 
                                                                             log_level=INFO, 
                                                                             log_when_joined=True, 
                                                                             log_msg="Loader joined")
-                    self.logger.log_msg("Loaders threads joined", level=INFO)
+                    if loaders_joined:
+                        self.logger.log_msg("Loaders threads joined", level=INFO)
                 #endregion
                 if extractor_joined and transformators_joined and loaders_joined:
                     self.close()
