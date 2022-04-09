@@ -100,7 +100,7 @@ if __name__=="__main__":
     #region CPU affinity
     cpus_affinity_options = config['cpus_affinity_options']
     if config['cpus_affinity_options'] is None or len(config['cpus_affinity_options'])==0:
-        config['cpus_affinity_options'] = [0] if cpus_count == 1 else [i for i in range(0, int(cpus_count*0.75))]
+        config['cpus_affinity_options'] = [0] if cpus_count == 1 else [i for i in range(0, cpus_count if '--all-cpu' in sys.argv else int(cpus_count*0.75))]
     #endregion
     exec_time_sec = (0.00050067901 * 8/cpus_count) * in_dir_size_mo * 1024 #0.00050067901 sec/ko
     nbr_processes = nbr_dirs * nbr_processes_per_pip
@@ -155,7 +155,15 @@ if __name__=="__main__":
             exit()
 
     if '-s' not in sys.argv:
-        LOGGER.log(INFO, 'To run the script add the -s option to the command')
+        LOGGER.log(INFO, """
+        Help :
+        python main.py options
+        
+        -s           Start processing
+        -f           Start processing even if the estimated RAM isn't enough
+        --all-cpus   Start processing using the full CPUs (default to 75% of CPUs are used)
+
+        """)
         exit()
         
     if not os.path.isdir(config['out_dir']):
