@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from logging import Logger
-from typing import Dict, Generator
+from typing import Dict, Generator, AnyStr, List
 from core.commons import WithLogging
 import os
 
@@ -20,11 +20,11 @@ class FilesListExtractor(AbstractExtractor):
     """
     yields a dict
     """
-    def __init__(self, logger: Logger, intput_dir: str, pattern: str, output_key: str) -> None:
+    def __init__(self, logger: Logger, intput_dir: str, file_pattern: str, output_key: str) -> None:
         super().__init__(logger)
         self.input_dir = intput_dir
         self.output_key = output_key
-        self.pattern = pattern
+        self.file_pattern = file_pattern
         if not os.path.isdir(intput_dir):
             raise RuntimeError("{} should be a valid directory".format(intput_dir))
 
@@ -32,7 +32,30 @@ class FilesListExtractor(AbstractExtractor):
         for root_dir, dirs, files in os.walk(self.input_dir):
             if len(files)>0:
                 for file in files:
-                    if file.endswith(self.pattern):
+                    if file.endswith(self.file_pattern):
                         file_path = os.path.join(root_dir, file)
                         res = dict([(self.output_key,file_path)])
                         yield res
+
+class FoldersFilesListExtractor(AbstractExtractor):
+    """
+    yields a dict
+    """
+    def __init__(self, logger: Logger, intput_dirs: List[AnyStr], file_pattern: str, output_key: str) -> None:
+        super().__init__(logger)
+        self.intput_dirs = intput_dirs
+        self.output_key = output_key
+        self.file_pattern = file_pattern
+        for input_dir in intput_dirs:
+            if not os.path.isdir(intput_dir):
+                raise RuntimeError("{} should be a valid directory".format(intput_dir))
+
+    def extract(self) -> Generator[dict, None, None]:
+        for input_dir in intput_dirs:
+            for root_dir, dirs, files in os.walk(input_dir):
+                if len(files)>0:
+                    for file in files:
+                        if file.endswith(self.file_pattern):
+                            file_path = os.path.join(root_dir, file)
+                            res = dict([(self.output_key, file_path)])
+                            yield res
