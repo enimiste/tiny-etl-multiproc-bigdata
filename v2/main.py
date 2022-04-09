@@ -8,6 +8,7 @@ import time
 from datetime import date
 import os
 import sys
+from typing import Dict, AnyStr, Any
 
 import psutil
 from core.extractors import FilesListExtractor, FoldersFilesListExtractor, AbstractExtractor
@@ -54,7 +55,7 @@ DB_USER = 'root'
 DB_PWD = 'root'
 # DB_SQL_QUERY="""INSERT INTO allwordstemp (word, filename, filecount)  VALUES(%s,%s,%s)"""
 DB_SQL_QUERY= """INSERT INTO words (word, file_path, file_words_count)  VALUES(%s,%s,%s)"""
-CPU_MAX_USAGE = 0.5 #0...1
+CPU_MAX_USAGE = 0.90 #0...1
 MONO_PIPELINE = True
 #==========================================================
 
@@ -62,6 +63,126 @@ MONO_PIPELINE = True
 
 
 
+def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config: Dict[AnyStr, Any]):
+    return ThreadedPipeline(_LOGGER, 
+                use_threads_as_extractors_executors=config['use_threads_as_extractors_executors'],
+                max_transformation_pipelines=config['max_transformation_pipelines'],
+                use_threads_as_transformation_pipelines=config['use_threads_as_transformation_pipelines'],
+                use_threads_as_loaders_executors=config['use_threads_as_loaders_executors'],
+                trans_in_queue_max_size=config['buffer_size'],
+                global_cpus_affinity_options=config['cpus_affinity_options'],
+                extractor=extractor_,
+                transformers=[
+                        ItemAttributeTransformer(logger, operations=[(['_'], [os.path.abspath])]),
+                        # AddStaticValuesTransformer(_LOGGER,
+                        #         static_values=[(['words_count'], 0)],
+                        #         copy_values_key_paths=[('file_path', ['_'])],
+                        #         remove_key_paths = [['_']]),
+                        ReduceItemTransformer(  logger,
+                                input_key_path=(['_'], str), 
+                                output_key='words_count', 
+                                copy_values_key_paths=[('file_path', ['_'])],
+                                transformers=[
+                                        # FileTextReaderTransformer consumes a lot of RAM but FileToTextLinesTransformer takes more time
+                                        FileToTextLinesTransformer(logger, 
+                                                pattern=".txt", 
+                                                input_key_path=None, 
+                                                output_key=None),
+                                        # TextWordTokenizerTransformer( logger, 
+                                        #         pattern="\\s+", 
+                                        #         input_key_path=['_', 'line'], 
+                                        #         output_key=None,
+                                        #         mappers=[str.strip],
+                                        #         ignore_word_fn=str.isspace),
+                                        ArabicTextWordsTokenizerTransformer( logger, 
+                                                input_key_path=['_', 'line'], 
+                                                output_key=None,
+                                                ignore_word_fn=str.isspace)
+                                            ],
+                                initial_value=0,
+                                reducer=ReduceItemTransformer.count
+                        ),                                        
+                        UniqueFilterTransformer(logger, 
+                                bag_key_path=(['file_path'], str), 
+                                unique_key_path=(['_', 'word'], str),
+                                unique_value_normalizers=[str.lower, str.strip],
+                                yield_unique_values=True,
+                                transformers=[
+                                        FileToTextLinesTransformer(logger, 
+                                                pattern=".txt", 
+                                                input_key_path=['file_path'], 
+                                                output_key='_',
+                                                copy_values_key_paths=[('file_path', ['file_path']), 
+                                                                    ('words_count', ['words_count'])]), 
+                                        # TextWordTokenizerTransformer(logger, 
+                                        #         pattern="\\s+", 
+                                        #         input_key_path=['_', 'line'], 
+                                        #         output_key='_', 
+                                        #         mappers=[str.strip],
+                                        #         ignore_word_fn=str.isspace,
+                                        #         # remove_chars = ["\ufeff"],
+                                        #         copy_values_key_paths=[('file_path', ['file_path']), 
+                                        #                             ('words_count', ['words_count'])]),
+                                        ArabicTextWordsTokenizerTransformer(logger, 
+                                                input_key_path=['_', 'line'], 
+                                                output_key='_', 
+                                                ignore_word_fn=str.isspace,
+                                                copy_values_key_paths=[('file_path', ['file_path']), 
+                                                                    ('words_count', ['words_count'])]),
+                                        ItemAttributeTransformer(logger, 
+                                                operations=[
+                                                    (['_', 'word'], [ArabicTextWordsTokenizerTransformer.remove_diac, truncate_str_255]),
+                                                ]),
+                                ]
+                        ),                                        
+                        ItemAttributeTransformer(logger, 
+                                operations=[(['file_path'], [basename_backwards_x4, truncate_str_270])]
+                        ),
+                ],
+                loaders=[
+                        # ConditionalLoader(  logger, 
+                        #         not config['save_to_db'],
+                        #         CSV_FileLoader( _LOGGER,
+                        #                 input_key_path=None,
+                        #                 values_path= config['values_to_load_path']
+                        #                 out_dir=os.path.abspath(config['out_dir']),
+                        #                 out_file_ext='txt',
+                        #                 buffer_size=config['buffer_size'])
+                        # ),
+                        # ConditionalLoader(  _LOGGER, 
+                        #         config['save_to_db'],
+                        #         #  False,
+                        #         MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)
+                        # ),
+                        # NoopLoader(_LOGGER, 
+                        #         input_key_path=None, 
+                        #         log=True, 
+                        #         log_level=INFO, 
+                        #         values_path=config['values_to_load_path'],
+                        # ),
+                        ConditionalLoader(  logger, 
+                                config['save_to_db'],
+                                # False,
+                                LoadBalanceLoader(logger, 
+                                        queue_no_block_timeout_sec = 0.09,
+                                        buffer_size=config['load_balancer_buffer_size'],
+                                        use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
+                                        cpus_affinity_options=config['cpus_affinity_options'],
+                                        loaders= [(
+                                                    config['buffer_size']*10, 
+                                                    MySQL_DBLoader( logger, **{
+                                                                    'input_key_path': None, 
+                                                                    'values_path': config['values_to_load_path'],
+                                                                    'sql_query': config['db_sql_query'],
+                                                                    'buffer_size': config['buffer_size'],
+                                                                    'host': config['db_host'],
+                                                                    'database': config['db_name'],
+                                                                    'user': config['db_user'],
+                                                                    'password': config['db_password']})) 
+                                                    for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
+                                )
+                        ),
+                ])
 
 
 
@@ -215,16 +336,19 @@ if __name__=="__main__":
     LOGGER.log(INFO, "Script started")
     pipelines = []
     try:
-        
+        dirs = [os.path.abspath(os.path.join(config['in_dir'], dir)) for dir in dirs]
         if config['mono_pipeline']:
-            pipelines.append(make_threaded_pipeline(FoldersFilesListExtractor(logging.getLogger("Pipeline "), 
-                                                                                intput_dirs=dirs, 
-                                                                                file_pattern=".txt", output_key='_')))
+            _LOGGER = logging.getLogger("Pipeline (Unique)")
+            pipelines.append(make_threaded_pipeline(extractor_=FoldersFilesListExtractor(_LOGGER, 
+                                                                                input_dirs=dirs, 
+                                                                                file_pattern=".txt", output_key='_'),
+                                                    logger=_LOGGER, config=config))
         else:
             for (idx, dir) in enumerate(dirs):
                 in_dir = os.path.join(config['in_dir'], dir)
                 _LOGGER=logging.getLogger("Pipeline " + str(idx+1))
-                pipelines.append(make_threaded_pipeline(FilesListExtractor(_LOGGER, intput_dir=in_dir, file_pattern=".txt", output_key='_')))
+                pipelines.append(make_threaded_pipeline(extractor_=FilesListExtractor(_LOGGER, input_dir=in_dir, file_pattern=".txt", output_key='_'),
+                                                        logger=_LOGGER, config=config))
 
         LOGGER.log(INFO, '{} pipelines created by root folder in {}'.format(len(pipelines), config['in_dir']))
         for pipeline in pipelines:
@@ -237,128 +361,6 @@ if __name__=="__main__":
     finally:
         end_exec_time=time.perf_counter()
         LOGGER.info('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))))
-
-
-def make_threaded_pipeline(extractor_: AbstractExtractor):
-    ThreadedPipeline(_LOGGER, 
-                use_threads_as_extractors_executors=config['use_threads_as_extractors_executors'],
-                max_transformation_pipelines=config['max_transformation_pipelines'],
-                use_threads_as_transformation_pipelines=config['use_threads_as_transformation_pipelines'],
-                use_threads_as_loaders_executors=config['use_threads_as_loaders_executors'],
-                trans_in_queue_max_size=config['buffer_size'],
-                global_cpus_affinity_options=config['cpus_affinity_options'],
-                extractor=extractor_,
-                transformers=[
-                        ItemAttributeTransformer(_LOGGER, operations=[(['_'], [os.path.abspath])]),
-                        # AddStaticValuesTransformer(_LOGGER,
-                        #         static_values=[(['words_count'], 0)],
-                        #         copy_values_key_paths=[('file_path', ['_'])],
-                        #         remove_key_paths = [['_']]),
-                        ReduceItemTransformer(  _LOGGER,
-                                input_key_path=(['_'], str), 
-                                output_key='words_count', 
-                                copy_values_key_paths=[('file_path', ['_'])],
-                                transformers=[
-                                        # FileTextReaderTransformer consumes a lot of RAM but FileToTextLinesTransformer takes more time
-                                        FileToTextLinesTransformer(_LOGGER, 
-                                                pattern=".txt", 
-                                                input_key_path=None, 
-                                                output_key=None),
-                                        # TextWordTokenizerTransformer( _LOGGER, 
-                                        #         pattern="\\s+", 
-                                        #         input_key_path=['_', 'line'], 
-                                        #         output_key=None,
-                                        #         mappers=[str.strip],
-                                        #         ignore_word_fn=str.isspace),
-                                        ArabicTextWordsTokenizerTransformer( _LOGGER, 
-                                                input_key_path=['_', 'line'], 
-                                                output_key=None,
-                                                ignore_word_fn=str.isspace)
-                                            ],
-                                initial_value=0,
-                                reducer=ReduceItemTransformer.count
-                        ),                                        
-                        UniqueFilterTransformer(_LOGGER, 
-                                bag_key_path=(['file_path'], str), 
-                                unique_key_path=(['_', 'word'], str),
-                                unique_value_normalizers=[str.lower, str.strip],
-                                yield_unique_values=True,
-                                transformers=[
-                                        FileToTextLinesTransformer(_LOGGER, 
-                                                pattern=".txt", 
-                                                input_key_path=['file_path'], 
-                                                output_key='_',
-                                                copy_values_key_paths=[('file_path', ['file_path']), 
-                                                                    ('words_count', ['words_count'])]), 
-                                        # TextWordTokenizerTransformer(_LOGGER, 
-                                        #         pattern="\\s+", 
-                                        #         input_key_path=['_', 'line'], 
-                                        #         output_key='_', 
-                                        #         mappers=[str.strip],
-                                        #         ignore_word_fn=str.isspace,
-                                        #         # remove_chars = ["\ufeff"],
-                                        #         copy_values_key_paths=[('file_path', ['file_path']), 
-                                        #                             ('words_count', ['words_count'])]),
-                                        ArabicTextWordsTokenizerTransformer(_LOGGER, 
-                                                input_key_path=['_', 'line'], 
-                                                output_key='_', 
-                                                ignore_word_fn=str.isspace,
-                                                copy_values_key_paths=[('file_path', ['file_path']), 
-                                                                    ('words_count', ['words_count'])]),
-                                        ItemAttributeTransformer(_LOGGER, 
-                                                operations=[
-                                                    (['_', 'word'], [ArabicTextWordsTokenizerTransformer.remove_diac, truncate_str_255]),
-                                                ]),
-                                ]
-                        ),                                        
-                        ItemAttributeTransformer(_LOGGER, 
-                                operations=[(['file_path'], [basename_backwards_x4, truncate_str_270])]
-                        ),
-                ],
-                loaders=[
-                        # ConditionalLoader(  _LOGGER, 
-                        #         not config['save_to_db'],
-                        #         CSV_FileLoader( _LOGGER,
-                        #                 input_key_path=None,
-                        #                 values_path= config['values_to_load_path']
-                        #                 out_dir=os.path.abspath(config['out_dir']),
-                        #                 out_file_ext='txt',
-                        #                 buffer_size=config['buffer_size'])
-                        # ),
-                        # ConditionalLoader(  _LOGGER, 
-                        #         config['save_to_db'],
-                        #         #  False,
-                        #         MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)
-                        # ),
-                        # NoopLoader(_LOGGER, 
-                        #         input_key_path=None, 
-                        #         log=True, 
-                        #         log_level=INFO, 
-                        #         values_path=config['values_to_load_path'],
-                        # ),
-                        ConditionalLoader(  _LOGGER, 
-                                config['save_to_db'],
-                                # False,
-                                LoadBalanceLoader(_LOGGER, 
-                                        queue_no_block_timeout_sec = 0.09,
-                                        buffer_size=config['load_balancer_buffer_size'],
-                                        use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
-                                        cpus_affinity_options=config['cpus_affinity_options'],
-                                        loaders= [(
-                                                    config['buffer_size']*10, 
-                                                    MySQL_DBLoader( _LOGGER, **{
-                                                                    'input_key_path': None, 
-                                                                    'values_path': config['values_to_load_path'],
-                                                                    'sql_query': config['db_sql_query'],
-                                                                    'buffer_size': config['buffer_size'],
-                                                                    'host': config['db_host'],
-                                                                    'database': config['db_name'],
-                                                                    'user': config['db_user'],
-                                                                    'password': config['db_password']})) 
-                                                    for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
-                                )
-                        ),
-                ])
 
 
 
