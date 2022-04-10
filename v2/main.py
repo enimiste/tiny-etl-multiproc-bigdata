@@ -83,7 +83,7 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                 max_transformation_pipelines=config['max_transformation_pipelines'],
                 use_threads_as_transformation_pipelines=config['use_threads_as_transformation_pipelines'],
                 use_threads_as_loaders_executors=config['use_threads_as_loaders_executors'],
-                trans_in_queue_max_size=config['buffer_size'],
+                trans_in_queue_max_size=config['trans_in_queue_max_size'],
                 global_cpus_affinity_options=config['cpus_affinity_options'],
                 extractor=extractor_,
                 transformers=[
@@ -185,12 +185,12 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                         use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
                                         cpus_affinity_options=config['cpus_affinity_options'],
                                         loaders= [(
-                                                    config['buffer_size'], 
+                                                    config['load_balancer_queue_max_size'], 
                                                     MySQL_DBLoader( logger, **{
                                                                     'input_key_path': None, 
                                                                     'values_path': config['values_to_load_path'],
                                                                     'sql_query': config['db_sql_query'][i],
-                                                                    'buffer_size': config['buffer_size'],
+                                                                    'buffer_size': config['db_buffer_size'],
                                                                     'host': config['db_host'],
                                                                     'database': config['db_name'],
                                                                     'user': config['db_user'],
@@ -208,7 +208,7 @@ if __name__=="__main__":
         'in_dir': IN_DIR,
         'out_dir': 'out_dir',
         'save_to_db': SAVE_TO_DB, 
-        'buffer_size': 10_000,#10_000 optimal
+        'db_buffer_size': 10_000,#10_000 optimal
         'db_host': DB_HOST, 
         'db_name': DB_NAME, 
         'db_user': DB_USER, 
@@ -217,6 +217,7 @@ if __name__=="__main__":
         'cpu_pax_usage': max(0, min(1, CPU_MAX_USAGE)),
         'cpus_affinity_options': [],# will be calculated below
         'use_threads_as_extractors_executors': False,#False optimal
+        'trans_in_queue_max_size': 10_000,#10_000 optimal
         'max_transformation_pipelines': 4,#2 optimal
         'use_threads_as_transformation_pipelines': False,#False optimal
         'use_threads_as_loaders_executors': False,#False optimal
@@ -227,7 +228,8 @@ if __name__=="__main__":
                                 ('words_count', ['words_count'], True)],
         'load_balancer_parallel_loader_count': LOAD_BALANCER_PIPES,#4 optimal
         'use_threads_as_load_balancer_loaders_executors': False,#False optimal
-        'load_balancer_buffer_size': 1_000,#1_000 optimal
+        'load_balancer_queue_max_size': 10_000,
+        'load_balancer_buffer_size': 1500,#1500 optimal
         'mono_pipeline': MONO_PIPELINE,
     }
 
