@@ -11,7 +11,7 @@ import sys
 from typing import Dict, AnyStr, Any
 
 import psutil
-from core.extractors import FilesListExtractor, FoldersFilesListExtractor, AbstractExtractor
+from core.extractors import FilesListExtractor, AbstractExtractor
 from core.loaders import CSV_FileLoader
 from core.pipline import ThreadedPipeline
 from core.transformers import  FileToTextLinesTransformer, TextWordTokenizerTransformer
@@ -26,8 +26,7 @@ from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
 from core.transformers import UniqueFilterTransformer
 from core.commons import basename_backwards_x4, format_duree, truncate_str_255, truncate_str_270
-from core.commons import rotary_iter
-from v2.core.commons import len_str_gt_255
+from core.commons import len_str_gt_255
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -46,15 +45,19 @@ LOGGER = logging.getLogger("Global")
 #============================================= PARAMETRAGE :
 # IN_DIR = '../bdall_test_data/__generated'
 # IN_DIR = '../bdall_test_data/small_data'
-# IN_DIR = '../bdall_test_data/tiny_data'
-IN_DIR = 'E:/bdall'
+# IN_DIR = '../bdall_test_data/tiny_data/__files'
+IN_DIR = '../bdall_test_data/tiny_data/__generated_1'
+# IN_DIR = 'E:/bdall'
 SAVE_TO_DB = True
 DB_HOST = 'localhost'
 DB_NAME = 'words'
 DB_USER = 'root'
 DB_PWD = 'root'
-# DB_SQL_QUERY="""INSERT INTO allwordstemp (word, word_len, word_truncated, filename, filecount)  VALUES(%s,%s,%s,%s,%s)"""
-DB_SQL_QUERY= """INSERT INTO words (word, word_len, word_truncated, file_path, file_words_count)  VALUES(%s,%s,%s,%s,%s)"""
+LOAD_BALANCER_PIPES = 4
+# DB_SQL_QUERIES= ["INSERT INTO allwordstemp (word, word_len, word_truncated, filename, filecount)  VALUES(%s,%s,%s,%s,%s)" 
+#                                                       for _ in range(0,LOAD_BALANCER_PIPES)]
+DB_SQL_QUERIES= ["INSERT INTO words (word, word_len, word_truncated, file_path, file_words_count)  VALUES(%s,%s,%s,%s,%s)" 
+                                                        for _ in range(0,LOAD_BALANCER_PIPES)]
 CPU_MAX_USAGE = 0.90 #0...1
 MONO_PIPELINE = True
 #==========================================================
@@ -62,12 +65,15 @@ MONO_PIPELINE = True
 
 """"
 CREATE TABLE `words` (
-	`word` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
-	`word_len` INT(10) NOT NULL,
-	`word_truncated` TINYINT(3) NOT NULL,
-	`file_path` VARCHAR(270) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`word` VARCHAR(255) NOT NULL,
+	`word_len` INT(10) NOT NULL DEFAULT '0',
+	`word_truncated` BIT(1) NOT NULL DEFAULT b'0',
+	`file_path` VARCHAR(270) NOT NULL,
 	`file_words_count` INT(10) NOT NULL DEFAULT '0'
 )
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB
+;
 """
 
 
@@ -81,7 +87,7 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                 global_cpus_affinity_options=config['cpus_affinity_options'],
                 extractor=extractor_,
                 transformers=[
-                        OneToOneItemAttributesTransformer(logger, operations=[(['_'], [os.path.abspath])]),
+                        OneToOneItemAttributesTransformer(logger, trans_values_3=[(['_'], [os.path.abspath])]),
                         # OneToOneItemAttributesTransformer(logger,
                         #         static_values_1=[(['words_count'], 0), (['word_len'], 0), (['word_truncated', 0])]),
                         ReduceItemTransformer(  logger,
@@ -138,7 +144,7 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                         OneToOneItemAttributesTransformer(logger, 
                                                 derived_values_2=[
                                                     (['_', 'word'], ['_', 'word_len'], [ArabicTextWordsTokenizerTransformer.remove_diac, str.__len__]),
-                                                    (['_', 'word_len'], ['_', 'word_truncated'], [len_str_gt_255]),
+                                                    (['_', 'word'], ['_', 'word_truncated'], [len_str_gt_255]),
                                                 ],
                                                 trans_values_3=[
                                                     (['_', 'word'], [truncate_str_255]),
@@ -179,17 +185,17 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                         use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
                                         cpus_affinity_options=config['cpus_affinity_options'],
                                         loaders= [(
-                                                    config['buffer_size']*10, 
+                                                    config['buffer_size'], 
                                                     MySQL_DBLoader( logger, **{
                                                                     'input_key_path': None, 
                                                                     'values_path': config['values_to_load_path'],
-                                                                    'sql_query': config['db_sql_query'],
+                                                                    'sql_query': config['db_sql_query'][i],
                                                                     'buffer_size': config['buffer_size'],
                                                                     'host': config['db_host'],
                                                                     'database': config['db_name'],
                                                                     'user': config['db_user'],
                                                                     'password': config['db_password']})) 
-                                                    for _ in range(0, max(1, config['load_balancer_parallel_loader_count']))]
+                                                    for i in range(0, max(1, config['load_balancer_parallel_loader_count']))]
                                 )
                         ),
                 ])
@@ -207,11 +213,11 @@ if __name__=="__main__":
         'db_name': DB_NAME, 
         'db_user': DB_USER, 
         'db_password': DB_PWD,
-        'db_sql_query': DB_SQL_QUERY,
+        'db_sql_query': DB_SQL_QUERIES,
         'cpu_pax_usage': max(0, min(1, CPU_MAX_USAGE)),
         'cpus_affinity_options': [],# will be calculated below
         'use_threads_as_extractors_executors': False,#False optimal
-        'max_transformation_pipelines': 3,#2 optimal
+        'max_transformation_pipelines': 4,#2 optimal
         'use_threads_as_transformation_pipelines': False,#False optimal
         'use_threads_as_loaders_executors': False,#False optimal
         'values_to_load_path': [('word', ['_', 'word'], True), 
@@ -219,8 +225,8 @@ if __name__=="__main__":
                                 ('word_truncated', ['_', 'word_truncated'], True),
                                 ('file', ['file_path'], True),
                                 ('words_count', ['words_count'], True)],
-        'load_balancer_parallel_loader_count': 4,#4 optimal
-        'use_threads_as_load_balancer_loaders_executors': False,#True optimal
+        'load_balancer_parallel_loader_count': LOAD_BALANCER_PIPES,#4 optimal
+        'use_threads_as_load_balancer_loaders_executors': False,#False optimal
         'load_balancer_buffer_size': 1_000,#1_000 optimal
         'mono_pipeline': MONO_PIPELINE,
     }
@@ -351,8 +357,7 @@ if __name__=="__main__":
         dirs = [os.path.abspath(os.path.join(config['in_dir'], dir)) for dir in dirs]
         if config['mono_pipeline']:
             _LOGGER = logging.getLogger("Pipeline (Unique)")
-            pipelines.append(make_threaded_pipeline(extractor_=FoldersFilesListExtractor(_LOGGER, 
-                                                                                input_dirs=dirs, 
+            pipelines.append(make_threaded_pipeline(extractor_=FilesListExtractor(_LOGGER, input_dir=os.path.abspath(config['in_dir']), 
                                                                                 file_pattern=".txt", output_key='_'),
                                                     logger=_LOGGER, config=config))
         else:
@@ -372,18 +377,38 @@ if __name__=="__main__":
         LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(ex))))
     finally:
         end_exec_time=time.perf_counter()
-        LOGGER.info('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))))
+        duree_exec = round(end_exec_time-start_exec_time, 3)
+        rate = duree_exec/in_dir_size_mo/1024
+        LOGGER.info('Script executed in {} sec. Rate {} sec/ko ({} Mo/sec)'.format(duree_exec, round(rate, 3), round(1/rate/1024, 3)))
 
 
 
 """
-SELECT COUNT(*) FROM words; 
+SELECT COUNT(*) FROM words_1;
+SELECT COUNT(*) FROM words_2;
+SELECT COUNT(*) FROM words_3;
+SELECT COUNT(*) FROM words_4;
 
-SELECT count(DISTINCT(file_path)) FROM words;
+SELECT COUNT(*) FROM words_1 WHERE word_truncated=b'1';
+SELECT COUNT(*) FROM words_2 WHERE word_truncated=b'1';
+SELECT COUNT(*) FROM words_3 WHERE word_truncated=b'1';
+SELECT COUNT(*) FROM words_4 WHERE word_truncated=b'1';
 
-select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words AS w) AS x;
+select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words_1 AS w) AS X;
+select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words_2 AS w) AS X;
+select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words_3 AS w) AS X;
+select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words_4 AS w) AS X;
 
-SELECT * FROM words LIMIT 1000;
+
+SELECT count(DISTINCT(file_path)) FROM words_1;
+SELECT count(DISTINCT(file_path)) FROM words_2;
+SELECT count(DISTINCT(file_path)) FROM words_3;
+SELECT count(DISTINCT(file_path)) FROM words_4;
+
+SELECT * FROM words_1 LIMIT 1000;
+SELECT * FROM words_2 LIMIT 1000;
+SELECT * FROM words_3 LIMIT 1000;
+SELECT * FROM words_4 LIMIT 1000;
 
 SELECT concat(word, file_path), COUNT(*) AS x FROM words GROUP BY 1 HAVING X>1; 
 """

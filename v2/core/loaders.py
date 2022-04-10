@@ -302,11 +302,12 @@ class MySQL_DBLoader(AbstractLoader):
 
         try:
             if self.connection is None:
-                self.connection = mysql.connector.connect(host=self.host, database=self.database, user=self.user, password=self.password)
-                super().log_msg("MySQL connection is opened successfully",  level=INFO)   
+                con = mysql.connector.connect(host=self.host, database=self.database, user=self.user, password=self.password)
+                self.connection = (con, con.cursor())
+                super().log_msg("MySQL connection is opened successfully  <{}>".format(self.connection[0].__class__.__name__),  level=INFO)   
             
-            if not self.connection.is_connected():
-                self.connection.reconnect()
+            if not self.connection[0].is_connected():
+                self.connection[0].reconnect()
             return self.connection
 
         except mysql.connector.Error as error:
@@ -337,7 +338,7 @@ class MySQL_DBLoader(AbstractLoader):
     def write_buffered_data_to_disk(self) -> None:
         import mysql.connector
 
-        connection = self._connect()
+        (connection, cursor) = self._connect()
         reconnection_retries = 0
         while True:
             try:
@@ -346,13 +347,11 @@ class MySQL_DBLoader(AbstractLoader):
                 inserted_data = 0
                 super().log_msg("{0} rows available to be inserted".format(data_len))
 
-                cursor = connection.cursor()
                 connection.start_transaction()
                 cursor.executemany(self.sql_query, items)   
                 connection.commit()
 
                 inserted_data+=cursor.rowcount
-                cursor.close()
                 super().log_msg("{} Record inserted successfully".format(cursor.rowcount))
                 super().log_msg("{} Total record inserted successfully".format(data_len))
                 self.buffer.clear()
@@ -384,7 +383,9 @@ class MySQL_DBLoader(AbstractLoader):
                 self.buffer.clear()
                 super().log_msg('Flushed buffered data in <{}>'.format(str(self.__class__.__name__)), level=INFO)
             if self.connection is not None:
-                self.connection.close()
+                (conn, cursor) = self.connection
+                cursor.close()
+                conn.close()
             super().log_msg("MySQL connection is closed successfully",  level=INFO)
         except Exception as ex:
             super().log_msg("Error closing MySQL connection", exception=ex , level=ERROR)
