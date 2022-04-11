@@ -27,6 +27,7 @@ from core.commons import get_dir_size_in_mo
 from core.transformers import UniqueFilterTransformer
 from core.commons import basename_backwards_x4, format_duree, truncate_str_255, truncate_str_270
 from core.commons import len_str_gt_255
+from core.transformers import FileTextReaderTransformer
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -96,18 +97,18 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                 copy_values_key_paths=[('file_path', ['_'])],
                                 transformers=[
                                         # FileTextReaderTransformer consumes a lot of RAM but FileToTextLinesTransformer takes more time
-                                        FileToTextLinesTransformer(logger, 
+                                        FileTextReaderTransformer(logger, 
                                                 pattern=".txt", 
                                                 input_key_path=None, 
                                                 output_key=None),
                                         # TextWordTokenizerTransformer( logger, 
                                         #         pattern="\\s+", 
-                                        #         input_key_path=['_', 'line'], 
+                                        #         input_key_path=['_', 'content'], 
                                         #         output_key=None,
                                         #         mappers=[str.strip],
                                         #         ignore_word_fn=str.isspace),
                                         ArabicTextWordsTokenizerTransformer( logger, 
-                                                input_key_path=['_', 'line'], 
+                                                input_key_path=['_', 'content'], 
                                                 output_key=None,
                                                 ignore_word_fn=str.isspace)
                                             ],
@@ -120,7 +121,7 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                 unique_value_normalizers=[str.lower, str.strip],
                                 yield_unique_values=True,
                                 transformers=[
-                                        FileToTextLinesTransformer(logger, 
+                                        FileTextReaderTransformer(logger, 
                                                 pattern=".txt", 
                                                 input_key_path=['file_path'], 
                                                 output_key='_',
@@ -128,7 +129,7 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                                                     ('words_count', ['words_count'])]), 
                                         # TextWordTokenizerTransformer(logger, 
                                         #         pattern="\\s+", 
-                                        #         input_key_path=['_', 'line'], 
+                                        #         input_key_path=['_', 'content'], 
                                         #         output_key='_', 
                                         #         mappers=[str.strip],
                                         #         ignore_word_fn=str.isspace,
@@ -136,7 +137,7 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                         #         copy_values_key_paths=[('file_path', ['file_path']), 
                                         #                             ('words_count', ['words_count'])]),
                                         ArabicTextWordsTokenizerTransformer(logger, 
-                                                input_key_path=['_', 'line'], 
+                                                input_key_path=['_', 'content'], 
                                                 output_key='_', 
                                                 ignore_word_fn=str.isspace,
                                                 copy_values_key_paths=[('file_path', ['file_path']), 
