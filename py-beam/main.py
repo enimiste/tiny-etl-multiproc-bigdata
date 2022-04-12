@@ -1,3 +1,4 @@
+from cProfile import label
 import os
 import re
 import argparse
@@ -62,12 +63,18 @@ def main(argv=None, save_main_session=True):
         help='Output file to write results to.')
     known_args, pipeline_args = parser.parse_known_args(argv)
     pipeline_args.extend([
-        # '--runner=DirectRunner',
-        "--runner=FlinkRunner",
-        "--flink_master=localhost:8081",
-        "--environment_type=LOOPBACK",
-        '--parallelism=7',
         '--job_name=arabic-words-extraction',
+        # =============== DIRECT RUNNER
+        # '--runner=DirectRunner',
+        # =============== FLINK RUNNER
+        # "--runner=FlinkRunner",
+        # "--flink_master=localhost:8081",
+        # "--environment_type=LOOPBACK",
+        # '--parallelism=7',
+        # =============== SPARK RUNNER
+        "--runner=PortableRunner",
+        "--job_endpoint=localhost:8082=1",
+        "--environment_type=LOOPBACK",
     ])
 
     known_args.output = os.path.abspath(known_args.output)
@@ -84,7 +91,6 @@ def main(argv=None, save_main_session=True):
             files = [known_args.input]
         elif os.path.isdir(known_args.input):
             files = extract_files_from_dir(os.path.abspath(known_args.input), known_args.ext, "file:///")
-            print(files)
         else:
             raise RuntimeError('Invalid path ' + known_args.input)
         logging.log(logging.INFO, '{} files found'.format(len(files)))
@@ -109,14 +115,17 @@ def main(argv=None, save_main_session=True):
 
         # Write the output using a "Write" transform that has side effects.
         # pylint: disable=expression-not-assigned
-        words | WriteToText('{}/{}_{}'.format(os.path.dirname(known_args.output), int(time.time()), os.path.basename(known_args.output)))
+        words | beam.Map(lambda x: print('{}'.format(x)))
+        # words | WriteToText('{}/{}_{}'.format(os.path.dirname(known_args.output), int(time.time()), os.path.basename(known_args.output)))
 
 
 if __name__ == "__main__":
     """"
+    FLINK :
+    =======
     ./start-cluster.sh
 
-    python37.exe main.py --input=./input --ext=.txt --output=./output/words.csv
+    python.exe main.py --input=./input --ext=.txt --output=./output/words.csv
 
     ./stop-cluster.sh
     """
@@ -127,3 +136,18 @@ if __name__ == "__main__":
     end_exec_time=time.perf_counter()
     duree_exec = round(end_exec_time-start_exec_time, 3)
     logging.log(logging.INFO, 'Script End executed in {} sec.'.format(format_duree(duree_exec)))
+
+
+    """"
+    SPARK:
+    ======
+    The launch scripts located at %SPARK_HOME%\sbin do not support Windows. You need to manually run the master and worker as outlined below.
+
+    Go to %SPARK_HOME%\bin folder in a command prompt
+
+    Run ./spark-class.cmd org.apache.spark.deploy.master.Master to run the master. This will give you a URL of the form spark://ip:port
+
+    Run ./spark-class.cmd org.apache.spark.deploy.worker.Worker spark://ip:port to run the worker. Make sure you use the URL you obtained in step 2.
+
+    python.exe main.py --input=./input --ext=.txt --output=./output/words.csv
+    """

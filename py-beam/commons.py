@@ -5,6 +5,8 @@ import math
 import os
 
 def extract_files_from_dir(dir_abs_path: str, file_ext:str, pref: str):
+    if pref is None:
+        pref = ''
     res_files = []
     for root_dir, dirs, files in os.walk(dir_abs_path):
         if len(files)>0:
