@@ -1,0 +1,5 @@
+- Cygwin
+- Install python 2.7.x (64bits)
+- python37.exe -m pip install wheel
+- python37.exe -m pip install "apache-flink==1.14.4"
+- python37 -m pip install "pyspark==3.0.0"
