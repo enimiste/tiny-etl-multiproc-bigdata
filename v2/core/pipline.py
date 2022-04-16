@@ -12,9 +12,9 @@ from typing import List, Set
 import uuid
 
 from core.commons import LoggerWrapper, WithLogging, rotary_iter
-from core.extractors import AbstractExtractor
-from core.loaders import AbstractLoader
-from core.transformers import AbstractTransformer
+from core.extractors.commons import AbstractExtractor
+from core.loaders.commons import AbstractLoader
+from core.transformers.commons import AbstractTransformer
 from core.commons import flatMapApply
 from core.commons import block_join_threads_or_processes, kill_threads_processes
 from core.commons import make_thread_process

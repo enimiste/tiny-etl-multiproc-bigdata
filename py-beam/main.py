@@ -73,7 +73,7 @@ def main(argv=None, save_main_session=True):
         # '--parallelism=7',
         # =============== SPARK RUNNER
         "--runner=PortableRunner",
-        "--job_endpoint=localhost:8082=1",
+        "--job_endpoint=localhost:8082",
         "--environment_type=LOOPBACK",
     ])
 

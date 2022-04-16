@@ -183,7 +183,7 @@ def format_duree(duree_sec: int) -> str:
     s = duree_sec - (h*3600 + m*60)
     return '{}d {}h {}m {}sec'.format(d, h, m, s)
     
-def make_thread_process(use_thread: bool, target, args) -> threading.Thread | multiprocessing.Process:
+def make_thread_process(use_thread: bool, target, args):
     if use_thread:
         return threading.Thread(target=target, args=args)
     else:

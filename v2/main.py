@@ -11,23 +11,25 @@ import sys
 from typing import Dict, AnyStr, Any
 
 import psutil
-from core.extractors import FilesListExtractor, AbstractExtractor
-from core.loaders import CSV_FileLoader
-from core.pipline import ThreadedPipeline
-from core.transformers import  FileToTextLinesTransformer, TextWordTokenizerTransformer
-from custom_transformers import ArabicTextWordsTokenizerTransformer
-from core.transformers import OneToOneItemAttributesTransformer
-from core.loaders import ConditionalLoader, MySQL_DBLoader
-from core.transformers import OneToOneNoopTransformer
-from core.transformers import ReduceItemTransformer
-from core.loaders import LoadBalanceLoader
-from core.loaders import NoopLoader
+
 from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
-from core.transformers import UniqueFilterTransformer
 from core.commons import basename_backwards_x4, format_duree, truncate_str_255, truncate_str_270
 from core.commons import len_str_gt_255
-from core.transformers import FileTextReaderTransformer
+from core.pipline import ThreadedPipeline
+from core.extractors.files import FilesListExtractor
+from core.extractors.commons import AbstractExtractor
+from core.transformers.text import  TextWordTokenizerTransformer
+from core.transformers.files import  FileToTextLinesTransformer, FileTextReaderTransformer
+from core.transformers.one_to_one import OneToOneItemAttributesTransformer
+from core.transformers.commons import OneToOneNoopTransformer
+from core.transformers.aggregators import ReduceItemTransformer
+from core.transformers.aggregators import UniqueFilterTransformer
+from core.loaders.commons import ConditionalLoader, NoopLoader
+from core.loaders.loadbalancer import LoadBalanceLoader
+from core.loaders.mysql import MySQL_DBLoader
+from core.loaders.files import CSV_FileLoader
+from arabic_transformers import ArabicTextWordsTokenizerTransformer
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -37,7 +39,7 @@ logging.basicConfig(handlers=[ConcurrentRotatingFileHandler(mode="a",
                                                                     filename=os.path.abspath(f'logs/log-{date.today()}.log'),
                                                                     maxBytes=50*1024*1024, backupCount=100), console_handler], 
                                                 level=logging.DEBUG,
-                                                encoding='utf-8',
+                                                # encoding='utf-8',
                                                 format=LOGGING_FORMAT)
 LOGGER = logging.getLogger("Global")
 
@@ -46,8 +48,8 @@ LOGGER = logging.getLogger("Global")
 #============================================= PARAMETRAGE :
 # IN_DIR = '../bdall_test_data/__generated'
 # IN_DIR = '../bdall_test_data/small_data'
-# IN_DIR = '../bdall_test_data/tiny_data/__files'
-IN_DIR = '../bdall_test_data/tiny_data/__generated_1'
+IN_DIR = '../bdall_test_data/tiny_data/__files'
+# IN_DIR = '../bdall_test_data/tiny_data/__generated_1'
 # IN_DIR = 'E:/bdall'
 SAVE_TO_DB = True
 DB_HOST = 'localhost'
@@ -62,20 +64,6 @@ DB_SQL_QUERIES= ["INSERT INTO words (word, word_len, word_truncated, file_path, 
 CPU_MAX_USAGE = 0.90 #0...1
 MONO_PIPELINE = True
 #==========================================================
-
-
-""""
-CREATE TABLE `words` (
-	`word` VARCHAR(255) NOT NULL,
-	`word_len` INT(10) NOT NULL DEFAULT '0',
-	`word_truncated` BIT(1) NOT NULL DEFAULT b'0',
-	`file_path` VARCHAR(270) NOT NULL,
-	`file_words_count` INT(10) NOT NULL DEFAULT '0'
-)
-COLLATE='utf8mb4_general_ci'
-ENGINE=InnoDB
-;
-"""
 
 
 def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config: Dict[AnyStr, Any]):
@@ -205,6 +193,10 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
 
 if __name__=="__main__":
     #0.00050067901 sec/ko
+    import platform
+    if not platform.python_version().startswith('3.7'):
+        print('This script can be executed used Python 3.7.x')
+        exit()
     config = {
         'in_dir': IN_DIR,
         'out_dir': 'out_dir',
@@ -384,35 +376,4 @@ if __name__=="__main__":
         rate = duree_exec/in_dir_size_mo/1024
         LOGGER.info('Script executed in {} sec. Rate {} sec/ko ({} Mo/sec)'.format(duree_exec, round(rate, 3), round(1/rate/1024, 3)))
 
-
-
-"""
-SELECT COUNT(*) FROM words_1;
-SELECT COUNT(*) FROM words_2;
-SELECT COUNT(*) FROM words_3;
-SELECT COUNT(*) FROM words_4;
-
-SELECT COUNT(*) FROM words_1 WHERE word_truncated=b'1';
-SELECT COUNT(*) FROM words_2 WHERE word_truncated=b'1';
-SELECT COUNT(*) FROM words_3 WHERE word_truncated=b'1';
-SELECT COUNT(*) FROM words_4 WHERE word_truncated=b'1';
-
-select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words_1 AS w) AS X;
-select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words_2 AS w) AS X;
-select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words_3 AS w) AS X;
-select sum(file_words_count) FROM (SELECT DISTINCT(w.file_path), w.file_words_count FROM words_4 AS w) AS X;
-
-
-SELECT count(DISTINCT(file_path)) FROM words_1;
-SELECT count(DISTINCT(file_path)) FROM words_2;
-SELECT count(DISTINCT(file_path)) FROM words_3;
-SELECT count(DISTINCT(file_path)) FROM words_4;
-
-SELECT * FROM words_1 LIMIT 1000;
-SELECT * FROM words_2 LIMIT 1000;
-SELECT * FROM words_3 LIMIT 1000;
-SELECT * FROM words_4 LIMIT 1000;
-
-SELECT concat(word, file_path), COUNT(*) AS x FROM words GROUP BY 1 HAVING X>1; 
-"""
     
