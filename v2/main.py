@@ -11,6 +11,7 @@ import sys
 from typing import Dict, AnyStr, Any
 
 import psutil
+import argparse
 
 from core.commons import block_join_threads_or_processes
 from core.commons import get_dir_size_in_mo
@@ -30,6 +31,7 @@ from core.loaders.loadbalancer import LoadBalanceLoader
 from core.loaders.mysql import MySQL_DBLoader
 from core.loaders.files import CSV_FileLoader
 from arabic_transformers import ArabicTextWordsTokenizerTransformer
+from core.loaders.cassandra import Cassandra_DBLoader
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -154,41 +156,45 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                         #                 out_file_ext='txt',
                         #                 buffer_size=config['buffer_size'])
                         # ),
-                        # ConditionalLoader(  _LOGGER, 
-                        #         config['save_to_db'],
-                        #         #  False,
-                        #         MySQL_DBLoader( _LOGGER, **mysql_db_loader_config)
-                        # ),
+                        ConditionalLoader(  _LOGGER, 
+                                config['save_to_db'],
+                                #  False,
+                                Cassandra_DBLoader( _LOGGER, input_key_path=None,
+                                        values_path= config['values_to_load_path'],
+                                        sql_query=config['db_sql_query'],
+                                        db_name=config['db_name'],
+                                        hosts=[config['db_host']],
+                                        buffer_size=config['db_buffer_size'])
+                        ),
                         # NoopLoader(_LOGGER, 
                         #         input_key_path=None, 
                         #         log=True, 
                         #         log_level=INFO, 
                         #         values_path=config['values_to_load_path'],
                         # ),
-                        ConditionalLoader(  logger, 
-                                config['save_to_db'],
-                                # False,
-                                LoadBalanceLoader(logger, 
-                                        queue_no_block_timeout_sec = 0.09,
-                                        buffer_size=config['load_balancer_buffer_size'],
-                                        use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
-                                        cpus_affinity_options=config['cpus_affinity_options'],
-                                        loaders= [(
-                                                    config['load_balancer_queue_max_size'], 
-                                                    MySQL_DBLoader( logger, **{
-                                                                    'input_key_path': None, 
-                                                                    'values_path': config['values_to_load_path'],
-                                                                    'sql_query': config['db_sql_query'][i],
-                                                                    'buffer_size': config['db_buffer_size'],
-                                                                    'host': config['db_host'],
-                                                                    'database': config['db_name'],
-                                                                    'user': config['db_user'],
-                                                                    'password': config['db_password']})) 
-                                                    for i in range(0, max(1, config['load_balancer_parallel_loader_count']))]
-                                )
-                        ),
+                        # ConditionalLoader(  logger, 
+                        #         config['save_to_db'],
+                        #         # False,
+                        #         LoadBalanceLoader(logger, 
+                        #                 queue_no_block_timeout_sec = 0.09,
+                        #                 buffer_size=config['load_balancer_buffer_size'],
+                        #                 use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
+                        #                 cpus_affinity_options=config['cpus_affinity_options'],
+                        #                 loaders= [(
+                        #                             config['load_balancer_queue_max_size'], 
+                        #                             MySQL_DBLoader( logger, **{
+                        #                                             'input_key_path': None, 
+                        #                                             'values_path': config['values_to_load_path'],
+                        #                                             'sql_query': config['db_sql_query'][i],
+                        #                                             'buffer_size': config['db_buffer_size'],
+                        #                                             'host': config['db_host'],
+                        #                                             'database': config['db_name'],
+                        #                                             'user': config['db_user'],
+                        #                                             'password': config['db_password']})) 
+                        #                             for i in range(0, max(1, config['load_balancer_parallel_loader_count']))]
+                        #         )
+                        # ),
                 ])
-
 
 
 if __name__=="__main__":
@@ -209,6 +215,9 @@ if __name__=="__main__":
         'db_sql_query': DB_SQL_QUERIES,
         'cpu_pax_usage': max(0, min(1, CPU_MAX_USAGE)),
         'cpus_affinity_options': [],# will be calculated below
+        'all_cpu': '-all-cpus' in sys.argv,
+        'force_run': '-f' in sys.argv,
+        'start_run': '-s' in sys.argv,
         'use_threads_as_extractors_executors': False,#False optimal
         'trans_in_queue_max_size': 10_000,#10_000 optimal
         'max_transformation_pipelines': 4,#2 optimal
@@ -251,7 +260,7 @@ if __name__=="__main__":
     #region CPU affinity
     if config['cpus_affinity_options'] is None or len(config['cpus_affinity_options'])==0:
         cpus_max = 1
-        if '--all-cpu' in sys.argv:
+        if config['all_cpu']:
             cpus_max = cpus_count
         else:
             cpus_max = math.floor(cpus_count*config['cpu_pax_usage'])
@@ -326,10 +335,10 @@ if __name__=="__main__":
         --all-cpus   Start processing using the full CPUs (default to {}% of CPUs are used)
 
         """.format(config['cpu_pax_usage']*100))
-        if '-f' not in sys.argv:
+        if not config['force_run']:
             exit()
 
-    if '-s' not in sys.argv:
+    if not config['start_run']:
         LOGGER.log(INFO, """
         Help :
         python main.py options

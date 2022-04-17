@@ -4,29 +4,32 @@ import threading
 from typing import AnyStr, List, Set, Tuple
 
 from core.commons import dict_deep_get
-from core.loaders import AbstractLoader
+from core.loaders.commons import AbstractLoader
+
+from cassandra.cluster import Session
 
 class Cassandra_DBLoader(AbstractLoader):
     def __init__(self, 
                 logger: Logger, 
                 input_key_path: List[AnyStr],
                 values_path: List[Tuple[str, List[AnyStr], bool]],
+                buffer_size: int,
                 sql_query: str,
-                buffer_size: int, 
-                host: str, 
-                database: str, 
-                user: str, 
-                password: str):
+                db_name: str,
+                hosts: List[AnyStr] = ['127.0.0.1'],
+                request_timeout=15,
+                executor_threads=2 ):
         super().__init__(logger, input_key_path, values_path)
-        self.connection = None
-        self.sql_query = sql_query
         self.buffer_size=buffer_size
-        self.host=host
-        self.user=user
-        self.password=password
-        self.database = database
         self.buffer = []
         self.calling_thread = Value('i', -1)
+        self.sql_query = sql_query
+        self.db_name = db_name
+        self.hosts = hosts
+        self.prepared_query = None
+        self.session = None
+        self.request_timeout=request_timeout
+        self.executor_threads=executor_threads
 
     def _row_from_data(self, item: dict)->list:
         row = []
@@ -37,22 +40,6 @@ class Cassandra_DBLoader(AbstractLoader):
             row.append(val)
         return row
 
-    def _connect(self):
-        import mysql.connector
-
-        try:
-            if self.connection is None:
-                con = mysql.connector.connect(host=self.host, database=self.database, user=self.user, password=self.password)
-                self.connection = (con, con.cursor())
-                super().log_msg("MySQL connection is opened successfully  <{}>".format(self.connection[0].__class__.__name__),  level=INFO)   
-            
-            if not self.connection[0].is_connected():
-                self.connection[0].reconnect()
-            return self.connection
-
-        except mysql.connector.Error as error:
-            super().log_msg("Failed to connect to database {}".format(str(error.args)), exception=error, level=ERROR)
-            raise error
 
     def load(self, job_uuid: str, items: List[dict], last_call: bool) -> None:
         id = threading.get_ident()
@@ -72,48 +59,41 @@ class Cassandra_DBLoader(AbstractLoader):
         if len(data)>0:
             self.buffer = self.buffer + data
 
-        if last_call or len(self.buffer) > self.buffer_size:
+        if last_call or (len(self.buffer) > self.buffer_size):
             self.write_buffered_data_to_disk()
 
+    def _connect(self) -> Session:
+        from cassandra.cluster import Cluster, ExecutionProfile, EXEC_PROFILE_DEFAULT, Session
+        from cassandra.policies import WhiteListRoundRobinPolicy, DowngradingConsistencyRetryPolicy, ConsistencyLevel
+        from cassandra.query import tuple_factory
+
+        if self.session is None or self.cluster is None or self.cluster.is_shutdown():
+
+            profile = ExecutionProfile(
+                load_balancing_policy=WhiteListRoundRobinPolicy(self.hosts),
+                retry_policy=DowngradingConsistencyRetryPolicy(),
+                consistency_level=ConsistencyLevel.LOCAL_QUORUM,
+                serial_consistency_level=ConsistencyLevel.LOCAL_SERIAL,
+                request_timeout=self.request_timeout,
+                row_factory=tuple_factory
+            )
+            self.cluster = Cluster(execution_profiles={EXEC_PROFILE_DEFAULT: profile}, executor_threads=self.executor_threads)
+            self.session = self.cluster.connect(keyspace=self.db_name)
+            super().log_msg('Connection was successfully opened to Cassandra')
+            self.prepared_query = self.session.prepare(self.sql_query)
+
+        return self.session
+
     def write_buffered_data_to_disk(self) -> None:
-        import mysql.connector
 
-        (connection, cursor) = self._connect()
-        reconnection_retries = 0
-        while True:
-            try:
-                items =  [] + self.buffer
-                data_len=len(items)
-                inserted_data = 0
-                super().log_msg("{0} rows available to be inserted".format(data_len))
-
-                connection.start_transaction()
-                cursor.executemany(self.sql_query, items)   
-                connection.commit()
-
-                inserted_data+=cursor.rowcount
-                super().log_msg("{} Record inserted successfully".format(cursor.rowcount))
-                super().log_msg("{} Total record inserted successfully".format(data_len))
-                self.buffer.clear()
-            except mysql.connector.OperationalError as error:
-                connection = self._connect()
-                if reconnection_retries<5:
-                    reconnection_retries += 1
-                    super().log_msg("Reconnection {}/5".format(reconnection_retries), level=INFO)
-                    continue
-                else:
-                    super().log_msg("Reconnection max retries reached (=5)".format(reconnection_retries), level=INFO)
-            except mysql.connector.DataError as error:
-                super().log_msg("Failed to insert records. Error={}".format(error), exception=error, level=ERROR)
-                if connection is not None and connection.in_transaction:
-                    try:
-                        connection.rollback()
-                    except Exception as ex:
-                        super().log_msg("Failed to rollback inserted records {}".format(ex.args), exception=ex, level=ERROR)
-            except mysql.connector.Error as error:
-                super().log_msg("Failed to insert records. Error={}".format(error), exception=error, level=ERROR)
-            
-            return
+        session = self._connect()
+        items =  [] + self.buffer
+        data_len=len(items)
+        super().log_msg("{0} rows available to be inserted".format(data_len))
+        for row in self.buffer:
+            session.execute(self.prepared_query, row)
+        super().log_msg("{} Total record inserted successfully".format(data_len))
+        self.buffer.clear()
 
     def close(self) -> None:
         try:
@@ -123,12 +103,10 @@ class Cassandra_DBLoader(AbstractLoader):
                 self.buffer.clear()
                 super().log_msg('Flushed buffered data in <{}>'.format(str(self.__class__.__name__)), level=INFO)
             if self.connection is not None:
-                (conn, cursor) = self.connection
-                cursor.close()
-                conn.close()
-            super().log_msg("MySQL connection is closed successfully",  level=INFO)
+                self.cluster.shutdown()
+            super().log_msg("Cassandra connection is closed successfully",  level=INFO)
         except Exception as ex:
-            super().log_msg("Error closing MySQL connection", exception=ex , level=ERROR)
+            super().log_msg("Error closing Cassandra connection", exception=ex , level=ERROR)
 
     def has_buffered_data(self) -> bool:
         return len(self.buffer)>0

@@ -1,6 +1,6 @@
 # Requirements :
 - Python 3.7.x
-- MySQL 8.x or (Apache Cassandra 3.x + Java 8)
+- MySQL 8.x or (Apache Cassandra 3.x + Oracle Java 8)
 - Git bash to run main.py script
 - `pip install mysql-connector-python`
 - `pip install concurrent-log-handler`
@@ -69,5 +69,19 @@ SELECT concat(word, file_path), COUNT(*) AS x FROM words GROUP BY 1 HAVING X>1;
 ```
 
 # Cassandra Store :
+- [https://dbschema.com/download.html](SQL Editor)
+- Enable Mini-dumps through Advanced System Settings -- > Startup & Recovery -- > Settings -- > Choosing 'small memory dump'.
+
 ## DB Schema :
+```sh
+$ cqlsh: CREATE KEYSPACE IF NOT EXISTS arabic_words WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : '1' };
+$ cqlsh: use arabic_words;
+$ cqlsh>arabic_words:; CREATE TABLE `words` (
+	`word` text,
+	`word_len`int,
+	`word_truncated` text,
+	`file_path` text,
+	`file_words_count` int
+);
+```
 ## Config :
