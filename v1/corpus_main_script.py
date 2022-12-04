@@ -1,36 +1,26 @@
 from multiprocessing import Queue, Process
 import os
 import signal
+from threading import Thread
 import uuid
 import time
-from utils import DATA_BY_PROCESS_CHUNK_SIZE, MAX_QUEUE_GET_TIMEOUT_SEC, run_pipelines_blocking
+from utils import DATA_BY_PROCESS_CHUNK_SIZE, MAX_QUEUE_GET_TIMEOUT_SEC, pipeline_builder, run_pipelines_blocking, save_words_worker, split_list
 from utils import MAX_QUEUE_PUT_TIMEOUT_SEC, MAX_QUEUE_SIZE, PROC_JOIN_TIMEOUT
 from utils import log_msg, read_arabic_words_in_txt_files
-from classes import AbstractWordSaver, WordSaverFactory
+from classes import WordSaverFactory
 from utils import remove_diac_from_word, tokenize_arabic_words_as_array_bis
 from logging import INFO, WARN, ERROR
 import glob
-
-def split_list(items: list, chunk_size: int):
-  for i in range(0, len(items), chunk_size):
-      yield items[i:i + chunk_size]
-
-def save_words(queue: Queue, job_uuid: str, words_saver: AbstractWordSaver):
-    try:
-        while True:
-            words = queue.get(block=True, timeout=MAX_QUEUE_GET_TIMEOUT_SEC)
-            words_saver.save_words(job_uuid, words)
-    except Exception as e:
-        log_msg("Queue empty {} after timeout : {}".format(job_uuid, str(e.args)), exception=e, level=ERROR)
-
+ 
 def build_read_arabic_words_pipelines(bdall_dir: str, 
                                         tokenizer_fn, 
                                         remove_diac_from_word_fn, 
                                         words_saver_factory: WordSaverFactory, 
                                         queue_max_size, 
                                         infos: dict,
-                                        has_base_dirs=False):
-    pipelines = [] # [{'queue': Queue, 'save_proc': Process, 'tasks': [Process, ...]}]
+                                        has_base_dirs=False,
+                                        use_threads: bool=False):
+    pipelines = [] # [{'queue': Queue, 'process': Process, 'tasks': [Process, ...], 'resource': has close method}]
     processes_count = 0
     bdall_files_count=0
     nbr_total_dom=0
@@ -75,10 +65,7 @@ def build_read_arabic_words_pipelines(bdall_dir: str,
                 queue = Queue(maxsize=queue_max_size)
                 job_uuid = str(uuid.uuid1())
                 words_saver = words_saver_factory.create(job_uuid)
-                pipeline = {'queue': queue, 
-                            'tasks': [], 
-                            'saver': words_saver,  
-                            'save_proc': Process(target=save_words, args=(queue, job_uuid, words_saver))}
+                pipeline = pipeline_builder(job_uuid, queue, words_saver)
                 processes_count+=1
 
                 # Period folders
@@ -103,11 +90,19 @@ def build_read_arabic_words_pipelines(bdall_dir: str,
                     for chunk in files_chunks:
                         if len(chunk)>0:
                             chnks_cnt+=1
-                            p1 = Process(target=read_arabic_words_in_txt_files, args=(chunk, 
-                                                                                    tokenizer_fn, 
-                                                                                    remove_diac_from_word_fn, 
-                                                                                    {'corpus': corpus, 'domaine':dom, 'periode': per}.update(infos), 
-                                                                                    queue))
+                            params = {
+                                'target':read_arabic_words_in_txt_files, 
+                                'args': (   chunk, 
+                                            tokenizer_fn, 
+                                            remove_diac_from_word_fn, 
+                                            {'corpus': corpus, 'domaine':dom, 'periode': per}.update(infos), 
+                                            queue)
+                            }
+                            if use_threads:
+                                p1 = Thread(target=params['target'], args=params['args'], name=str(uuid.uuid1()))
+                            else:
+                                p1 = Process(target=params['target'], args=params['args'])
+                            
                             pipeline['tasks'].append(p1)
                             processes_count+=1
                     log_msg("{} chunks found/ {} files in {}".format(chnks_cnt, len(files), per_dir))
@@ -124,22 +119,30 @@ def build_read_arabic_words_pipelines(bdall_dir: str,
             queue = Queue(maxsize=queue_max_size)
             job_uuid = str(uuid.uuid1())
             words_saver = words_saver_factory.create(job_uuid)
-            pipeline = {'queue': queue, 
-                        'tasks': [], 
-                        'saver': words_saver,  
-                        'save_proc': Process(target=save_words, args=(queue, job_uuid, words_saver))}
+            
+            pipeline = pipeline_builder(job_uuid, queue, words_saver)
+
             processes_count+=1
             chunks = split_list(orph_chnks, DATA_BY_PROCESS_CHUNK_SIZE)
             for chunk in chunks:
                 if len(chunk)>0:
-                    p1 = Process(target=read_arabic_words_in_txt_files, args=(chunk, 
-                                                                                    tokenizer_fn, 
-                                                                                    remove_diac_from_word_fn, 
-                                                                                    {'corpus': corpus, 'domaine':dom, 'periode': per}.update(infos), 
-                                                                                    queue))
+                    params = {
+                        'target':read_arabic_words_in_txt_files, 
+                        'args': (   chunk, 
+                                    tokenizer_fn, 
+                                    remove_diac_from_word_fn, 
+                                    {'corpus': corpus, 'domaine':dom, 'periode': per}.update(infos), 
+                                    queue)
+                    }
+                    if use_threads:
+                        p1 = Thread(target=params['target'], args=params['args'], name=str(uuid.uuid1()))
+                    else:
+                        p1 = Process(target=params['target'], args=params['args'])
+                    
                     pipeline['tasks'].append(p1)
                     processes_count+=1
-            pipelines.append(pipeline)
+            pipelines.append(
+                pipeline)
     return (pipelines, processes_count, bdall_files_count, len(orphan_txt_files_paths))
 
 def read_arabic_words_many_corpus_dir(bdall_dir: str, 
@@ -148,7 +151,8 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                                         words_saver_factory: WordSaverFactory, 
                                         queue_max_size, 
                                         show_only_summary=False,
-                                        has_base_dirs=False):
+                                        has_base_dirs=False,
+                                        use_threads: bool = False):
 
     start_time = time.perf_counter()
     original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -160,14 +164,16 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
                                                                                                 words_saver_factory, 
                                                                                                 queue_max_size, 
                                                                                                 {'corpus': '', 'domaine':'', 'periode': ''},
-                                                                                                has_base_dirs)
-
-    log_msg("{} processes will be started over {} total number of files ({} files found out of the standard folders)...".format(processes_count, 
+                                                                                                has_base_dirs,
+                                                                                                use_threads)
+    
+    log_msg("{} {} will be started over {} total number of files ({} files found out of the standard folders)...".format(processes_count, 
+                                                                                                                                'threads' if use_threads else 'processes',
                                                                                                                                 bdall_files_count, 
                                                                                                                                 orphan_txt_files_count), 
                                                                                                                                 level=INFO)
     if show_only_summary:
-        log_msg("Files & processes summary", level=INFO)
+        log_msg("Files & processes/threads summary", level=INFO)
     else:
         if len(pipelines)>0:
             run_pipelines_blocking(pipelines) # this a blocking operation
@@ -182,7 +188,7 @@ def read_arabic_words_many_corpus_dir(bdall_dir: str,
 if __name__=="__main__":
     import time
 
-    in_dir='bdall_test_data'
+    in_dir='../bdall_test_data'
     #in_dir='bdall_real_data'
     #in_dir='bdall'
     in_dir_has_base_dirs = True # bdall > corpus > base > D > D > *.txt
@@ -192,7 +198,7 @@ if __name__=="__main__":
     db_name='arabic_lang'
     db_user='root'
     db_password='root'
-    chunk_size=1000
+    chunk_size=1500
     show_summary=False
 
     log_msg("Script started : {}".format(in_dir),  level=INFO)
@@ -212,6 +218,7 @@ if __name__=="__main__":
         'db_password': db_password,
         'out_dir': out_dir
     }
+
     try:
         read_arabic_words_many_corpus_dir(os.path.abspath(in_dir), 
                                         tokenize_arabic_words_as_array_bis, 
@@ -219,11 +226,13 @@ if __name__=="__main__":
                                         WordSaverFactory(config),
                                         MAX_QUEUE_SIZE,
                                         show_only_summary=show_summary,
-                                        has_base_dirs=in_dir_has_base_dirs)
+                                        has_base_dirs=in_dir_has_base_dirs,
+                                        use_threads=False)
     except Exception as ex:
         log_msg("Error : {}".format(str(ex.args)), exception=ex, level=ERROR)
     end_exec_time=time.perf_counter()
     log_msg('Script executed in {} sec'.format(str(round(end_exec_time-start_exec_time, 3))),  level=INFO)
+    
 
 # 174 domaines au total sur tous les corpus found in E:\bdall
 # 784 processes will be started over 216839 (71%) total number of files (86594 fichiers ignored) : 

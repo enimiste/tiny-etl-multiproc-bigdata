@@ -1,4 +1,12 @@
 __pycache__
-*.log
+*.log*
 /logs
-bdall_test_data
+/bdall_test_data
+**/*.zip
+**/out_dir/*.txt
+**/out_dir/*.csv
+**/logs/*.lock
+bdall/
+bdall.7z
+bdall.zip
+bdall.rar

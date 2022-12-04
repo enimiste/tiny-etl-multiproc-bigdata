@@ -1,54 +1,3 @@
-# Flatmapped python big data processor (ETL):
-
-- Extract data from inputs, then dispatch each input on the transoformers chain, the output of the transformers chain is then piped to the loaders in parallel
-- Transformers chain : output of each layer is processed in parallel by the next layer
-
-# Core (uses Async) :
-`EXTRACTORS |> TRANSFORMERS |> LOADERS`
-
-This library was constructed to process Arabic text files,
-But it contains many usefull ETL classes to process other text files :
-### Extractors :
-- `FilesListExtractor`
-- `FoldersFilesListExtractor`
-
-### Transformers :
-- `OneToOneNoopTransformer`
-- `FileToTextLinesTransformer`
-- `FileTextReaderTransformer`
-- `OneToOneItemAttributesTransformer`
-- `AbstractTextWordTokenizerTransformer`
-- `TextWordTokenizerTransformer`
-
-## Loaders
-- `NoopLoader`
-- `ConditionalLoader`
-- `CSV_FileLoader`
-- `LoadBalanceLoader`
-- `MySQL_DBLoader`
-- `Cassandra_DBLoader`
-
-If there is need to develop custom ETL classes, you can extend the classes :
-- AbstractExtractor
-- AbstractTransformer
-- AbstractLoader
-
-# Usage :
-
-```
-Help :
-        python main.py options
-        
-        -s           Start processing
-        -f           Start processing even if the estimated RAM isn't enough
-        --all-cpus   Start processing using the full CPUs (default to {}% of CPUs are used)
-```
-
-Source : [V2 Github](https://github.com/enimiste/python-multiproc-bigdata/tree/pipeline/v2)
-
-# main.py code (V2) :
-
-```python
 import json
 import math
 import traceback
@@ -335,6 +284,7 @@ if __name__=="__main__":
     
     LOGGER.log(INFO, 'Config : {}'.format(json.dumps(config, indent=4)))
     LOGGER.log(INFO, """
+
                         Execution rate             = 0.00050067901 sec/ko
                         Ref. CPU                   = 8 logical
                         Ref. CPU type              = 2.4Ghz, i5 11Gen
@@ -383,6 +333,7 @@ if __name__=="__main__":
         -s           Start processing
         -f           Start processing even if the estimated RAM isn't enough
         --all-cpus   Start processing using the full CPUs (default to {}% of CPUs are used)
+
         """.format(config['cpu_pax_usage']*100))
         if not config['force_run']:
             exit()
@@ -395,6 +346,7 @@ if __name__=="__main__":
         -s           Start processing
         -f           Start processing even if the estimated RAM isn't enough
         --all-cpus   Start processing using the full CPUs (default to {}% of CPUs are used)
+
         """.format(config['cpu_pax_usage']*100))
         exit()
         
@@ -433,5 +385,4 @@ if __name__=="__main__":
         rate = duree_exec/in_dir_size_mo/1024
         LOGGER.info('Script executed in {} sec. Rate {} sec/ko ({} Mo/sec)'.format(duree_exec, round(rate, 3), round(1/rate/1024, 3)))
 
-
-```
+    
