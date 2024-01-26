@@ -33,7 +33,11 @@ If there is need to develop custom ETL classes, you can extend the classes :
 - AbstractTransformer
 - AbstractLoader
 
+## Schéma d'architecture :
 ![image](https://github.com/enimiste/python-multiproc-bigdata/assets/2515677/bddcafe2-9291-48f4-962a-c5d7f878df66)
+
+## Fonctionnement interne de l'application des transformations :
+![image](https://github.com/enimiste/python-multiproc-bigdata/assets/2515677/fbd09e46-24ac-470a-a14f-be11757fbfd7)
 
 # Usage :
 
