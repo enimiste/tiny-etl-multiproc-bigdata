@@ -33,6 +33,8 @@ If there is need to develop custom ETL classes, you can extend the classes :
 - AbstractTransformer
 - AbstractLoader
 
+![image](https://github.com/enimiste/python-multiproc-bigdata/assets/2515677/bddcafe2-9291-48f4-962a-c5d7f878df66)
+
 # Usage :
 
 ```
