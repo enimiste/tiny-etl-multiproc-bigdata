@@ -13,25 +13,25 @@ from typing import Dict, AnyStr, Any
 import psutil
 import argparse
 
-from core.commons import block_join_threads_or_processes
-from core.commons import get_dir_size_in_mo
-from core.commons import basename_backwards_x4, format_duree, truncate_str_255, truncate_str_270
-from core.commons import len_str_gt_255
-from core.pipline import ThreadedPipeline
-from core.extractors.files import FilesListExtractor
-from core.extractors.commons import AbstractExtractor
-from core.transformers.text import  TextWordTokenizerTransformer
-from core.transformers.files import  FileToTextLinesTransformer, FileTextReaderTransformer
-from core.transformers.one_to_one import OneToOneItemAttributesTransformer
-from core.transformers.commons import OneToOneNoopTransformer
-from core.transformers.aggregators import ReduceItemTransformer
-from core.transformers.aggregators import UniqueFilterTransformer
-from core.loaders.commons import ConditionalLoader, NoopLoader
-from core.loaders.loadbalancer import LoadBalanceLoader
-from core.loaders.mysql import MySQL_DBLoader
-from core.loaders.files import CSV_FileLoader
+from tiny_etl.commons import block_join_threads_or_processes
+from tiny_etl.commons import get_dir_size_in_mo
+from tiny_etl.commons import basename_backwards_x4, format_duree, truncate_str_255, truncate_str_270
+from tiny_etl.commons import len_str_gt_255
+from tiny_etl.pipline import ThreadedPipeline
+from tiny_etl.extractors.files import FilesListExtractor
+from tiny_etl.extractors.commons import AbstractExtractor
+from tiny_etl.transformers.text import  TextWordTokenizerTransformer
+from tiny_etl.transformers.files import  FileToTextLinesTransformer, FileTextReaderTransformer
+from tiny_etl.transformers.one_to_one import OneToOneItemAttributesTransformer
+from tiny_etl.transformers.commons import OneToOneNoopTransformer
+from tiny_etl.transformers.aggregators import ReduceItemTransformer
+from tiny_etl.transformers.aggregators import UniqueFilterTransformer
+from tiny_etl.loaders.commons import ConditionalLoader, NoopLoader
+from tiny_etl.loaders.loadbalancer import LoadBalanceLoader
+from tiny_etl.loaders.mysql import MySQL_DBLoader
+from tiny_etl.loaders.files import CSV_FileLoader
 from arabic_transformers import ArabicTextWordsTokenizerTransformer
-from core.loaders.cassandra import Cassandra_DBLoader
+from tiny_etl.loaders.cassandra import Cassandra_DBLoader
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -50,7 +50,7 @@ LOGGER = logging.getLogger("Global")
 #============================================= PARAMETRAGE :
 # IN_DIR = '../bdall_test_data/__generated'
 # IN_DIR = '../bdall_test_data/small_data'
-IN_DIR = '../bdall_test_data/tiny_data/__files'
+IN_DIR = './sample_data'
 # IN_DIR = '../bdall_test_data/tiny_data/__generated_1'
 # IN_DIR = 'E:/bdall'
 SAVE_TO_DB = True

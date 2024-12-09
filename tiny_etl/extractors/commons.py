@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from logging import Logger
 from typing import Dict, Generator, AnyStr, List
-from core.commons import WithLogging
+from tiny_etl.commons import WithLogging
 
 class AbstractExtractor(WithLogging):
     def __init__(self, logger: Logger) -> None:

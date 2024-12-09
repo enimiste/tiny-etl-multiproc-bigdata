@@ -2,7 +2,7 @@ from logging import Logger
 from typing import Dict, Generator, AnyStr, List
 import os
 
-from core.extractors.commons import AbstractExtractor
+from tiny_etl.extractors.commons import AbstractExtractor
 
 class FilesListExtractor(AbstractExtractor):
     """

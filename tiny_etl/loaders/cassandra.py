@@ -3,8 +3,8 @@ from multiprocessing.sharedctypes import Value
 import threading
 from typing import AnyStr, List, Set, Tuple
 
-from core.commons import dict_deep_get
-from core.loaders.commons import AbstractLoader
+from tiny_etl.commons import dict_deep_get
+from tiny_etl.loaders.commons import AbstractLoader
 
 from cassandra.cluster import Session
 

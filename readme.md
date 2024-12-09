@@ -34,10 +34,10 @@ If there is need to develop custom ETL classes, you can extend the classes :
 - AbstractLoader
 
 ## Schéma d'architecture :
-![image](https://github.com/enimiste/python-multiproc-bigdata/assets/2515677/bddcafe2-9291-48f4-962a-c5d7f878df66)
+![image](archi.png)
 
 ## Fonctionnement interne de l'application des transformations :
-![image](https://github.com/enimiste/python-multiproc-bigdata/assets/2515677/fbd09e46-24ac-470a-a14f-be11757fbfd7)
+![image](acrhi-interne.png)
 
 # Usage :
 
@@ -50,9 +50,7 @@ Help :
         --all-cpus   Start processing using the full CPUs (default to {}% of CPUs are used)
 ```
 
-Source : [V2 Github](https://github.com/enimiste/python-multiproc-bigdata/tree/pipeline/v2)
-
-# main.py code (V2) :
+# Example (example/main.py) :
 
 ```python
 import json
@@ -107,7 +105,7 @@ LOGGER = logging.getLogger("Global")
 #============================================= PARAMETRAGE :
 # IN_DIR = '../bdall_test_data/__generated'
 # IN_DIR = '../bdall_test_data/small_data'
-IN_DIR = '../bdall_test_data/tiny_data/__files'
+IN_DIR = '../sample_data'
 # IN_DIR = '../bdall_test_data/tiny_data/__generated_1'
 # IN_DIR = 'E:/bdall'
 SAVE_TO_DB = True

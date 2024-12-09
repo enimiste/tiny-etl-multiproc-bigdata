@@ -4,8 +4,8 @@ from multiprocessing.sharedctypes import Value
 from typing import AnyStr, List, Set, Tuple
 import uuid
 
-from core.commons import WithLogging
-from core.commons import dict_deep_get
+from tiny_etl.commons import WithLogging
+from tiny_etl.commons import dict_deep_get
  
 class AbstractLoader(WithLogging):
     def __init__(self, logger: Logger, 

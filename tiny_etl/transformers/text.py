@@ -2,7 +2,7 @@ from abc import abstractmethod
 from functools import reduce
 from logging import Logger, ERROR, DEBUG, INFO
 from typing import Any, AnyStr, Callable, Generator, Tuple, List
-from core.transformers.commons import AbstractTransformer
+from tiny_etl.transformers.commons import AbstractTransformer
 
 
 class AbstractTextWordTokenizerTransformer(AbstractTransformer):

@@ -1,9 +1,9 @@
 from functools import reduce
 from logging import Logger, ERROR, DEBUG, INFO
 from typing import Any, AnyStr, Callable, Generator, Tuple, List
-from core.commons import dict_deep_get, dict_deep_set
-from core.commons import dict_deep_remove
-from core.transformers.commons import AbstractTransformer
+from tiny_etl.commons import dict_deep_get, dict_deep_set
+from tiny_etl.commons import dict_deep_remove
+from tiny_etl.transformers.commons import AbstractTransformer
 
 
 class OneToOneItemAttributesTransformer(AbstractTransformer):

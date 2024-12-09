@@ -12,7 +12,7 @@ import traceback
 from typing import Any, AnyStr, Callable, Generator, List, Set, Tuple
 import uuid
 
-from core.affinity import set_process_affinity_mask
+from tiny_etl.affinity import set_process_affinity_mask
 
 def rotary_iter(items: list, rand: bool=False):
     random.seed(str(uuid.uuid1()))

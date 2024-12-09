@@ -4,13 +4,13 @@ from multiprocessing.sharedctypes import Value
 import queue
 from typing import AnyStr, List, Set, Tuple
 
-from core.commons import WithLogging
-from core.commons import rotary_iter
-from core.commons import block_join_threads_or_processes
-from core.commons import LoggerWrapper
-from core.commons import make_thread_process
-from core.commons import set_process_affinity
-from core.loaders.commons import AbstractLoader
+from tiny_etl.commons import WithLogging
+from tiny_etl.commons import rotary_iter
+from tiny_etl.commons import block_join_threads_or_processes
+from tiny_etl.commons import LoggerWrapper
+from tiny_etl.commons import make_thread_process
+from tiny_etl.commons import set_process_affinity
+from tiny_etl.loaders.commons import AbstractLoader
 
 
 class LoadBalanceLoader(AbstractLoader):

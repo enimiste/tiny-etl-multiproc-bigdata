@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Any, AnyStr, Generator, List, Tuple, Callable
 
-from core.transformers.text import AbstractTextWordTokenizerTransformer
+from tiny_etl.transformers.text import AbstractTextWordTokenizerTransformer
 
 class ArabicTextWordsTokenizerTransformer(AbstractTextWordTokenizerTransformer):
     def __init__(self, logger: Logger, 

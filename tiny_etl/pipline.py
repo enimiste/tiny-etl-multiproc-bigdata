@@ -11,14 +11,14 @@ from typing import List, Set
 
 import uuid
 
-from core.commons import LoggerWrapper, WithLogging, rotary_iter
-from core.extractors.commons import AbstractExtractor
-from core.loaders.commons import AbstractLoader
-from core.transformers.commons import AbstractTransformer
-from core.commons import flatMapApply
-from core.commons import block_join_threads_or_processes, kill_threads_processes
-from core.commons import make_thread_process
-from core.commons import set_process_affinity
+from tiny_etl.commons import LoggerWrapper, WithLogging, rotary_iter
+from tiny_etl.extractors.commons import AbstractExtractor
+from tiny_etl.loaders.commons import AbstractLoader
+from tiny_etl.transformers.commons import AbstractTransformer
+from tiny_etl.commons import flatMapApply
+from tiny_etl.commons import block_join_threads_or_processes, kill_threads_processes
+from tiny_etl.commons import make_thread_process
+from tiny_etl.commons import set_process_affinity
 
 class AbstractPipeline(Process, ABC):
     def __init__(self, logger: Logger) -> None:

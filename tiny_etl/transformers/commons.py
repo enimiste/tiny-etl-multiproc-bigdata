@@ -1,9 +1,9 @@
 from abc import abstractmethod
 from logging import Logger, ERROR, DEBUG, INFO
 from typing import Any, AnyStr, Generator, Tuple, List
-from core.commons import WithLogging
-from core.commons import dict_deep_get
-from core.commons import dict_deep_remove
+from tiny_etl.commons import WithLogging
+from tiny_etl.commons import dict_deep_get
+from tiny_etl.commons import dict_deep_remove
 
 IgnoreTransformationResult = object()
 

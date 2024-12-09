@@ -2,13 +2,13 @@ from functools import reduce
 from logging import Logger, ERROR, DEBUG, INFO
 from multiprocessing import Lock
 from typing import Any, AnyStr, Callable, Generator, Tuple, List
-from core.commons import dict_deep_get
-from core.commons import flatMapApply
-from core.commons import dict_deep_remove
-from core.commons import AbstractConcurrentKeyBagSet
-from core.commons import ConcurrentKeyBagSet
+from tiny_etl.commons import dict_deep_get
+from tiny_etl.commons import flatMapApply
+from tiny_etl.commons import dict_deep_remove
+from tiny_etl.commons import AbstractConcurrentKeyBagSet
+from tiny_etl.commons import ConcurrentKeyBagSet
 
-from core.transformers.commons import AbstractTransformer
+from tiny_etl.transformers.commons import AbstractTransformer
 
 class ReduceItemTransformer(AbstractTransformer):
     def __init__(self, logger: Logger, 
