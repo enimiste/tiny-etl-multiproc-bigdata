@@ -52,7 +52,7 @@ LOGGER = logging.getLogger("Global")
 IN_DIR = os.path.abspath(os.path.dirname(__file__) + "/sample_data")
 LOAD_BALANCER_PIPES = 4
 CPU_MAX_USAGE = 0.90 #0...1
-MONO_PIPELINE = True
+MONO_PIPELINE = False
 #==========================================================
 
 
@@ -145,15 +145,14 @@ if __name__=="__main__":
     config = {
         'in_dir': IN_DIR,
         'out_dir': 'out_dir',
-        'db_buffer_size': 1_000,#10_000 optimal
         'cpu_pax_usage': max(0, min(1, CPU_MAX_USAGE)),
         'cpus_affinity_options': [],# will be calculated below
         'all_cpu': '-all-cpus' in sys.argv,
         'force_run': '-f' in sys.argv,
         'start_run': '-s' in sys.argv,
         'use_threads_as_extractors_executors': False,#False optimal
-        'trans_in_queue_max_size': 1_000,#10_000 optimal
-        'max_transformation_pipelines': 4,#2 optimal
+        'trans_in_queue_max_size': 9_000,
+        'max_transformation_pipelines': 4,
         'use_threads_as_transformation_pipelines': False,#False optimal
         'use_threads_as_loaders_executors': False,#False optimal
         'values_to_load_path': [('word', ['_', 'word'], True), 
@@ -164,7 +163,7 @@ if __name__=="__main__":
         'load_balancer_parallel_loader_count': LOAD_BALANCER_PIPES,#4 optimal
         'use_threads_as_load_balancer_loaders_executors': False,#False optimal
         'load_balancer_queue_max_size': 1_000,
-        'load_balancer_buffer_size': 1_000,#1500 optimal
+        'load_balancer_buffer_size': 1_000,
         'mono_pipeline': MONO_PIPELINE,
     }
 
