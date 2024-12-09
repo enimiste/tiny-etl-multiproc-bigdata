@@ -52,7 +52,7 @@ LOGGER = logging.getLogger("Global")
 IN_DIR = os.path.abspath(os.path.dirname(__file__) + "/sample_data")
 LOAD_BALANCER_PIPES = 4
 CPU_MAX_USAGE = 0.90 #0...1
-MONO_PIPELINE = False
+MONO_PIPELINE = True
 #==========================================================
 
 
@@ -128,11 +128,11 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                         ),
                 ],
                 loaders=[
-                         NoopLoader(_LOGGER, 
-                                 input_key_path=None, 
-                                 log=True, 
-                                 log_level=INFO, 
-                                 values_path=config['values_to_load_path'],
+                        NoopLoader(_LOGGER, 
+                                input_key_path=None, 
+                                log=True, 
+                                log_level=INFO, 
+                                values_path=config['values_to_load_path'],
                         )
                 ])
 
@@ -215,9 +215,7 @@ if __name__=="__main__":
     
     
     LOGGER.log(INFO, 'Config : {}'.format(json.dumps(config, indent=4)))
-    LOGGER.log(INFO, """
-
-                        Execution rate             = 0.00050067901 sec/ko
+    env_stats = """
                         Ref. CPU                   = 8 logical
                         Ref. CPU type              = 2.4Ghz, i5 11Gen
                         Ref. RAM                   = 8Go
@@ -227,7 +225,6 @@ if __name__=="__main__":
                         CPU                       ~= {}
                         RAM free                   = {}Mo
                         CPUs affinity options      = {} vCpu ({}%)
-                        Estimated execution time   = {} (Total : {}sec)
                         _____________________________________________________________________
                         Nbr processes python       = {}
                         RAM available              = {}Mo (RAM free - {}Mo)
@@ -244,8 +241,6 @@ if __name__=="__main__":
                                                                         ram_mo, 
                                                                         len(config['cpus_affinity_options']),
                                                                         round(100*nbr_cpus_affinity_options/cpus_count, 2),
-                                                                        format_duree(exec_time_sec),
-                                                                        math.floor(exec_time_sec),
                                                                         nbr_processes, 
                                                                         ram_secur_mo, 
                                                                         ram_reserv_mo, 
@@ -253,7 +248,8 @@ if __name__=="__main__":
                                                                         ram_per_process_mo,
                                                                         '1 (Mono pipeline)' if config['mono_pipeline'] else len(dirs),
                                                                         nbr_dirs_secur,
-                                                                        nbr_dirs))
+                                                                        nbr_dirs)
+    LOGGER.log(INFO, env_stats)
     if ram_secur_mo<estim_processes_mo:
         LOGGER.log(INFO, 'RAM not enough for running the {} processes ({}Mo each). You should structure the {} folder to have at most {} root folders, {} found'.format(
             nbr_processes, ram_per_process_mo, config['in_dir'], nbr_dirs_secur, nbr_dirs
@@ -315,6 +311,7 @@ if __name__=="__main__":
         end_exec_time=time.perf_counter()
         duree_exec = round(end_exec_time-start_exec_time, 3)
         rate = duree_exec/in_dir_size_mo/1024
+        LOGGER.log(INFO, env_stats)
         LOGGER.info('Script executed in {} sec. Rate {} sec/ko ({} Mo/sec)'.format(duree_exec, round(rate, 3), round(1/rate/1024, 3)))
 
     
