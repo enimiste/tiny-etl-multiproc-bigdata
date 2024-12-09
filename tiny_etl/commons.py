@@ -218,7 +218,8 @@ class WithLogging(ABC):
     def log_msg_sync(logger: Logger, msg: str, exception: Exception = None, level: int = logging.DEBUG):
         if not logger is None:
             if not exception is None and level==ERROR:
-                logger.log(level, "{}, Trace : {}".format(msg, str(traceback.format_exception(exception))))
+                logger.log(level, "{}, Trace : {}".format(msg, 
+                                                          str(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))))
             else:
                 logger.log(level, msg)
         else:

@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/.."))
+
 import json
 import math
 import traceback
@@ -6,8 +10,6 @@ import logging
 from logging import INFO, ERROR, WARN, Logger
 import time
 from datetime import date
-import os
-import sys
 from typing import Dict, AnyStr, Any
 
 import psutil
@@ -31,7 +33,6 @@ from tiny_etl.loaders.loadbalancer import LoadBalanceLoader
 from tiny_etl.loaders.mysql import MySQL_DBLoader
 from tiny_etl.loaders.files import CSV_FileLoader
 from arabic_transformers import ArabicTextWordsTokenizerTransformer
-from tiny_etl.loaders.cassandra import Cassandra_DBLoader
 
 LOGGING_FORMAT = '%(name)s %(levelname)s : %(asctime)s - %(processName)s (%(threadName)s) : %(message)s'
 console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -48,21 +49,8 @@ LOGGER = logging.getLogger("Global")
 
 
 #============================================= PARAMETRAGE :
-# IN_DIR = '../bdall_test_data/__generated'
-# IN_DIR = '../bdall_test_data/small_data'
-IN_DIR = './sample_data'
-# IN_DIR = '../bdall_test_data/tiny_data/__generated_1'
-# IN_DIR = 'E:/bdall'
-SAVE_TO_DB = True
-DB_HOST = 'localhost'
-DB_NAME = 'words'
-DB_USER = 'root'
-DB_PWD = 'root'
+IN_DIR = os.path.abspath(os.path.dirname(__file__) + "/sample_data")
 LOAD_BALANCER_PIPES = 4
-# DB_SQL_QUERIES= ["INSERT INTO allwordstemp (word, word_len, word_truncated, filename, filecount)  VALUES(%s,%s,%s,%s,%s)" 
-#                                                       for _ in range(0,LOAD_BALANCER_PIPES)]
-DB_SQL_QUERIES= ["INSERT INTO words (word, word_len, word_truncated, file_path, file_words_count)  VALUES(%s,%s,%s,%s,%s)" 
-                                                        for _ in range(0,LOAD_BALANCER_PIPES)]
 CPU_MAX_USAGE = 0.90 #0...1
 MONO_PIPELINE = True
 #==========================================================
@@ -86,22 +74,21 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                 output_key='words_count', 
                                 copy_values_key_paths=[('file_path', ['_'])],
                                 transformers=[
-                                        # FileTextReaderTransformer consumes a lot of RAM but FileToTextLinesTransformer takes more time
                                         FileTextReaderTransformer(logger, 
                                                 pattern=".txt", 
                                                 input_key_path=None, 
                                                 output_key=None),
-                                        # TextWordTokenizerTransformer( logger, 
-                                        #         pattern="\\s+", 
-                                        #         input_key_path=['_', 'content'], 
-                                        #         output_key=None,
-                                        #         mappers=[str.strip],
-                                        #         ignore_word_fn=str.isspace),
-                                        ArabicTextWordsTokenizerTransformer( logger, 
+                                        TextWordTokenizerTransformer(logger, 
+                                                pattern="\\s+", 
                                                 input_key_path=['_', 'content'], 
                                                 output_key=None,
-                                                ignore_word_fn=str.isspace)
-                                            ],
+                                                mappers=[str.strip],
+                                                ignore_word_fn=str.isspace),
+                                        # ArabicTextWordsTokenizerTransformer( logger, 
+                                        #         input_key_path=['_', 'content'], 
+                                        #         output_key=None,
+                                        #         ignore_word_fn=str.isspace)
+                                    ],
                                 initial_value=0,
                                 reducer=ReduceItemTransformer.count
                         ),                                        
@@ -117,21 +104,15 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                                                 output_key='_',
                                                 copy_values_key_paths=[('file_path', ['file_path']), 
                                                                     ('words_count', ['words_count'])]), 
-                                        # TextWordTokenizerTransformer(logger, 
-                                        #         pattern="\\s+", 
-                                        #         input_key_path=['_', 'content'], 
-                                        #         output_key='_', 
-                                        #         mappers=[str.strip],
-                                        #         ignore_word_fn=str.isspace,
-                                        #         # remove_chars = ["\ufeff"],
-                                        #         copy_values_key_paths=[('file_path', ['file_path']), 
-                                        #                             ('words_count', ['words_count'])]),
-                                        ArabicTextWordsTokenizerTransformer(logger, 
-                                                input_key_path=['_', 'content'], 
-                                                output_key='_', 
-                                                ignore_word_fn=str.isspace,
-                                                copy_values_key_paths=[('file_path', ['file_path']), 
-                                                                    ('words_count', ['words_count'])]),
+                                        TextWordTokenizerTransformer(logger, 
+                                                 pattern="\\s+", 
+                                                 input_key_path=['_', 'content'], 
+                                                 output_key='_', 
+                                                 mappers=[str.strip],
+                                                 ignore_word_fn=str.isspace,
+                                                 # remove_chars = ["\ufeff"],
+                                                 copy_values_key_paths=[('file_path', ['file_path']), 
+                                                                     ('words_count', ['words_count'])]),
                                         OneToOneItemAttributesTransformer(logger, 
                                                 derived_values_2=[
                                                     (['_', 'word'], ['_', 'word_len'], [ArabicTextWordsTokenizerTransformer.remove_diac, str.__len__]),
@@ -147,79 +128,31 @@ def make_threaded_pipeline(extractor_: AbstractExtractor, logger: Logger, config
                         ),
                 ],
                 loaders=[
-                        # ConditionalLoader(  logger, 
-                        #         not config['save_to_db'],
-                        #         CSV_FileLoader( _LOGGER,
-                        #                 input_key_path=None,
-                        #                 values_path= config['values_to_load_path']
-                        #                 out_dir=os.path.abspath(config['out_dir']),
-                        #                 out_file_ext='txt',
-                        #                 buffer_size=config['buffer_size'])
-                        # ),
-                        ConditionalLoader(  _LOGGER, 
-                                config['save_to_db'],
-                                #  False,
-                                Cassandra_DBLoader( _LOGGER, input_key_path=None,
-                                        values_path= config['values_to_load_path'],
-                                        sql_query=config['db_sql_query'],
-                                        db_name=config['db_name'],
-                                        hosts=[config['db_host']],
-                                        buffer_size=config['db_buffer_size'])
-                        ),
-                        # NoopLoader(_LOGGER, 
-                        #         input_key_path=None, 
-                        #         log=True, 
-                        #         log_level=INFO, 
-                        #         values_path=config['values_to_load_path'],
-                        # ),
-                        # ConditionalLoader(  logger, 
-                        #         config['save_to_db'],
-                        #         # False,
-                        #         LoadBalanceLoader(logger, 
-                        #                 queue_no_block_timeout_sec = 0.09,
-                        #                 buffer_size=config['load_balancer_buffer_size'],
-                        #                 use_threads_as_loaders_executors=config['use_threads_as_load_balancer_loaders_executors'],
-                        #                 cpus_affinity_options=config['cpus_affinity_options'],
-                        #                 loaders= [(
-                        #                             config['load_balancer_queue_max_size'], 
-                        #                             MySQL_DBLoader( logger, **{
-                        #                                             'input_key_path': None, 
-                        #                                             'values_path': config['values_to_load_path'],
-                        #                                             'sql_query': config['db_sql_query'][i],
-                        #                                             'buffer_size': config['db_buffer_size'],
-                        #                                             'host': config['db_host'],
-                        #                                             'database': config['db_name'],
-                        #                                             'user': config['db_user'],
-                        #                                             'password': config['db_password']})) 
-                        #                             for i in range(0, max(1, config['load_balancer_parallel_loader_count']))]
-                        #         )
-                        # ),
+                         NoopLoader(_LOGGER, 
+                                 input_key_path=None, 
+                                 log=True, 
+                                 log_level=INFO, 
+                                 values_path=config['values_to_load_path'],
+                        )
                 ])
 
 
 if __name__=="__main__":
-    #0.00050067901 sec/ko
     import platform
-    if not platform.python_version().startswith('3.7'):
-        print('This script can be executed used Python 3.7.x')
+    if not platform.python_version().startswith('3.9'):
+        print('This script can be executed used Python 3.9 or greater')
         exit()
     config = {
         'in_dir': IN_DIR,
         'out_dir': 'out_dir',
-        'save_to_db': SAVE_TO_DB, 
-        'db_buffer_size': 10_000,#10_000 optimal
-        'db_host': DB_HOST, 
-        'db_name': DB_NAME, 
-        'db_user': DB_USER, 
-        'db_password': DB_PWD,
-        'db_sql_query': DB_SQL_QUERIES,
+        'db_buffer_size': 1_000,#10_000 optimal
         'cpu_pax_usage': max(0, min(1, CPU_MAX_USAGE)),
         'cpus_affinity_options': [],# will be calculated below
         'all_cpu': '-all-cpus' in sys.argv,
         'force_run': '-f' in sys.argv,
         'start_run': '-s' in sys.argv,
         'use_threads_as_extractors_executors': False,#False optimal
-        'trans_in_queue_max_size': 10_000,#10_000 optimal
+        'trans_in_queue_max_size': 1_000,#10_000 optimal
         'max_transformation_pipelines': 4,#2 optimal
         'use_threads_as_transformation_pipelines': False,#False optimal
         'use_threads_as_loaders_executors': False,#False optimal
@@ -230,8 +163,8 @@ if __name__=="__main__":
                                 ('words_count', ['words_count'], True)],
         'load_balancer_parallel_loader_count': LOAD_BALANCER_PIPES,#4 optimal
         'use_threads_as_load_balancer_loaders_executors': False,#False optimal
-        'load_balancer_queue_max_size': 10_000,
-        'load_balancer_buffer_size': 1500,#1500 optimal
+        'load_balancer_queue_max_size': 1_000,
+        'load_balancer_buffer_size': 1_000,#1500 optimal
         'mono_pipeline': MONO_PIPELINE,
     }
 
@@ -378,7 +311,7 @@ if __name__=="__main__":
         block_join_threads_or_processes(pipelines, logger=LOGGER, log_level=INFO, log_when_joined=True, log_msg="Pipeline joined")
         LOGGER.log(INFO, 'Pipelines joined'.format(len(pipelines)))
     except Exception as ex:
-        LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(ex))))
+        LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(etype=type(ex), value=ex, tb=ex.__traceback__))))
     finally:
         end_exec_time=time.perf_counter()
         duree_exec = round(end_exec_time-start_exec_time, 3)

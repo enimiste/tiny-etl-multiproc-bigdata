@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from concurrent.futures import thread
 from logging import Logger, INFO, WARN, ERROR
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Manager
 from multiprocessing.sharedctypes import Value
 import queue
 import signal
@@ -183,15 +183,23 @@ class ThreadedPipeline(AbstractPipeline):
         in_queues = []
         out_queues = []
         try:
+            import sys
+            def makeQueue(maxsize: int):
+                return Queue(maxsize=maxsize)
+            
+            if sys.platform in ('darwin', 'Darwin'):
+                m = Manager()
+                def makeQueue(maxsize: int):
+                    return m.Queue(maxsize=maxsize)
+            
             self.pipeline_started.value=0
             self.pipeline_closed.value=0
 
             original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
             signal.signal(signal.SIGINT, original_sigint_handler)
+            in_queues = [makeQueue(maxsize=self.trans_in_queue_max_size) for _ in range(self.max_transformation_pipelines)]
+            out_queues = [makeQueue(maxsize=(self.trans_in_queue_max_size * self.max_transformation_pipelines)) for _ in range(len(self.loaders))]
 
-            in_queues = [Queue(maxsize=self.trans_in_queue_max_size) for _ in range(self.max_transformation_pipelines)]
-            out_queues = [Queue(maxsize=(self.trans_in_queue_max_size * self.max_transformation_pipelines)) for _ in range(len(self.loaders))]
-            
             extract_threads.append(make_thread_process(self.use_threads_as_extractors_executors, 
                                                                         target=ThreadedPipeline.extract_items, 
                                                                         args=(in_queues, 

@@ -3,6 +3,11 @@
 - Extract data from inputs, then dispatch each input on the transoformers chain, the output of the transformers chain is then piped to the loaders in parallel
 - Transformers chain : output of each layer is processed in parallel by the next layer
 
+# Dependencies :
+- Python 3.7 or greater
+- psutil (pip install)
+- concurrent_log_handler (pip install)
+
 # Core (uses Async) :
 `EXTRACTORS |> TRANSFORMERS |> LOADERS`
 
@@ -51,6 +56,12 @@ Help :
 ```
 
 # Example (example/main.py) :
+```shell
+$ cd project_folder
+$ python3 -m venv .
+$ chmod +x ./bin/activate
+$ ./bin/activate
+```
 
 ```python
 import json
@@ -430,7 +441,7 @@ if __name__=="__main__":
         block_join_threads_or_processes(pipelines, logger=LOGGER, log_level=INFO, log_when_joined=True, log_msg="Pipeline joined")
         LOGGER.log(INFO, 'Pipelines joined'.format(len(pipelines)))
     except Exception as ex:
-        LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(ex))))
+        LOGGER.log(ERROR, "Trace : {}".format(str(traceback.format_exception(value=ex))))
     finally:
         end_exec_time=time.perf_counter()
         duree_exec = round(end_exec_time-start_exec_time, 3)

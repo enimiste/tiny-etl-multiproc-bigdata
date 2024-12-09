@@ -45,3 +45,8 @@ if sys.platform in ('win32',):
             return win32process.GetProcessAffinityMask(pHandle)[0]
         except win32process.error as e:
             raise ValueError(e)
+
+# Mon code
+else:
+    def set_process_affinity_mask(pid, value):
+        pass

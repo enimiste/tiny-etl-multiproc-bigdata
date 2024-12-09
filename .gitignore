@@ -10,3 +10,7 @@ bdall/
 bdall.7z
 bdall.zip
 bdall.rar
+bin
+include
+lib
+pyvenv.cfg
